@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profiles — Online Fundraising System Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    
+</head>
+<body>
+  
+    <!-- ========== TOP BAR ========== -->
+    <div class="topbar">
+        <span class="topbar-logo">Online Fundraising System — Admin Portal</span>
+        <div class="topbar-user">
+            <!-- BACKEND: Replace "User Admin" with logged-in admin's username -->
+            <span id="admin-name">User Admin</span>
+            <div class="avatar">UA</div>
+        </div>
+    </div>
+
+    <div class="layout">
+
+        <!-- ========== SIDEBAR ========== -->
+        <div class="sidebar">
+            <a href="UserAdminProfiles.html" class="nav-item active">User Profiles</a>
+            <a href="UserAdminAccounts.html" class="nav-item">User Accounts</a>
+            <!-- BACKEND: Hook logout to session clear route e.g. /logout -->
+            <a href="UserAdminLogin.html" class="nav-item logout">Log Out</a>
+        </div>
+
+        <!-- ========== MAIN CONTENT ========== -->
+        <!--
+            BCE BOUNDARY: DisplayUserProfile
+            This entire <div class="main"> represents the Boundary layer.
+            On page load, displayUserProfile() is called.
+            It receives [UserProfile] list from DisplayUserProfileController
+            and renders each profile as a card.
+        -->
+        <div class="main" id="DisplayUserProfile">
+            <div class="page-title">User Profiles</div>
+            <div class="page-sub">View and manage all profile types on the platform</div>
+
+            <!-- TOOLBAR: Search + Create -->
+            <div class="toolbar">
+                <input
+                    class="search-box"
+                    type="text"
+                    id="search-input"
+                    placeholder="Search profile type..."
+                    onkeyup="searchProfiles()"
+                />
+                <!-- BACKEND: Hook to POST /create-profile route -->
+                <button class="btn-primary" onclick="alert('Create profile coming soon')">
+                    + Create Profile
+                </button>
+            </div>
+
+            <!-- ========== PROFILE CARDS GRID ========== -->
+            <div class="grid" id="profile-grid">
+                {% for profile in profiles %}
+                <div class="profile-card" data-name="{{ profile.profile_name | lower }}">
+                    <div class="card-top">
+                        <div class="icon-circle">{{ profile.profile_name[:2] | upper }}</div>
+                        <div>
+                            <div class="card-name">{{ profile.profile_name }}</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="field-row">
+                            <span class="field-label">Profile Type</span>
+                            <span class="badge">{{ profile.profile_name }}</span>
+                        </div>
+                        <div class="field-row">
+                            <span class="field-label">Access Level</span>
+                            <span class="field-val">{{ profile.access_level }}</span>
+                        </div>
+                            <div class="field-row">
+                            <span class="field-label">Status</span>
+                            <span class="field-val status-active">{{profile.status}}</span>
+                        </div>
+                        <div class="field-row">
+                            <span class="field-label">Status</span>
+                            <span class="field-val {% if profile.status == 1 %}status-active{% else %}status-suspended{% endif %}">
+                                {% if profile.status == 1 %}
+                                    Active
+                                {% else %}
+                                    Inactive
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="act-btn" onclick="alert('Update {{ profile.profile_name }}')">Update</button>
+                        <button class="act-btn danger" onclick="alert('Suspend {{ profile.profile_name }}')">Suspend</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+        </div>
+        <!-- END MAIN / END BCE BOUNDARY -->
+
+    </div>
+    <!-- END LAYOUT -->
+
+    <script>
+        /*
+            BCE BOUNDARY: displayUserProfile()
+            This function is called on page load, representing the
+            Boundary receiving [UserProfile] from the Controller
+            and rendering it to the User Admin.
+            BACKEND: When Flask is integrated, this will be replaced
+            by Jinja2 rendering the profiles loop server-side.
+        */
+        function displayUserProfile() {
+            const grid = document.getElementById('profile-grid');
+            grid.style.display = 'grid';
+        }
+
+        // Search function — filters cards by profile type name
+        function searchProfiles() {
+            const input = document.getElementById('search-input').value.toLowerCase();
+            const cards = document.querySelectorAll('.profile-card');
+            cards.forEach(card => {
+                const name = card.getAttribute('data-name');
+                card.style.display = name.includes(input) ? 'block' : 'none';
+            });
+        }
+
+        // BCE BOUNDARY: Call displayUserProfile() on page load
+        window.onload = function() {
+            displayUserProfile();
+        };
+    </script>
+
+</body>
+</html>
