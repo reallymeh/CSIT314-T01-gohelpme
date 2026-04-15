@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styleCreateUserProfile.css') }}">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Create User Profile</h1>
+
+    {% if message %}
+    <p class="message {{ message_type }}">{{ message }}</p>
+    {% endif %}
+
+    <div class="box">
+        <form method="POST" action="{{ url_for('admin_view_profile.create_user_profile') }}">
+
+            <div class="input-group">
+                <label>Profile Name</label>
+                <input type="text" name="name" placeholder="Enter profile name" required>
+            </div>
+
+            <div class="input-group">
+                <label>Access Level</label>
+                <input type="number" name="access_level" placeholder="Enter access level" required>
+            </div>
+
+            <div class="input-group">
+                <label>Status</label>
+                <select name="status" required>
+                    <option value="">Select status</option>
+                    <option value="1">Active</option>
+                    <option value="0">Inactive</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Description</label>
+                <textarea name="description" rows="3" placeholder="Enter description"></textarea>
+            </div>
+
+            <button type="submit" class="btn">Create Profile</button>
+            <a href="{{ url_for('admin_view_profile.user_profile_list') }}" class="btn">
+                  Back to Profiles
+            </a>
+        </form>
+    </div>
+
+</div>
+
+<script>
+setTimeout(function() {
+    var msg = document.querySelector(".message");
+    if (msg) msg.style.display = "none";
+}, 3000);
+</script>
+
+</body>
+</html>
