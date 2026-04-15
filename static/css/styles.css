@@ -264,3 +264,7 @@ body {
 .act-btn.danger:hover {
     background-color: #fff0f0;
 }
+/** Create User button **/
+a{
+    text-decoration: none;
+}

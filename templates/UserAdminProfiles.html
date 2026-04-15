@@ -51,33 +51,38 @@
                     onkeyup="searchProfiles()"
                 />
                 <!-- BACKEND: Hook to POST /create-profile route -->
-                <button class="btn-primary" onclick="alert('Create profile coming soon')">
-                    + Create Profile
-                </button>
+               <a href="{{ url_for('admin_view_profile.show_create_profile') }}" class="btn-primary">
+                  + Create Profile
+               </a>
             </div>
 
             <!-- ========== PROFILE CARDS GRID ========== -->
             <div class="grid" id="profile-grid">
                 {% for profile in profiles %}
-                <div class="profile-card" data-name="{{ profile.profile_name | lower }}">
+                <div class="profile-card" data-name="{{ profile.name | lower }}">
                     <div class="card-top">
-                        <div class="icon-circle">{{ profile.profile_name[:2] | upper }}</div>
+                        <div class="icon-circle">{{ profile.name[:2] | upper }}</div>
                         <div>
-                            <div class="card-name">{{ profile.profile_name }}</div>
+                            <div class="card-name">{{ profile.name }}</div>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="field-row">
                             <span class="field-label">Profile Type</span>
-                            <span class="badge">{{ profile.profile_name }}</span>
+                            <span class="badge">{{ profile.name }}</span>
                         </div>
                         <div class="field-row">
                             <span class="field-label">Access Level</span>
                             <span class="field-val">{{ profile.access_level }}</span>
                         </div>
-                            <div class="field-row">
+                        <div class="field-row">
                             <span class="field-label">Status</span>
                             <span class="field-val status-active">{{profile.status}}</span>
+                        </div>
+                        <!-- add description field -->
+                        <div class="field-row">
+                            <span class="field-label">Description</span>
+                            <span class="field-val">{{profile.description}}</span>
                         </div>
                         <div class="field-row">
                             <span class="field-label">Status</span>
@@ -91,8 +96,8 @@
                         </div>
                     </div>
                     <div class="card-actions">
-                        <button class="act-btn" onclick="alert('Update {{ profile.profile_name }}')">Update</button>
-                        <button class="act-btn danger" onclick="alert('Suspend {{ profile.profile_name }}')">Suspend</button>
+                        <button class="act-btn" onclick="alert('Update {{ profile.name }}')">Update</button>
+                        <button class="act-btn danger" onclick="alert('Suspend {{ profile.name }}')">Suspend</button>
                     </div>
                 </div>
                 {% endfor %}
