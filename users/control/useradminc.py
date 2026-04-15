@@ -1,5 +1,5 @@
 from users.entity.user import User
-from users.entity.userprofile import UserProfile, getUserProfile, updateUserProfileDB
+from users.entity.userprofile import UserProfile, getUserProfile, updateUserProfileDB, updateUserAccountDB
 from dataclasses import dataclass
 from typing import List
 
@@ -17,3 +17,24 @@ class UpdateUserProfileController:
             return False
             
         return updateUserProfileDB(profile_id, new_name, new_access_level)
+
+@dataclass
+class UpdateUserAccountController:
+    def updateUserAccount(self, user_id: str, updated_data: dict) -> bool:
+        # 1. Validation check
+        if not updated_data.get('name') or not updated_data.get('email'):
+            return False
+            
+        # 2. Create the User entity object from the frontend payload
+        updated_user = User(
+            user_id=user_id,
+            name=updated_data.get('name'),
+            email=updated_data.get('email'),
+            phone=updated_data.get('phone', ''),
+            address=updated_data.get('address', ''),
+            user_type=updated_data.get('userType'),
+            status=updated_data.get('status'),
+            bio=updated_data.get('bio', '')
+        )
+        
+        return updateUserAccountDB(user_id, updated_user)
