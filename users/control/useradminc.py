@@ -1,5 +1,5 @@
 from users.entity.user import User
-from users.entity.userprofile import UserProfile, getUserProfile, updateUserProfileDB, updateUserAccountDB, suspendProfile
+from users.entity.userprofile import UserProfile, updateUserProfileDB, updateUserAccountDB, suspendProfile
 from dataclasses import dataclass
 from typing import List
 
