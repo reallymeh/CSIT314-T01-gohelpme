@@ -39,6 +39,7 @@ def updateUserProfileDB(profile_id: str, new_name: str, new_access_level: int) -
     finally:
         conn.close()
 
+# shift to user.py
 @dataclass
 class UserAccount:
     """
@@ -52,6 +53,7 @@ class UserAccount:
     user_type: str
     bio: str
 
+# shift to user.py, make it into @static method
 def updateUserAccountDB(user_id: str, user_data: UserAccount) -> bool:
     """
     Takes a User object and updates the corresponding record in the database.
