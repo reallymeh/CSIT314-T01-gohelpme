@@ -17,13 +17,15 @@ def init_db():
 
     user_profile_data = [
     ('user admin', 1, 1 ),
-    ('platform manager', 2, 0 ),
-    ('fund raiser', 3, 0 ),
-    ('donee', 4, 0 )
+    ('platform manager', 2, 1 ),
+    ('fund raiser', 3, 1 ),
+    ('donee', 4, 1 )
     ]
     cur.executemany("INSERT OR IGNORE INTO user_profile VALUES(?, ?, ?)", user_profile_data)
 
     conn.commit()
+
+    cur.close()
     conn.close()
 
 def connect_db():
