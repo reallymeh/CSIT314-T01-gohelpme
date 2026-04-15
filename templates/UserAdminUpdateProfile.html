@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Profile — Admin Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+  
+    <div class="topbar">
+        <span class="topbar-logo">Online Fundraising System — Admin Portal</span>
+        <div class="topbar-user">
+            <span id="admin-name">User Admin</span>
+            <div class="avatar">UA</div>
+        </div>
+    </div>
+
+    <div class="layout">
+
+        <div class="sidebar">
+            <a href="/admin/userprofile" class="nav-item active">User Profiles</a>
+            <a href="#" class="nav-item">User Accounts</a>
+            <a href="#" class="nav-item logout">Log Out</a>
+        </div>
+
+        <div class="main">
+            <div class="page-title">Update User Profile</div>
+            <div class="page-sub">Modify access level and profile type for: <strong>{{ profile_id }}</strong></div>
+
+            <div class="profile-card update-form-wrapper">
+                <div class="card-top">
+                    <div class="card-name">Profile Details</div>
+                </div>
+                
+                <div class="card-body">
+                    <input type="hidden" id="profileId" value="{{ profile_id }}">
+
+                    <div class="form-group">
+                        <label class="form-label" for="profileType">Profile Type</label>
+                        <input type="text" id="profileType" class="search-box form-input" value="{{ profile_id }}">
+                    </div>
+
+                    <div class="form-group-large">
+                        <label class="form-label" for="accessLevel">Access Level</label>
+                        <input type="number" id="accessLevel" class="search-box form-input" min="1" max="4" placeholder="e.g., 1-4">                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn-primary" onclick="submitUpdate()">Save Updates</button>
+                        <button class="act-btn" onclick="window.location.href='/admin/userprofile'">Cancel</button>
+                    </div>
+                    
+                    <div id="message" class="message-box"></div>
+                </div>
+            </div>
+
+        </div>
+        </div>
+    <script>
+        async function submitUpdate() {
+            const profileId = document.getElementById('profileId').value;
+            const newProfileType = document.getElementById('profileType').value;
+            const newAccessLevel = document.getElementById('accessLevel').value;
+            const messageBox = document.getElementById('message');
+
+            if (newAccessLevel < 1 || newAccessLevel > 4) {
+                messageBox.style.color = "#A32D2D"; // Red error color
+                messageBox.innerText = "Error: Access Level must be between 1 and 4.";
+                return; // Stop the function here so it doesn't send the request
+            }
+
+            const payload = {
+                profile_type: newProfileType,
+                access_level: newAccessLevel
+            };
+
+            try {
+                const response = await fetch(`/admin/api/profiles/${profileId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    messageBox.style.color = "#3B6D11"; // status-active green
+                    messageBox.innerText = "Success! " + result.message;
+                    
+                    setTimeout(() => {
+                        window.location.href = '/admin/userprofile';
+                    }, 2000);
+                } else {
+                    messageBox.style.color = "#A32D2D"; // status-suspended red
+                    messageBox.innerText = "Error: " + result.error;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                messageBox.style.color = "#A32D2D";
+                messageBox.innerText = "Failed to connect to the backend server.";
+            }
+        }
+    </script>
+</body>
+</html>

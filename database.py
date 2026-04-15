@@ -25,6 +25,8 @@ def init_db():
     cur.executemany("INSERT OR IGNORE INTO user_profile VALUES(?, ?, ?, ?)", user_profile_data)
 
     conn.commit()
+
+    cur.close()
     conn.close()
 
 def connect_db():
