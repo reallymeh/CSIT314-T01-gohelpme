@@ -33,7 +33,6 @@ class UpdateUserAccountController:
             phone=updated_data.get('phone', ''),
             address=updated_data.get('address', ''),
             user_type=updated_data.get('userType'),
-            status=updated_data.get('status'),
             bio=updated_data.get('bio', '')
         )
         

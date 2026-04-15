@@ -43,7 +43,7 @@ def user_profile_list():
 def render_update_page(profile_id):
     return render_template('UserAdminUpdateProfile.html', profile_id=profile_id)
 
-@admin_profiles_bp.route('/updateaccount/<user_id>', methods=['GET'])
+@admin_profiles_bp.route('/updateaccount/<user_id>', methods=['GET']) # url will be .../admin/updateaccount/<user_id>
 def render_update_account_page(user_id):
     return render_template('UserAdminUpdateAccount.html', user_id=user_id)
 
