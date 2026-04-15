@@ -1,6 +1,7 @@
 from users.entity.user import User
 from users.entity.userprofile import UserProfile
-from users.control.useradminc import DisplayUserProfileController, UpdateUserProfileController, UpdateUserAccountController
+from users.control.useradminc import DisplayUserProfileController, UpdateUserProfileController, UpdateUserAccountController, SuspendUserProfileController
+
 
 from flask import Blueprint, render_template, request, jsonify
 
@@ -12,6 +13,7 @@ class DisplayUserProfile:
 
     def displayUserProfile(self) -> List[UserProfile]:
         return self.controller.displayUserProfile()
+
 
 class UpdateUserProfile:
     def __init__(self):
@@ -30,12 +32,13 @@ class UpdateUserAccount:
 # flask integration
 admin_profiles_bp = Blueprint('admin_view_profile', __name__, url_prefix='/admin')
 
-display_profile = DisplayUserProfile()
-
 update_user_account = UpdateUserAccount()
+
+admin_profiles_bp = Blueprint('admin_view_profile', __name__, url_prefix='/admin')
 
 @admin_profiles_bp.route('/userprofile') # url will be .../admin/userprofile
 def user_profile_list():
+    display_profile = DisplayUserProfile()
     profiles = display_profile.displayUserProfile()
     return render_template('UserAdminProfiles.html', profiles=profiles)
 
@@ -61,3 +64,26 @@ def update_user_account_api(user_id):
         return jsonify({"success": True, "message": f"Account {user_id} updated successfully"}), 200
     else:
         return jsonify({"success": False, "message": "Failed to update account in database"}), 500
+class SuspendUserProfile:
+    def __init__(self):
+        self.controller = SuspendUserProfileController()
+    
+    def displaySuspendSuccess(self):
+        return "Succesfully suspend user!"
+    
+    def displaySuspendFail(self):
+        return "Failed to suspend user!"
+
+    def suspendUserProfile(self, user_profile_name:str):
+        if self.controller.suspendUserProfile(user_profile_name):
+            return self.displaySuspendSuccess()
+        else:
+            return self.displaySuspendFail()
+
+@admin_profiles_bp.route('/suspend_user', methods=['POST'])
+def suspend_user():
+    data = request.get_json()
+    user_profile_name = data.get('user_profile_name')
+    message = SuspendUserProfile().suspendUserProfile(user_profile_name)
+
+    return jsonify({'message': message})

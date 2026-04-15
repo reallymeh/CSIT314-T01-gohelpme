@@ -1,5 +1,5 @@
 from users.entity.user import User
-from users.entity.userprofile import UserProfile, getUserProfile, updateUserProfileDB, updateUserAccountDB
+from users.entity.userprofile import UserProfile, getUserProfile, updateUserProfileDB, updateUserAccountDB, suspendProfile
 from dataclasses import dataclass
 from typing import List
 
@@ -37,3 +37,7 @@ class UpdateUserAccountController:
         )
         
         return updateUserAccountDB(user_id, updated_user)
+class SuspendUserProfileController:
+    def suspendUserProfile(self, user_profile_name:str) -> bool:
+        return suspendProfile(user_profile_name)
+

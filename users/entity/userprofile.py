@@ -15,6 +15,8 @@ def getUserProfile() -> List[UserProfile]:
     conn, cur = connect_db()
     result = cur.execute("SELECT * FROM user_profile")
     rows = result.fetchall()
+
+    cur.close()
     conn.close()
 
     return [UserProfile(name,access,status) for name, access, status in rows]
@@ -70,3 +72,30 @@ def updateUserAccountDB(user_id: str, user_data: UserAccount) -> bool:
         return False
     finally:
         conn.close()
+def suspendProfile(user_profile_name : str) -> bool:
+    conn, cur = None, None
+
+    try:
+        conn, cur = connect_db()
+        cur.execute("""
+            UPDATE user_profile
+            SET status = 0
+            WHERE name = ?
+    """, (user_profile_name,))
+        
+        conn.commit() # save changes
+        if cur.rowcount == 0: # no rows updated
+            return False
+        else:
+            return True
+    
+    except Exception:
+        # can add error code if needed
+        return False
+    
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+

@@ -91,8 +91,10 @@
                         </div>
                     </div>
                     <div class="card-actions">
+
                         <button class="act-btn" onclick="window.location.href='/admin/updateprofile/{{ profile.profile_name }}'">Update</button>
-                        <button class="act-btn danger" onclick="alert('Suspend {{ profile.profile_name }}')">Suspend</button>
+                        <button class="act-btn danger" onclick="suspendProfile('{{ profile.profile_name }}')">Suspend</button>
+
                     </div>
                 </div>
                 {% endfor %}
@@ -119,6 +121,9 @@
         }
 
         // Search function — filters cards by profile type name
+
+        // TODO
+        // refactor searchProfiles into BCE framework
         function searchProfiles() {
             const input = document.getElementById('search-input').value.toLowerCase();
             const cards = document.querySelectorAll('.profile-card');
@@ -132,6 +137,25 @@
         window.onload = function() {
             displayUserProfile();
         };
+
+        function suspendProfile(profileName) {
+            if (confirm("Are you sure you want to suspend " + profileName + "?")) {
+                
+                fetch('/admin/suspend_user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_profile_name: profileName })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);     // Show success or fail message
+                    location.reload();       // Refresh the page to update the list
+                })
+                .catch(() => {
+                    alert("Something went wrong!");
+                });
+            }
+        }
     </script>
 
 </body>
