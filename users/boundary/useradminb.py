@@ -1,9 +1,11 @@
 from users.entity.user import User
 from users.entity.userprofile import UserProfile
-from users.control.useradminc import DisplayUserProfileController, UpdateUserProfileController, UpdateUserAccountController, SuspendUserProfileController
+
+from users.control.useradminc import DisplayUserProfileController, UpdateUserProfileController, UpdateUserAccountController, SuspendUserProfileController,CreateUserProfileController 
 
 
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for
+
 
 from typing import List
 
@@ -13,8 +15,7 @@ class DisplayUserProfile:
 
     def displayUserProfile(self) -> List[UserProfile]:
         return self.controller.displayUserProfile()
-
-
+    
 class UpdateUserProfile:
     def __init__(self):
         self.controller = UpdateUserProfileController()
@@ -34,7 +35,6 @@ admin_profiles_bp = Blueprint('admin_view_profile', __name__, url_prefix='/admin
 
 update_user_account = UpdateUserAccount()
 
-admin_profiles_bp = Blueprint('admin_view_profile', __name__, url_prefix='/admin')
 
 @admin_profiles_bp.route('/userprofile') # url will be .../admin/userprofile
 def user_profile_list():
@@ -42,6 +42,41 @@ def user_profile_list():
     profiles = display_profile.displayUserProfile()
     return render_template('UserAdminProfiles.html', profiles=profiles)
 
+# Create user profile
+class CreateUserProfile: 
+    def __init__(self): 
+        self.controller = CreateUserProfileController()
+    def clickCreate(self):  
+        name = request.form['name'].strip()
+        access_levels = int(request.form['access_level'])
+        statuses = int(request.form['status'])
+        descriptions = request.form['description']
+        return self.controller.createUserProfile(name, access_levels, statuses, descriptions)
+    def displayError(self):
+        return render_template(
+            'UserAdminCreateUserProfile.html',
+            message='Profile already exists or could not be created.',
+            message_type='error'
+        )
+    def displaySuccess(self):
+        return render_template(
+            'UserAdminCreateUserProfile.html',
+            message='Profile created successfully.',
+            message_type='success'
+        )
+
+create_profile = CreateUserProfile()
+
+@admin_profiles_bp.route('/create_profile', methods=['GET'])
+def show_create_profile():
+    return render_template('UserAdminCreateUserProfile.html')
+
+@admin_profiles_bp.route('/create_profile', methods=['POST'])
+def create_user_profile():
+    if create_profile.clickCreate():
+        return create_profile.displaySuccess() 
+    else:
+        return create_profile.displayError()
 @admin_profiles_bp.route('/updateprofile/<profile_id>', methods=['GET']) # url will be .../admin/updateprofile/<profile_id>
 def render_update_page(profile_id):
     return render_template('UserAdminUpdateProfile.html', profile_id=profile_id)
@@ -64,6 +99,7 @@ def update_user_account_api(user_id):
         return jsonify({"success": True, "message": f"Account {user_id} updated successfully"}), 200
     else:
         return jsonify({"success": False, "message": "Failed to update account in database"}), 500
+      
 class SuspendUserProfile:
     def __init__(self):
         self.controller = SuspendUserProfileController()

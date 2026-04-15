@@ -9,19 +9,20 @@ def init_db():
         "CREATE TABLE IF NOT EXISTS user_profile (\
          name TEXT PRIMARY KEY,\
          access_level INTEGER NOT NULL,\
-         status INTEGER NOT NULL\
+         status INTEGER NOT NULL,\
+         description TEXT NOT NULL\
         )"
     )
 
     # Populate user_profile table
 
     user_profile_data = [
-    ('user admin', 1, 1 ),
-    ('platform manager', 2, 1 ),
-    ('fund raiser', 3, 1 ),
-    ('donee', 4, 1 )
+    ('user admin', 1, 1, "Administrator with full access" ),
+    ('platform manager', 2, 0, "Manager responsible for platform operations" ),
+    ('fund raiser', 3, 0, "User who creates and manages fundraising campaigns" ),
+    ('donee', 4, 0, "User who receives funds from fundraising campaigns" )
     ]
-    cur.executemany("INSERT OR IGNORE INTO user_profile VALUES(?, ?, ?)", user_profile_data)
+    cur.executemany("INSERT OR IGNORE INTO user_profile VALUES(?, ?, ?, ?)", user_profile_data)
 
     conn.commit()
 
