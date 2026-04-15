@@ -91,7 +91,7 @@
                         </div>
                     </div>
                     <div class="card-actions">
-                        <button class="act-btn" onclick="alert('Update {{ profile.profile_name }}')">Update</button>
+                        <button class="act-btn" onclick="window.location.href='/admin/updateprofile/{{ profile.profile_name }}'">Update</button>
                         <button class="act-btn danger" onclick="alert('Suspend {{ profile.profile_name }}')">Suspend</button>
                     </div>
                 </div>

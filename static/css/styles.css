@@ -264,3 +264,43 @@ body {
 .act-btn.danger:hover {
     background-color: #fff0f0;
 }
+
+/* =========================================
+   UPDATE PROFILE FORM STYLES
+   ========================================= */
+
+.update-form-wrapper {
+    max-width: 500px;
+    margin-top: 20px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group-large {
+    margin-bottom: 24px;
+}
+
+.form-label {
+    display: block;
+    color: #666666;
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+
+.form-input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.message-box {
+    margin-top: 15px;
+    font-size: 13px;
+    font-weight: bold;
+}
