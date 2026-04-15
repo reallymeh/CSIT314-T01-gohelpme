@@ -77,6 +77,8 @@ def create_user_profile():
         return create_profile.displaySuccess() 
     else:
         return create_profile.displayError()
+
+# Update profile 
 @admin_profiles_bp.route('/updateprofile/<profile_id>', methods=['GET']) # url will be .../admin/updateprofile/<profile_id>
 def render_update_page(profile_id):
     return render_template('UserAdminUpdateProfile.html', profile_id=profile_id)
