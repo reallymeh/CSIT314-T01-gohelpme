@@ -1,3 +1,4 @@
+
 from users.entity.user import User
 from users.entity.userprofile import UserProfile
 
@@ -46,24 +47,18 @@ def user_profile_list():
 class CreateUserProfile: 
     def __init__(self): 
         self.controller = CreateUserProfileController()
-    def clickCreate(self):  
-        name = request.form['name'].strip()
-        access_levels = int(request.form['access_level'])
-        statuses = int(request.form['status'])
-        descriptions = request.form['description']
-        return self.controller.createUserProfile(name, access_levels, statuses, descriptions)
+
+    def clickCreate(self,name, access_levels, statuses, descriptions):  
+       if self.controller.createUserProfile(name, access_levels, statuses, descriptions):
+           return self.displaySuccess()
+       else: 
+            return self.displayError()
+       
     def displayError(self):
-        return render_template(
-            'UserAdminCreateUserProfile.html',
-            message='Profile already exists or could not be created.',
-            message_type='error'
-        )
+        return 'Failed to create profile. Please check the input and try again.'
+    
     def displaySuccess(self):
-        return render_template(
-            'UserAdminCreateUserProfile.html',
-            message='Profile created successfully.',
-            message_type='success'
-        )
+        return 'Profile created successfully!'
 
 create_profile = CreateUserProfile()
 
@@ -71,12 +66,20 @@ create_profile = CreateUserProfile()
 def show_create_profile():
     return render_template('UserAdminCreateUserProfile.html')
 
-@admin_profiles_bp.route('/create_profile', methods=['POST'])
+@admin_profiles_bp.route('/create_profile', methods=['POST'])# url will be .../admin/create_profile
 def create_user_profile():
-    if create_profile.clickCreate():
-        return create_profile.displaySuccess() 
-    else:
-        return create_profile.displayError()
+    data = request.get_json()
+    name = data.get('name', '').strip()
+    access_level = int(data.get('access'))
+    status = int(data.get('status'))
+    description = data.get('description', '')
+    message = create_profile.clickCreate(name, access_level, status, description)
+    if UserProfile.userProfileExists(name):
+        return jsonify({
+            "success": False,
+            "message": "User profile already exists."
+        }), 400
+    return jsonify({'message': message})
 
 # Update profile 
 @admin_profiles_bp.route('/updateprofile/<profile_id>', methods=['GET']) # url will be .../admin/updateprofile/<profile_id>
