@@ -8,7 +8,7 @@ def init_db():
     cur.execute(
         "CREATE TABLE IF NOT EXISTS user_profile (\
          name TEXT PRIMARY KEY,\
-         access_level INTEGER NOT NULL,\
+         access INTEGER NOT NULL,\
          status INTEGER NOT NULL,\
          description TEXT NOT NULL\
         )"
@@ -18,9 +18,9 @@ def init_db():
 
     user_profile_data = [
     ('user admin', 1, 1, "Administrator with full access" ),
-    ('platform manager', 2, 0, "Manager responsible for platform operations" ),
-    ('fund raiser', 3, 0, "User who creates and manages fundraising campaigns" ),
-    ('donee', 4, 0, "User who receives funds from fundraising campaigns" )
+    ('platform manager', 2, 1, "Manager responsible for platform operations" ),
+    ('fund raiser', 3, 1, "User who creates and manages fundraising campaigns" ),
+    ('donee', 4, 1, "User who receives funds from fundraising campaigns" )
     ]
     cur.executemany("INSERT OR IGNORE INTO user_profile VALUES(?, ?, ?, ?)", user_profile_data)
 

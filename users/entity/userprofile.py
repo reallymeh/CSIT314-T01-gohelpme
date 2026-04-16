@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from database import connect_db
 from typing import List
 
-
 @dataclass
 class UserProfile:
     """
@@ -45,7 +44,7 @@ class UserProfile:
 
             conn, cur = connect_db()
             cur.execute(
-                "INSERT INTO user_profile (name, access_level, status, description) VALUES (?, ?, ?, ?)",
+                "INSERT INTO user_profile (name, access, status, description) VALUES (?, ?, ?, ?)",
                 (name, access_level, status, description)
             )
             conn.commit()
