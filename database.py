@@ -8,7 +8,7 @@ def init_db():
     cur.execute(
         "CREATE TABLE IF NOT EXISTS user_profile (\
          name TEXT PRIMARY KEY,\
-         access_level INTEGER NOT NULL,\
+         access INTEGER NOT NULL,\
          status INTEGER NOT NULL,\
          description TEXT NOT NULL\
         )"
