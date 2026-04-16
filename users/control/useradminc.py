@@ -11,11 +11,10 @@ class DisplayUserProfileController:
 
 #Create user profile 
 class CreateUserProfileController:
-    def createUserProfile(self, name:str, access_levels:int, statuses:int, descriptions:str) -> bool:
-        return UserProfile.createUserProfile(name, access_levels, statuses, descriptions)
-    
-    def userProfileExists(self, name:str) -> bool:
-        return UserProfile.userProfileExists(name)
+    def createUserProfile(self, name:str, access_level:int, status:int, description:str) -> bool:
+        return UserProfile.createUserProfile(name, access_level, status, description)
+
+
 
 @dataclass
 class UpdateUserProfileController:
