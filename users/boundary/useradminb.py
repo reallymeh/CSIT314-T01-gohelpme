@@ -73,12 +73,12 @@ def create_user_profile():
     access_level = int(data.get('access'))
     status = int(data.get('status'))
     description = data.get('description', '')
-    message = create_profile.clickCreate(name, access_level, status, description)
     if UserProfile.userProfileExists(name):
         return jsonify({
             "success": False,
             "message": "User profile already exists."
         }), 400
+    message = create_profile.clickCreate(name, access_level, status, description)
     return jsonify({'message': message})
 
 # Update profile 
