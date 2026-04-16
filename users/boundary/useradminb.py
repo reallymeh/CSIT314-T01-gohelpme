@@ -101,6 +101,12 @@ def update_user_account_api(user_id):
         return jsonify({"success": True, "message": f"Account {user_id} updated successfully"}), 200
     else:
         return jsonify({"success": False, "message": "Failed to update account in database"}), 500
+    
+@admin_profiles_bp.route('/viewprofile/<profile_name>', methods=['GET'])
+def view_profile(profile_name):
+    # BACKEND: Replace this hardcoded route with SearchUserProfile().searchUserProfile(profile_name) #}
+    # BACKEND: If profile is None, redirect to user_profile_list #}
+    return render_template('UserAdminViewProfile.html')
       
 class SuspendUserProfile:
     def __init__(self):
