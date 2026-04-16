@@ -8,6 +8,12 @@
 </head>
 <body>
 
+    {# BCE BOUNDARY: ViewUserProfile #}
+    {# User Story: As a user admin, I want to view a specific user profile so that I can get the specific user profile details #}
+    {# Sequence: User Admin clicks View → ViewUserProfile(Boundary) → ViewUserProfileController(Controller) → UserProfile(Entity) #}
+    {# Flask route: GET /admin/viewprofile/</profile_name> in useradminb.py #}
+    {# BACKEND: profile object is passed from ViewUserProfileController via render_template('UserAdminViewProfile.html', profile=profile) #}
+
     <div class="topbar">
         <span class="topbar-logo">Online Fundraising System — Admin Portal</span>
         <div class="topbar-user">
@@ -26,24 +32,24 @@
             <a href="/logout" class="nav-item logout">Log Out</a>
         </div>
 
-        {# BACKEND: BCE BOUNDARY SearchUserProfile #}
-        {# profile object is passed from SearchUserProfileController via render_template #}
-        {# Flask route: GET /admin/viewprofile/<profile_name> in useradminb.py #}
-        <div class="main" id="SearchUserProfile">
+        <div class="main" id="ViewUserProfile">
 
             <a href="/admin/userprofile" class="back-link">← Back to User Profiles</a>
 
             <div class="page-title">View Profile</div>
             <div class="page-sub">Detailed information for selected profile type</div>
 
-            {# BACKEND: Replace all hardcoded values below with Jinja2 variables #}
-            {# BACKEND: displaySearchResult() renders this card when profile is found #}
-            {# BACKEND: displaySearchFail() redirects back if profile is None #}
+            {# BACKEND: displayViewResult() — renders this card when ViewUserProfileController returns a profile #}
+            {# BACKEND: displayViewFail() — redirects back to dashboard if ViewUserProfileController returns None #}
             <div class="detail-card">
                 <div class="detail-top">
+                    {# BACKEND: Replace hardcoded icon-donee and DO with Jinja2 conditional based on profile.name #}
+                    {# Example: {% if profile.name == 'fund raiser' %}icon-fr{% elif profile.name == 'donee' %}icon-donee ... {% endif %} #}
                     <div class="icon-circle icon-donee">DO</div>
                     <div>
+                        {# BACKEND: Replace "Donee" with {{ profile.name | title }} #}
                         <div class="detail-title">Donee</div>
+                        {# BACKEND: Replace hardcoded description with {{ profile.description }} #}
                         <div class="detail-desc">User who receives funds from fundraising campaigns</div>
                     </div>
                 </div>
@@ -51,22 +57,24 @@
                 <div class="detail-body">
                     <div class="field-row">
                         <span class="field-label">Profile Type</span>
-                        {# BACKEND: Replace with {{ profile.name | title }} and correct badge class #}
+                        {# BACKEND: Replace badge-donee and "Donee" with Jinja2 conditional based on profile.name #}
+                        {# Example: badge-fr for fund raiser, badge-donee for donee, badge-pm for platform manager, badge-admin for user admin #}
                         <span class="badge badge-donee">Donee</span>
                     </div>
                     <div class="field-row">
                         <span class="field-label">Access Level</span>
-                        {# BACKEND: Replace 4 with {{ profile.access }} #}
+                        {# BACKEND: Replace hardcoded 4 with {{ profile.access }} #}
                         <span class="field-val">4</span>
                     </div>
                     <div class="field-row">
                         <span class="field-label">Status</span>
-                        {# BACKEND: Replace with {% if profile.status == 1 %}Active{% else %}Inactive{% endif %} #}
+                        {# BACKEND: Replace with {% if profile.status == 1 %}status-active{% else %}status-suspended{% endif %} #}
+                        {# BACKEND: Replace "Active" with {% if profile.status == 1 %}Active{% else %}Inactive{% endif %} #}
                         <span class="field-val status-active">Active</span>
                     </div>
                     <div class="field-row">
                         <span class="field-label">Description</span>
-                        {# BACKEND: Replace with {{ profile.description }} #}
+                        {# BACKEND: Replace hardcoded description with {{ profile.description }} #}
                         <span class="field-val">User who receives funds from fundraising campaigns</span>
                     </div>
                 </div>
@@ -79,25 +87,27 @@
     </div>
 
     <script>
-        // BCE BOUNDARY: SearchUserProfile
-        // Called on page load — renders UserProfile returned from Controller
-        function displaySearchResult() {
+        // BCE BOUNDARY: ViewUserProfile
+        // displayViewResult() — called on page load
+        // renders UserProfile details returned from ViewUserProfileController
+        function displayViewResult() {
             const card = document.querySelector('.detail-card');
             if (card) {
                 card.style.display = 'block';
             }
         }
 
-        // BCE BOUNDARY: displaySearchFail()
-        // Called when Controller returns None — redirects back to profiles page
-        function displaySearchFail() {
+        // BCE BOUNDARY: displayViewFail()
+        // called when ViewUserProfileController returns None
+        // redirects back to dashboard
+        function displayViewFail() {
             alert("Profile not found!");
             window.location.href = '/admin/userprofile';
         }
 
-        // BCE BOUNDARY: Call displaySearchResult() on page load
+        // BCE BOUNDARY: Call displayViewResult() on page load
         window.onload = function() {
-            displaySearchResult();
+            displayViewResult();
         };
     </script>
 

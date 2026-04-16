@@ -8,6 +8,12 @@
 </head>
 <body>
 
+    {# BCE BOUNDARY: DisplayUserProfile #}
+    {# User Story: As a user admin, I want to view user profiles so that I can view the different types of user profiles #}
+    {# Sequence: User Admin navigates → DisplayUserProfile(Boundary) → DisplayUserProfileController(Controller) → UserProfile(Entity) #}
+    {# Flask route: GET /admin/userprofile in useradminb.py #}
+    {# BACKEND: profiles list is passed from DisplayUserProfileController via render_template('UserAdminProfiles.html', profiles=profiles) #}
+
     <div class="topbar">
         <span class="topbar-logo">Online Fundraising System — Admin Portal</span>
         <div class="topbar-user">
@@ -44,7 +50,7 @@
                 </a>
             </div>
 
-            {# BACKEND: profiles list is passed from DisplayUserProfileController via render_template #}
+            {# BACKEND: profiles list passed from DisplayUserProfileController #}
             {# Each profile object has: name, access, status, description #}
             <div class="grid" id="profile-grid">
                 {% for profile in profiles %}
@@ -64,7 +70,7 @@
                         </div>
                     </div>
                     <div class="card-actions">
-                        {# BACKEND: View button calls GET /admin/viewprofile/<name> → SearchUserProfile boundary #}
+                        {# BACKEND: View button calls GET /admin/viewprofile/<name> → ViewUserProfile boundary #}
                         <button class="act-btn view" onclick="window.location.href='/admin/viewprofile/{{ profile.name }}'">View</button>
                         {# BACKEND: Update button calls GET /admin/updateprofile/<name> → UpdateUserProfile boundary #}
                         <button class="act-btn" onclick="window.location.href='/admin/updateprofile/{{ profile.name }}'">Update</button>
@@ -81,13 +87,14 @@
 
     <script>
         // BCE BOUNDARY: DisplayUserProfile
-        // Called on page load — renders [UserProfile] list from Controller
+        // Called on page load — renders [UserProfile] list from DisplayUserProfileController
         function displayUserProfile() {
             const grid = document.getElementById('profile-grid');
             grid.style.display = 'grid';
         }
 
-        // Search function — filters cards by profile type name
+        // BCE BOUNDARY: SearchUserProfile
+        // Filters profile cards by name as user types in search box
         function searchProfiles() {
             const input = document.getElementById('search-input').value.toLowerCase();
             const cards = document.querySelectorAll('.profile-card');
@@ -103,7 +110,7 @@
         };
 
         // BCE BOUNDARY: SuspendUserProfile
-        // Sends suspend request to Controller via /admin/suspend_user
+        // Sends suspend request to SuspendUserProfileController via POST /admin/suspend_user
         // Calls displaySuspendSuccess() or displaySuspendFail() based on response
         function suspendProfile(profileName) {
             if (confirm("Are you sure you want to suspend " + profileName + "?")) {
