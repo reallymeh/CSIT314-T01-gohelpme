@@ -13,7 +13,9 @@ class DisplayUserProfileController:
 class CreateUserProfileController:
     def createUserProfile(self, name:str, access_levels:int, statuses:int, descriptions:str) -> bool:
         return UserProfile.createUserProfile(name, access_levels, statuses, descriptions)
-        return getUserProfile()
+    
+    def userProfileExists(self, name:str) -> bool:
+        return UserProfile.userProfileExists(name)
 
 @dataclass
 class UpdateUserProfileController:

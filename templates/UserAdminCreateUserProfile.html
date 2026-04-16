@@ -1,60 +1,118 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <title>Create Profile</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styleCreateUserProfile.css') }}">
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update User Account — Admin Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
-
-<div class="container">
-
-    <h1>Create User Profile</h1>
-
-    {% if message %}
-    <p class="message {{ message_type }}">{{ message }}</p>
-    {% endif %}
-
-    <div class="box">
-        <form method="POST" action="{{ url_for('admin_view_profile.create_user_profile') }}">
-
-            <div class="input-group">
-                <label>Profile Name</label>
-                <input type="text" name="name" placeholder="Enter profile name" required>
-            </div>
-
-            <div class="input-group">
-                <label>Access Level</label>
-                <input type="number" name="access_level" placeholder="Enter access level" required>
-            </div>
-
-            <div class="input-group">
-                <label>Status</label>
-                <select name="status" required>
-                    <option value="">Select status</option>
-                    <option value="1">Active</option>
-                    <option value="0">Inactive</option>
-                </select>
-            </div>
-
-            <div class="input-group">
-                <label>Description</label>
-                <textarea name="description" rows="3" placeholder="Enter description"></textarea>
-            </div>
-
-            <button type="submit" class="btn">Create Profile</button>
-            <a href="{{ url_for('admin_view_profile.user_profile_list') }}" class="btn">
-                  Back to Profiles
-            </a>
-        </form>
+    <div class="topbar">
+        <span class="topbar-logo">Online Fundraising System — Admin Portal</span>
+        <div class="topbar-user">
+            <span id="admin-name">User Admin</span>
+            <div class="avatar">UA</div>
+        </div>
     </div>
+
+    <div class="layout">
+         <div class="sidebar">
+            <a href="/admin/userprofile" class="nav-item">User Profiles</a>
+            <a href="/admin/useraccounts" class="nav-item active">User Accounts</a>
+            <a href="#" class="nav-item logout">Log Out</a>
+        </div>
+        <div class="main">
+            <div class="page-title">Create User Profile</div>
+            <div class="page-sub">Create a new user profile with the following details:</div>
+
+            <div class="profile-card update-form-wrapper">
+                <div class="card-top">
+                    <div class="card-name">Profile Details</div>
+                </div>
+
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>Profile Name</label>
+                        <input type="text" name="name" placeholder="Enter profile name" required>
+                    </div>
+
+                    <div class="input-group">
+                       <label>Access Level</label>
+                       <input type="number" name="access_level" placeholder="Enter access level" required>
+                    </div>
+
+                    <div class="input-group">
+                       <label>Status</label>
+                       <select name="status" required>
+                         <option value="">Select status</option>
+                         <option value="1">Active</option>
+                         <option value="0">Inactive</option>
+                       </select>
+                    </div>
+
+                    <div class="input-group">
+                      <label>Description</label>
+                      <textarea name="description" rows="3" placeholder="Enter description" required></textarea>
+                   </div>
+                   
+                   <div class="form-actions">
+                        <button class="btn-primary" onclick="createProfile()">Create Profile</button>
+                        <button class="act-btn" onclick="window.location.href='/admin/userprofile'">Cancel</button>
+                    </div>
+
+                    <div id="message" class="message-box"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    
 
 </div>
 
 <script>
-setTimeout(function() {
-    var msg = document.querySelector(".message");
-    if (msg) msg.style.display = "none";
-}, 3000);
+    function createProfile() {
+        const name = document.querySelector('input[name="name"]').value;
+        const accessLevel = document.querySelector('input[name="access_level"]').value;
+        const status = document.querySelector('select[name="status"]').value;
+        const description = document.querySelector('textarea[name="description"]').value;
+        const messageBox = document.getElementById('message');
+
+         if (!name || !accessLevel || !status || !description) {
+            messageBox.style.color = "#A32D2D"; // Red error color
+            messageBox.innerText = "Error: All fields are required.";
+            return;
+        }
+
+        if (accessLevel < 1 || accessLevel > 4) {
+            messageBox.style.color = "#A32D2D"; // Red error color
+            messageBox.innerText = "Error: Access Level must be between 1 and 4.";
+            return;
+        }
+       
+
+        const payload = {
+            name: name,
+            access: accessLevel,
+            status: status,
+            description: description
+        };
+
+        fetch('/admin/create_profile', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);     // Show success or fail message
+                    location.reload();       // Refresh the page to update the list
+                })
+                .catch(() => {
+                    alert("Something went wrong!");
+                });
+    }
 </script>
 
 </body>
