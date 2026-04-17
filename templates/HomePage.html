@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Fundraising System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+ </head>
+  <body>
+    {% if message %}
+      <div id="alert-box">{{ message }}</div>
+    {% endif %}
+    <div class="topbar">
+        <span class="topbar-logo">Online Fundraising System</span>
+        <div class="topbar-user">
+            <div class="avatar">UA</div>
+        </div>
+    </div>
+    <div class="title">
+        <div class="page-title">
+           <h1>Welcome to the Online Fundraising System</h1>
+        </div>
+        <div class="page-content">
+            <p>Your one-stop platform for creating and managing fundraising campaigns.</p>
+        </div>
+    </div>
+    <div class="card-actions-home">
+        <button class="login-btn" onclick="alert('coming soon!')">Login</button>
+    </div>
+  </body>
+  <script>
+    setTimeout(function() {
+      const alertBox = document.getElementById("alert-box");
+      if (alertBox) {
+        alertBox.style.display = "none";
+       }
+      }, 3000); // 3000ms = 3 seconds
+   </script>
+</html>
