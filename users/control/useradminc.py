@@ -43,7 +43,11 @@ class UpdateUserAccountController:
         )
         
         return updateUserAccountDB(user_id, updated_user)
+    
 class SuspendUserProfileController:
     def suspendUserProfile(self, user_profile_name:str) -> bool:
         return suspendProfile(user_profile_name)
 
+class ViewUserProfileController:
+    def viewUserProfile(self, profile_name:str) -> UserProfile:
+        return UserProfile.getProfile(profile_name)
