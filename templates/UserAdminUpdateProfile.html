@@ -34,7 +34,7 @@
                 </div>
                 
                 <div class="card-body">
-                    <input type="hidden" id="profileId" value="{{ profile_id }}">
+                    <input type="hidden" id="userProfileName" value="{{ user_profile_name }}">
 
                     <div class="form-group">
                         <label class="form-label" for="profileType">Profile Type</label>
@@ -63,9 +63,9 @@
         </div>
     <script>
         async function fetchProfileData() {
-            const profileId = document.getElementById('profileId').value;
+            const userProfileName = document.getElementById('profileId').value;
             try {
-                const response = await fetch(`/admin/api/profiles/${profileId}`);
+                const response = await fetch(`/admin/api/profiles/${userProfileName}`);
                 if (response.ok) {
                     const result = await response.json();
                     const profile = result.data;
@@ -79,7 +79,7 @@
         }
 
         async function submitUpdate() {
-            const profileId = document.getElementById('profileId').value;
+            const userProfileName = document.getElementById('userProfileName').value;
             const newProfileType = document.getElementById('profileType').value;
             const newAccessLevel = document.getElementById('accessLevel').value;
             const newDescription = document.getElementById('description').value;
@@ -98,7 +98,7 @@
             };
 
             try {
-                const response = await fetch(`/admin/api/profiles/${profileId}`, {
+                const response = await fetch(`/admin/api/profiles/${userProfileName}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'

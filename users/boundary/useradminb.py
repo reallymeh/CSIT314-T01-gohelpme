@@ -20,8 +20,8 @@ class UpdateUserProfile:
     def __init__(self):
         self.controller = UpdateUserProfileController()
         
-    def updateUserProfile(self, profile_id: str, new_name: str, new_access_level: int, new_description: str) -> bool:
-        return self.controller.updateUserProfile(profile_id, new_name, new_access_level, new_description)
+    def updateUserProfile(self, user_profile_name: str, new_name: str, new_access_level: int, new_description: str) -> bool:
+        return self.controller.updateUserProfile(user_profile_name, new_name, new_access_level, new_description)
 
 class UpdateUserAccount:
     def __init__(self):
@@ -81,9 +81,9 @@ def create_user_profile():
     return jsonify({'message': message})
 
 # Update profile 
-@admin_profiles_bp.route('/updateprofile/<profile_id>', methods=['GET']) # url will be .../admin/updateprofile/<profile_id>
-def render_update_page(profile_id):
-    return render_template('UserAdminUpdateProfile.html', profile_id=profile_id)
+@admin_profiles_bp.route('/updateprofile/<user_profile_name>', methods=['GET']) # url will be .../admin/updateprofile/<profile_id>
+def render_update_page(user_profile_name):
+    return render_template('UserAdminUpdateProfile.html', user_profile_name=user_profile_name)
 
 @admin_profiles_bp.route('/updateaccount/<user_id>', methods=['GET']) # url will be .../admin/updateaccount/<user_id>
 def render_update_account_page(user_id):
@@ -104,10 +104,10 @@ def update_user_account_api(user_id):
     else:
         return jsonify({"success": False, "message": "Failed to update account in database"}), 500
 
-@admin_profiles_bp.route('/api/profiles/<profile_id>', methods=['GET'])
-def get_profile_api(profile_id):
+@admin_profiles_bp.route('/api/profiles/<user_profile_name>', methods=['GET'])
+def get_profile_api(user_profile_name):
     display_profile = ViewUserProfile()
-    profile = display_profile.viewUserProfile(profile_id)
+    profile = display_profile.viewUserProfile(user_profile_name)
     
     if profile:
         return jsonify({
@@ -121,8 +121,8 @@ def get_profile_api(profile_id):
     else:
         return jsonify({"success": False, "error": "Profile not found"}), 404
 
-@admin_profiles_bp.route('/api/profiles/<profile_id>', methods=['PUT'])
-def update_profile_api(profile_id):
+@admin_profiles_bp.route('/api/profiles/<user_profile_name>', methods=['PUT'])
+def update_profile_api(user_profile_name):
     data = request.get_json()
     
     if not data:
@@ -142,10 +142,10 @@ def update_profile_api(profile_id):
         return jsonify({"success": False, "error": "Access Level must be between 1 and 4"}), 400
     
     update_controller = UpdateUserProfile()
-    success = update_controller.updateUserProfile(profile_id, new_profile_type, new_access_level, new_description)
+    success = update_controller.updateUserProfile(user_profile_name, new_profile_type, new_access_level, new_description)
     
     if success:
-        return jsonify({"success": True, "message": f"Profile {profile_id} updated successfully"}), 200
+        return jsonify({"success": True, "message": f"Profile {user_profile_name} updated successfully"}), 200
     else:
         return jsonify({"success": False, "error": "Failed to update profile in database"}), 500    
       

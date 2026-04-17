@@ -69,7 +69,7 @@ class UserProfile:
             print("Error:", e)
             return False
 @staticmethod
-def updateUserProfile(profile_id: str, new_name: str, new_access_level: int, new_description: str) -> bool:
+def updateUserProfile(user_profile_name: str, new_name: str, new_access_level: int, new_description: str) -> bool:
     """
     Updates the profile name, access level, and description in the database.
     """
@@ -77,7 +77,7 @@ def updateUserProfile(profile_id: str, new_name: str, new_access_level: int, new
     try:
         cur.execute(
             "UPDATE user_profile SET name = ?, access = ?, description = ? WHERE name = ?",
-            (new_name, new_access_level, new_description, profile_id)
+            (new_name, new_access_level, new_description, user_profile_name)
         )
         conn.commit()
         return True

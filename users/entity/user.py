@@ -27,7 +27,7 @@ class UserAccount:
     bio: str
 
 @staticmethod
-def updateUserAccountDB(user_id: str, user_data: UserAccount) -> bool:
+def updateUserAccount(user_id: str, user_data: UserAccount) -> bool:
     """
     Takes a User object and updates the corresponding record in the database.
     """
