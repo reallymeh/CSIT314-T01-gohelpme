@@ -6,5 +6,5 @@ user_bp = Blueprint('user', __name__, url_prefix='/user')
 
 @user_bp.route('/homepage') # url will be .../user/homepage
 def homepage():
-    message = request.args.get('message')  # 👈 THIS IS MISSING
+    message = request.args.get('message')  
     return render_template('HomePage.html', message=message)
