@@ -13,6 +13,20 @@ class UserProfile:
     description: str = " "
 
     @staticmethod
+    def getProfile(profile_name:str) -> UserProfile:
+        conn, cur = connect_db()
+        # check if need use ? to replace value
+        res = cur.execute("SELECT * FROM user_profile WHERE name = ? ", (profile_name,))
+        row = res.fetchone()
+        name, access, status, description = row
+        conn.close()
+
+
+        return UserProfile(name, access, status, description) 
+
+
+
+    @staticmethod
     def getUserProfiles() -> List["UserProfile"]:
         conn, cur = connect_db()
         rows = cur.execute("SELECT * FROM user_profile").fetchall()
