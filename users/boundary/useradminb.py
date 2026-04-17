@@ -128,3 +128,11 @@ def suspend_user():
     message = SuspendUserProfile().suspendUserProfile(user_profile_name)
 
     return jsonify({'message': message})
+
+class logoutPage: 
+    def logout(self):
+        return 'You have logged out successfully!'
+
+@admin_profiles_bp.route('/logout')
+def logout():
+    return redirect(url_for('user.homepage'))
