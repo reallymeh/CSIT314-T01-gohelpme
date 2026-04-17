@@ -200,3 +200,24 @@ def user_profile(user_profile_name):
     return render_template('UserAdminViewProfile.html', 
                            profile=profile
                            )
+
+# BCE BOUNDARY: SearchUserAccount
+# BACKEND: Replace hardcoded return with actual search logic
+# render_template passes accounts list from SearchUserAccountController
+@admin_profiles_bp.route('/useraccount', methods=['GET'])
+def user_account_list():
+    return render_template('UserAdminAccounts.html')
+
+# ========== BCE BOUNDARY: ViewUserAccount ==========
+# User Story: As a user admin, I want to view user account so that I can view the user's details
+# HARDCODED — backend needs to integrate the following:
+# 1. Create ViewUserAccountController in useradminc.py
+# 2. Create getAccount(account_name: str) function in useraccount entity
+# 3. Replace hardcoded return below with:
+#    account = ViewUserAccount().viewUserAccount(account_name)
+#    if account is None:
+#        return redirect(url_for('admin_view_profile.user_account_list'))
+#    return render_template('UserAdminViewAccount.html', account=account)
+@admin_profiles_bp.route('/viewaccount/<account_name>', methods=['GET'])
+def view_account(account_name):
+    return render_template('UserAdminViewAccount.html')

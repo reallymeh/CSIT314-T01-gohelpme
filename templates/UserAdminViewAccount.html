@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Account — Online Fundraising System Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+    {# BCE BOUNDARY: ViewUserAccount #}
+    {# User Story: As a user admin, I want to view user account so that I can view the user's details #}
+    {# Sequence: User Admin clicks View → ViewUserAccount(Boundary) → ViewUserAccountController(Controller) → UserAccount(Entity) #}
+    {# Flask route: GET /admin/viewaccount/<account_name> in useradminb.py #}
+    {# BACKEND: account object is passed from ViewUserAccountController via render_template('UserAdminViewAccount.html', account=account) #}
+    {# BACKEND: account object has: full_name, email_address, phone_number, address, user_type, account_status, description #}
+
+    <div class="topbar">
+        <span class="topbar-logo">Online Fundraising System — Admin Portal</span>
+        <div class="topbar-user">
+            {# BACKEND: Replace "User Admin" with logged-in admin's username from session #}
+            <span id="admin-name">User Admin</span>
+            <div class="avatar">UA</div>
+        </div>
+    </div>
+
+    <div class="layout">
+
+        <div class="sidebar">
+            <a href="/admin/userprofile" class="nav-item">User Profiles</a>
+            <a href="/admin/useraccount" class="nav-item active">User Accounts</a>
+            {# BACKEND: /logout route should clear session #}
+            <a href="/logout" class="nav-item logout">Log Out</a>
+        </div>
+
+        {# BACKEND: displayViewResult() renders this card when account is found #}
+        {# BACKEND: displayViewFail() redirects back to useraccount page if account is None #}
+        <div class="main" id="ViewUserAccount">
+
+            <a href="/admin/useraccount" class="back-link">← Back to User Accounts</a>
+
+            <div class="page-title">View Account</div>
+            <div class="page-sub">Detailed information for selected user account</div>
+
+            <div class="detail-card">
+                <div class="detail-top">
+                    {# BACKEND: Replace hardcoded initials JD with {{ account.full_name[:2] | upper }} #}
+                    {# BACKEND: Replace hardcoded icon-donee with conditional based on account.user_type #}
+                    <div class="icon-circle icon-donee">JD</div>
+                    <div>
+                        {# BACKEND: Replace with {{ account.full_name }} #}
+                        <div class="detail-title">John Doe</div>
+                        {# BACKEND: Replace with {{ account.user_type | title }} #}
+                        <div class="detail-desc">Donee</div>
+                    </div>
+                </div>
+
+                <div class="detail-body">
+                    <div class="field-row">
+                        <span class="field-label">Full Name</span>
+                        {# BACKEND: Replace with {{ account.full_name }} #}
+                        <span class="field-val">John Doe</span>
+                    </div>
+                    <div class="field-row">
+                        <span class="field-label">Email Address</span>
+                        {# BACKEND: Replace with {{ account.email_address }} #}
+                        <span class="field-val">johndoe@email.com</span>
+                    </div>
+                    <div class="field-row">
+                        <span class="field-label">Phone Number</span>
+                        {# BACKEND: Replace with {{ account.phone_number }} #}
+                        <span class="field-val">+65 9123 4567</span>
+                    </div>
+                    <div class="field-row">
+                        <span class="field-label">Address</span>
+                        {# BACKEND: Replace with {{ account.address }} #}
+                        <span class="field-val">123 Example Street</span>
+                    </div>
+                    <div class="field-row">
+                        <span class="field-label">User Type</span>
+                        {# BACKEND: Replace with {{ account.user_type | title }} #}
+                        <span class="field-val">Donee</span>
+                    </div>
+                    <div class="field-row">
+                        <span class="field-label">Account Status</span>
+                        {# BACKEND: Replace class with {% if account.account_status == 1 %}status-active{% else %}status-suspended{% endif %} #}
+                        {# BACKEND: Replace "Active" with {% if account.account_status == 1 %}Active{% else %}Inactive{% endif %} #}
+                        <span class="field-val status-active">Active</span>
+                    </div>
+                    <div class="field-row">
+                        <span class="field-label">Description</span>
+                        {# BACKEND: Replace with {{ account.description }} #}
+                        <span class="field-val">User who receives funds from fundraising campaigns</span>
+                    </div>
+                </div>
+
+            </div>
+            {# No Update or Suspend buttons here — actions are on the User Accounts search page only #}
+
+        </div>
+
+    </div>
+
+    <script>
+        // =====================
+        // BCE BOUNDARY: ViewUserAccount
+        // HARDCODED — backend needs to:
+        // 1. Add GET /admin/viewaccount/<account_name> route in useradminb.py
+        // 2. Pass real account object via render_template('UserAdminViewAccount.html', account=account)
+        // 3. Replace all hardcoded values with Jinja2 variables as indicated by {# BACKEND #} comments
+        // 4. displayViewResult() and displayViewFail() can be removed once Flask renders server-side
+        // =====================
+
+        // BCE BOUNDARY: ViewUserAccount
+        // displayViewResult() — called on page load
+        // renders UserAccount details returned from ViewUserAccountController
+        function displayViewResult() {
+            const card = document.querySelector('.detail-card');
+            if (card) {
+                card.style.display = 'block';
+            }
+        }
+
+        // BCE BOUNDARY: displayViewFail()
+        // called when ViewUserAccountController returns None
+        // redirects back to user accounts page
+        function displayViewFail() {
+            alert("Account not found!");
+            window.location.href = '/admin/useraccount';
+        }
+
+        // BCE BOUNDARY: Call displayViewResult() on page load
+        window.onload = function() {
+            displayViewResult();
+        };
+    </script>
+
+</body>
+</html>
