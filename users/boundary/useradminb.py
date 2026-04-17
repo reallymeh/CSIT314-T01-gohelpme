@@ -2,11 +2,10 @@
 from users.entity.user import User
 from users.entity.userprofile import UserProfile
 
-from users.control.useradminc import DisplayUserProfileController, UpdateUserProfileController, UpdateUserAccountController, \
-                                     SuspendUserProfileController,CreateUserProfileController, ViewUserProfileController 
+from users.control.useradminc import DisplayUserProfileController, UpdateUserProfileController, UpdateUserAccountController, SuspendUserProfileController,CreateUserProfileController, ViewUserProfileController 
 
 
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for, abort
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for
 
 
 from typing import List
@@ -131,19 +130,12 @@ def suspend_user():
 
     return jsonify({'message': message})
 
-class ViewUserProfile:
-    def __init__(self):
-        self.controller = ViewUserProfileController()
+class LogoutPage: 
+    def logout(self):
+        return 'You have logged out successfully!'
 
-    def viewUserProfile(self, profile_name:str) -> UserProfile:
-        return self.controller.viewUserProfile(profile_name)
-    
-@admin_profiles_bp.route('/viewprofile/<string:user_profile_name>')
-def user_profile(user_profile_name):
-    display_profile = ViewUserProfile()
-
-    profile = display_profile.viewUserProfile(user_profile_name)
-  
-    return render_template('UserAdminViewProfile.html', 
-                           profile=profile
-                           )
+@admin_profiles_bp.route('/logout')
+def logout():
+    page = LogoutPage()
+    message = page.logout()
+    return redirect(url_for('user.homepage', message=message))
