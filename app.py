@@ -8,7 +8,6 @@ def create_app():
     
     with app.app_context():
         init_db()
-    
     app.register_blueprint(admin_profiles_bp)
     app.register_blueprint(user_bp)
     

@@ -5,7 +5,7 @@ from users.entity.userprofile import UserProfile
 from users.control.useradminc import DisplayUserProfileController, UpdateUserProfileController, UpdateUserAccountController, SuspendUserProfileController,CreateUserProfileController 
 
 
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for
+from flask import Blueprint, flash, render_template, request, jsonify, redirect, url_for
 
 
 from typing import List
@@ -129,10 +129,12 @@ def suspend_user():
 
     return jsonify({'message': message})
 
-class logoutPage: 
+class LogoutPage: 
     def logout(self):
         return 'You have logged out successfully!'
 
 @admin_profiles_bp.route('/logout')
 def logout():
-    return redirect(url_for('user.homepage'))
+    page = LogoutPage()
+    message = page.logout()   # call class method
+    return redirect(url_for('user.homepage', message=message))

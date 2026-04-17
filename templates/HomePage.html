@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
  </head>
   <body>
+    {% if message %}
+      <div id="alert-box">{{ message }}</div>
+    {% endif %}
     <div class="topbar">
         <span class="topbar-logo">Online Fundraising System</span>
         <div class="topbar-user">
@@ -25,4 +28,12 @@
         <button class="login-btn" onclick="alert('coming soon!')">Login</button>
     </div>
   </body>
+  <script>
+    setTimeout(function() {
+      const alertBox = document.getElementById("alert-box");
+      if (alertBox) {
+        alertBox.style.display = "none";
+       }
+      }, 3000); // 3000ms = 3 seconds
+   </script>
 </html>
