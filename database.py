@@ -17,9 +17,9 @@ def init_db():
     # Populate user_profile table
 
     user_profile_data = [
-    ('user admin', 1, 1, "Administrator with full access" ),
-    ('platform manager', 2, 1, "Manager responsible for platform operations" ),
-    ('fund raiser', 3, 1, "User who creates and manages fundraising campaigns" ),
+    ('user_admin', 1, 1, "Administrator with full access" ),
+    ('platform_manager', 2, 1, "Manager responsible for platform operations" ),
+    ('fund_raiser', 3, 1, "User who creates and manages fundraising campaigns" ),
     ('donee', 4, 1, "User who receives funds from fundraising campaigns" )
     ]
     cur.executemany("INSERT OR IGNORE INTO user_profile VALUES(?, ?, ?, ?)", user_profile_data)
