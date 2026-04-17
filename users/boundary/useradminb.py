@@ -1,10 +1,11 @@
 from users.entity.user import User
 from users.entity.userprofile import UserProfile
 
-from users.control.useradminc import DisplayUserProfileController, UpdateUserProfileController, UpdateUserAccountController, SuspendUserProfileController,CreateUserProfileController 
+from users.control.useradminc import DisplayUserProfileController, UpdateUserProfileController, UpdateUserAccountController, \
+                                     SuspendUserProfileController,CreateUserProfileController, ViewUserProfileController 
 
 
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, abort
 
 
 from typing import List
@@ -102,11 +103,6 @@ def update_user_account_api(user_id):
     else:
         return jsonify({"success": False, "message": "Failed to update account in database"}), 500
     
-@admin_profiles_bp.route('/viewprofile/<profile_name>', methods=['GET'])
-def view_profile(profile_name):
-    # BACKEND: Replace this hardcoded route with SearchUserProfile().searchUserProfile(profile_name) #}
-    # BACKEND: If profile is None, redirect to user_profile_list #}
-    return render_template('UserAdminViewProfile.html')
       
 class SuspendUserProfile:
     def __init__(self):
@@ -131,3 +127,20 @@ def suspend_user():
     message = SuspendUserProfile().suspendUserProfile(user_profile_name)
 
     return jsonify({'message': message})
+
+class ViewUserProfile:
+    def __init__(self):
+        self.controller = ViewUserProfileController()
+
+    def viewUserProfile(self, profile_name:str) -> UserProfile:
+        return self.controller.viewUserProfile(profile_name)
+    
+@admin_profiles_bp.route('/viewprofile/<string:user_profile_name>')
+def user_profile(user_profile_name):
+    display_profile = ViewUserProfile()
+
+    profile = display_profile.viewUserProfile(user_profile_name)
+  
+    return render_template('UserAdminViewProfile.html', 
+                           profile=profile
+                           )
