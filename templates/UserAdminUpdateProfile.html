@@ -43,7 +43,12 @@
 
                     <div class="form-group-large">
                         <label class="form-label" for="accessLevel">Access Level</label>
-                        <input type="number" id="accessLevel" class="search-box form-input" min="1" max="4" placeholder="e.g., 1-4">                    </div>
+                        <input type="number" id="accessLevel" class="search-box form-input" min="1" max="4" placeholder="e.g., 1-4"></div>
+
+                    <div class="form-group-large">
+                    <label class="form-label" for="description">Description</label>
+                    <textarea id="description" class="search-box form-input" rows="3" style="resize: vertical; font-family: inherit;" placeholder="Enter profile description"></textarea>
+                </div>
 
                     <div class="form-actions">
                         <button class="btn-primary" onclick="submitUpdate()">Save Updates</button>
@@ -57,21 +62,39 @@
         </div>
         </div>
     <script>
+        async function fetchProfileData() {
+            const profileId = document.getElementById('profileId').value;
+            try {
+                const response = await fetch(`/admin/api/profiles/${profileId}`);
+                if (response.ok) {
+                    const result = await response.json();
+                    const profile = result.data;
+                    document.getElementById('profileType').value = profile.name || '';
+                    document.getElementById('accessLevel').value = profile.access_level || '';
+                    document.getElementById('description').value = profile.description || '';
+                }
+            } catch (error) {
+                console.error("Could not fetch profile data:", error);
+            }
+        }
+
         async function submitUpdate() {
             const profileId = document.getElementById('profileId').value;
             const newProfileType = document.getElementById('profileType').value;
             const newAccessLevel = document.getElementById('accessLevel').value;
+            const newDescription = document.getElementById('description').value;
             const messageBox = document.getElementById('message');
 
             if (newAccessLevel < 1 || newAccessLevel > 4) {
-                messageBox.style.color = "#A32D2D"; // Red error color
+                messageBox.style.color = "#A32D2D";
                 messageBox.innerText = "Error: Access Level must be between 1 and 4.";
-                return; // Stop the function here so it doesn't send the request
+                return;
             }
 
             const payload = {
                 profile_type: newProfileType,
-                access_level: newAccessLevel
+                access_level: newAccessLevel,
+                description: newDescription
             };
 
             try {
@@ -86,14 +109,14 @@
                 const result = await response.json();
 
                 if (response.ok) {
-                    messageBox.style.color = "#3B6D11"; // status-active green
+                    messageBox.style.color = "#3B6D11";
                     messageBox.innerText = "Success! " + result.message;
                     
                     setTimeout(() => {
                         window.location.href = '/admin/userprofile';
                     }, 2000);
                 } else {
-                    messageBox.style.color = "#A32D2D"; // status-suspended red
+                    messageBox.style.color = "#A32D2D";
                     messageBox.innerText = "Error: " + result.error;
                 }
             } catch (error) {
@@ -102,6 +125,8 @@
                 messageBox.innerText = "Failed to connect to the backend server.";
             }
         }
+
+        window.onload = fetchProfileData;
     </script>
 </body>
 </html>

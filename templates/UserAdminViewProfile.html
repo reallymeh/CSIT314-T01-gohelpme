@@ -67,7 +67,9 @@
                     </div>
                     <div class="field-row">
                         <span class="field-label">Access Level</span>
-                        <span class="field-val">{{ profile.access  }}</span>
+                        <!-- Line 72 Originally was:  <span class="field-val">{{ profile.access  }}</span> -->
+                         <!-- Changed to <span class="field-val">{{ profile.access_level  }}</span> -->>
+                        <span class="field-val">{{ profile.access_level  }}</span>
                     </div>
                     <div class="field-row">
                         <span class="field-label">Status</span>

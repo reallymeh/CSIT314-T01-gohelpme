@@ -1,4 +1,3 @@
-
 from users.entity.user import User
 from users.entity.userprofile import UserProfile
 
@@ -21,8 +20,8 @@ class UpdateUserProfile:
     def __init__(self):
         self.controller = UpdateUserProfileController()
         
-    def updateUserProfile(self, profile_id: str, new_name: str, new_access_level: int) -> bool:
-        return self.controller.updateUserProfile(profile_id, new_name, new_access_level)
+    def updateUserProfile(self, profile_id: str, new_name: str, new_access_level: int, new_description: str) -> bool:
+        return self.controller.updateUserProfile(profile_id, new_name, new_access_level, new_description)
 
 class UpdateUserAccount:
     def __init__(self):
@@ -104,7 +103,51 @@ def update_user_account_api(user_id):
         return jsonify({"success": True, "message": f"Account {user_id} updated successfully"}), 200
     else:
         return jsonify({"success": False, "message": "Failed to update account in database"}), 500
+
+@admin_profiles_bp.route('/api/profiles/<profile_id>', methods=['GET'])
+def get_profile_api(profile_id):
+    display_profile = ViewUserProfile()
+    profile = display_profile.viewUserProfile(profile_id)
     
+    if profile:
+        return jsonify({
+            "success": True,
+            "data": {
+                "name": profile.name,
+                "access_level": profile.access_level,
+                "description": profile.description
+            }
+        }), 200
+    else:
+        return jsonify({"success": False, "error": "Profile not found"}), 404
+
+@admin_profiles_bp.route('/api/profiles/<profile_id>', methods=['PUT'])
+def update_profile_api(profile_id):
+    data = request.get_json()
+    
+    if not data:
+        return jsonify({"success": False, "error": "No data provided"}), 400
+    
+    new_profile_type = data.get('profile_type')
+    new_access_level = data.get('access_level')
+    new_description = data.get('description', '')
+    
+    # Convert to integer
+    try:
+        new_access_level = int(new_access_level)
+    except (ValueError, TypeError):
+        return jsonify({"success": False, "error": "Access Level must be a number"}), 400
+    
+    if new_access_level < 1 or new_access_level > 4:
+        return jsonify({"success": False, "error": "Access Level must be between 1 and 4"}), 400
+    
+    update_controller = UpdateUserProfile()
+    success = update_controller.updateUserProfile(profile_id, new_profile_type, new_access_level, new_description)
+    
+    if success:
+        return jsonify({"success": True, "message": f"Profile {profile_id} updated successfully"}), 200
+    else:
+        return jsonify({"success": False, "error": "Failed to update profile in database"}), 500    
       
 class SuspendUserProfile:
     def __init__(self):

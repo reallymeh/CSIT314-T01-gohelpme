@@ -68,16 +68,16 @@ class UserProfile:
         except Exception as e:
             print("Error:", e)
             return False
-          
-def updateUserProfileDB(profile_id: str, new_name: str, new_access_level: int) -> bool:
+@staticmethod
+def updateUserProfileDB(profile_id: str, new_name: str, new_access_level: int, new_description: str) -> bool:
     """
-    Updates the profile name and access level in the database.
+    Updates the profile name, access level, and description in the database.
     """
     conn, cur = connect_db()
     try:
         cur.execute(
-            "UPDATE user_profile SET name = ?, access = ? WHERE name = ?",
-            (new_name, new_access_level, profile_id)
+            "UPDATE user_profile SET name = ?, access = ?, description = ? WHERE name = ?",
+            (new_name, new_access_level, new_description, profile_id)
         )
         conn.commit()
         return True
@@ -87,41 +87,8 @@ def updateUserProfileDB(profile_id: str, new_name: str, new_access_level: int) -
     finally:
         conn.close()
 
-# shift to user.py
-@dataclass
-class UserAccount:
-    """
-    Base class for user accounts
-    """
-    user_id: str
-    name: str
-    email: str
-    phone: str
-    address: str
-    user_type: str
-    bio: str
 
-# shift to user.py, make it into @static method
-def updateUserAccountDB(user_id: str, user_data: UserAccount) -> bool:
-    """
-    Takes a User object and updates the corresponding record in the database.
-    """
-    conn, cur = connect_db()
-    try:
-        cur.execute(
-            """UPDATE user_account 
-               SET name = ?, email = ?, phone = ?, address = ?, user_type = ?, bio = ? 
-               WHERE id = ?""",
-            (user_data.name, user_data.email, user_data.phone, user_data.address,
-             user_data.user_type, user_data.bio, user_id)
-        )
-        conn.commit()
-        return True
-    except Exception as e:
-        print(f"Database error updating user account: {e}")
-        return False
-    finally:
-        conn.close()
+@staticmethod
 def suspendProfile(user_profile_name : str) -> bool:
     conn, cur = None, None
 
@@ -133,14 +100,13 @@ def suspendProfile(user_profile_name : str) -> bool:
             WHERE name = ?
     """, (user_profile_name,))
         
-        conn.commit() # save changes
-        if cur.rowcount == 0: # no rows updated
+        conn.commit() 
+        if cur.rowcount == 0: 
             return False
         else:
             return True
     
     except Exception:
-        # can add error code if needed
         return False
     
     finally:
