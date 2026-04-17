@@ -13,7 +13,7 @@ class UserProfile:
     description: str = " "
 
     @staticmethod
-    def getProfile(profile_name:str) -> UserProfile:
+    def getProfile(profile_name:str) -> "UserProfile":
         conn, cur = connect_db()
         # check if need use ? to replace value
         res = cur.execute("SELECT * FROM user_profile WHERE name = ? ", (profile_name,))
