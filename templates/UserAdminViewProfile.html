@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Profile — Online Fundraising System Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="page-sub">Detailed information for selected profile type</div>
+
+    {# BCE BOUNDARY: ViewUserProfile #}
+    {# User Story: As a user admin, I want to view a specific user profile so that I can get the specific user profile details #}
+    {# Sequence: User Admin clicks View → ViewUserProfile(Boundary) → ViewUserProfileController(Controller) → UserProfile(Entity) #}
+    {# Flask route: GET /admin/viewprofile/</profile_name> in useradminb.py #}
+    {# BACKEND: profile object is passed from ViewUserProfileController via render_template('UserAdminViewProfile.html', profile=profile) #}
+
+    <div class="topbar">
+        <span class="topbar-logo">Online Fundraising System — Admin Portal</span>
+        <div class="topbar-user">
+            {# BACKEND: Replace "User Admin" with logged-in admin's username from session #}
+            <span id="admin-name">User Admin</span>
+            <div class="avatar">UA</div>
+        </div>
+    </div>
+
+    <div class="layout">
+
+        <div class="sidebar">
+            <a href="/admin/userprofile" class="nav-item active">User Profiles</a>
+            <a href="/admin/useraccount" class="nav-item">User Accounts</a>
+            {# BACKEND: /logout route should clear session #}
+            <a href="/logout" class="nav-item logout">Log Out</a>
+        </div>
+
+        <div class="main" id="ViewUserProfile">
+
+            <a href="/admin/userprofile" class="back-link">← Back to User Profiles</a>
+
+            <div class="page-title">View Profile</div>
+            <div class="page-sub">Detailed information for selected profile type</div>
+
+            {% if profile %}
+            <div class="detail-card">
+                <div class="detail-top">
+                    <div class="card-top">
+                        <div class="icon-circle
+                            {% if profile.name == 'fund raiser' %}icon-fr
+                            {% elif profile.name == 'donee' %}icon-donee
+                            {% elif profile.name == 'platform manager' %}icon-pm
+                            {% elif profile.name == 'user admin' %}icon-admin
+                            {% endif %}">
+                            {{ profile.name[:2] | upper }}
+                        </div>
+                        
+                        <div class="detail-title">{{profile.name | title | replace('_', ' ')}}</div>
+                        <div class="detail-desc">{{ profile.description | default('Description not available') }}</div>
+                    </div>
+                </div>
+
+                <div class="detail-body">
+                    <div class="field-row">
+                        <span class="field-label">Profile Type</span>
+                        <span class="badge badge-{{ profile.name | lower | replace(' ', '-') }}">
+                            {{ profile.name | title | replace('_', ' ') }}
+                        </span>
+                    </div>
+                    <div class="field-row">
+                        <span class="field-label">Access Level</span>
+                        <span class="field-val">{{ profile.access  }}</span>
+                    </div>
+                    <div class="field-row">
+                        <span class="field-label">Status</span>
+                        <span class="field-val {{ 'status-active' if profile.status == 1 else 'status-suspended' }}">
+                            {{ 'Active' if profile.status == 1 else 'Inactive' }}
+                        </span>
+                    </div>
+                    <div class="field-row">
+                        <span class="field-label">Description</span>
+                        <span class="field-val">{{ profile.description }}</span>
+                    </div>
+                </div>
+
+            </div>
+            {% else %}
+            <div class="error-message">
+                <p>Fail to load</p>
+            </div>
+            {% endif %}
+            {# No Update or Suspend buttons here — actions are on the dashboard only #}
+        </div>
+
+    </div>
+
+    <script>
+        /*
+        // BCE BOUNDARY: ViewUserProfile
+        // displayViewResult() — called on page load
+        // renders UserProfile details returned from ViewUserProfileController
+        function displayViewResult() {
+            const card = document.querySelector('.detail-card');
+            if (card) {
+                card.style.display = 'block';
+            }
+        }
+
+        // BCE BOUNDARY: Call displayViewResult() on page load
+        window.onload = function() {
+            displayViewResult();
+        };
+        */
+    </script>
+
+</body>
+</html>

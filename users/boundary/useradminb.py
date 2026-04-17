@@ -2,10 +2,10 @@
 from users.entity.user import User
 from users.entity.userprofile import UserProfile
 
-from users.control.useradminc import DisplayUserProfileController, UpdateUserProfileController, UpdateUserAccountController, SuspendUserProfileController,CreateUserProfileController 
+from users.control.useradminc import DisplayUserProfileController, UpdateUserProfileController, UpdateUserAccountController, SuspendUserProfileController,CreateUserProfileController, ViewUserProfileController 
 
 
-from flask import Blueprint, flash, render_template, request, jsonify, redirect, url_for
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for
 
 
 from typing import List
@@ -104,6 +104,7 @@ def update_user_account_api(user_id):
         return jsonify({"success": True, "message": f"Account {user_id} updated successfully"}), 200
     else:
         return jsonify({"success": False, "message": "Failed to update account in database"}), 500
+    
       
 class SuspendUserProfile:
     def __init__(self):
@@ -136,5 +137,5 @@ class LogoutPage:
 @admin_profiles_bp.route('/logout')
 def logout():
     page = LogoutPage()
-    message = page.logout()   # call class method
+    message = page.logout()
     return redirect(url_for('user.homepage', message=message))
