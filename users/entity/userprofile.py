@@ -69,7 +69,7 @@ class UserProfile:
             print("Error:", e)
             return False
 @staticmethod
-def updateUserProfileDB(profile_id: str, new_name: str, new_access_level: int, new_description: str) -> bool:
+def updateUserProfile(profile_id: str, new_name: str, new_access_level: int, new_description: str) -> bool:
     """
     Updates the profile name, access level, and description in the database.
     """

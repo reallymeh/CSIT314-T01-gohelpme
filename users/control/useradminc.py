@@ -1,5 +1,5 @@
 from users.entity.user import User
-from users.entity.userprofile import UserProfile, updateUserProfileDB, suspendProfile
+from users.entity.userprofile import UserProfile, updateUserProfile, suspendProfile
 from users.entity.user import User
 from dataclasses import dataclass
 from typing import List
@@ -16,8 +16,6 @@ class CreateUserProfileController:
         return UserProfile.createUserProfile(name, access_level, status, description)
 
 
-
-@dataclass
 @dataclass
 class UpdateUserProfileController:
     def updateUserProfile(self, profile_id: str, new_name: str, new_access_level: int, new_description: str) -> bool:  # Added description
@@ -25,7 +23,7 @@ class UpdateUserProfileController:
             print(f"Validation Error: Access level {new_access_level} is out of bounds (1-4).")
             return False
             
-        return updateUserProfileDB(profile_id, new_name, new_access_level, new_description)  # Added description
+        return updateUserProfile(profile_id, new_name, new_access_level, new_description)  # Added description
 @dataclass
 class UpdateUserAccountController:
     def updateUserAccount(self, user_id: str, updated_data: dict) -> bool:
