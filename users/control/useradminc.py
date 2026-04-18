@@ -79,3 +79,15 @@ class SearchUserProfileController:
 class ViewUserAccountController:
     def viewUserAccount(self, account_name: str) -> UserAccount | None:
         return getAccount(account_name)
+class CreateUserAccountController:
+    def createUserAccount(self, full_name: str, email_address: str, phone_number: str, address: str, user_type: str, account_status: int, password: str) -> bool:
+         # Basic validation
+        if not email_address or not password:
+            return False
+        return UserAccount.createUserAccount(full_name, email_address, phone_number, address, user_type, account_status, password)
+
+class LoginController:
+    def login(self, email_address: str, password: str) -> bool:
+            if not email_address or not password:
+                return False
+            return UserAccount.login(email_address, password)

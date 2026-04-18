@@ -20,15 +20,15 @@
 
         <div class="sidebar">
             <a href="/admin/userprofile" class="nav-item">User Profiles</a>
-            <a href="/admin/useraccounts" class="nav-item active">User Accounts</a>
-            <a href="#" class="nav-item logout">Log Out</a>
+            <a href="/admin/useraccount" class="nav-item active">User Accounts</a>
+            <a href="/admin/logout" class="nav-item logout">Log Out</a>
         </div>
 
         <div class="main">
             <div class="page-title">Update User Account</div>
             <div class="page-sub">Modify account details and status for ID: <strong>{{ user_id }}</strong></div>
 
-            <div class="profile-card update-form-wrapper" style="max-width: 600px;">
+            <div class="profile-card update-form-wrapper">
                 <div class="card-top">
                     <div class="card-name">Account Information</div>
                 </div>
@@ -36,22 +36,22 @@
                 <div class="card-body">
                     <input type="hidden" id="userId" value="{{ user_id }}">
 
-                    <div class="form-group">
+                    <div class="input-group">
                         <label class="form-label" for="name">Full Name *</label>
                         <input type="text" id="name" class="search-box form-input" required>
                     </div>
 
-                    <div class="form-group">
+                    <div class="input-group">
                         <label class="form-label" for="phone">Phone Number</label>
                         <input type="text" id="phone" class="search-box form-input">
                     </div>
 
-                    <div class="form-group">
+                    <div class="input-group">
                         <label class="form-label" for="address">Address</label>
                         <textarea id="address" class="search-box form-input" rows="2" style="resize: vertical; font-family: inherit;"></textarea>
                     </div>
 
-                    <div class="form-group">
+                    <div class="input-group">
                         <label class="form-label" for="accountStatus">Account Status</label>
                         <select id="accountStatus" class="search-box form-input">
                             <option value="active">Active</option>
@@ -59,7 +59,7 @@
                         </select>
                     </div>
 
-                    <div class="form-group">
+                    <div class="input-group">
                         <label class="form-label" for="userType">User Type (Role)</label>
                         <select id="userType" class="search-box form-input">
                             <option value="admin">User Admin</option>
@@ -69,14 +69,14 @@
                         </select>
                     </div>
 
-                    <div class="form-group-large">
+                    <div class="input-group">
                         <label class="form-label" for="bio">Bio / Description</label>
                         <textarea id="bio" class="search-box form-input" rows="3" style="resize: vertical; font-family: inherit;"></textarea>
                     </div>
 
                     <div class="form-actions">
                         <button class="btn-primary" onclick="submitAccountUpdate()">Save Updates</button>
-                        <button class="act-btn" onclick="window.location.href='/admin/useraccounts'">Cancel</button>
+                        <button class="btn-primary" onclick="window.location.href='/admin/useraccounts'">Cancel</button>
                     </div>
                     
                     <div id="message" class="message-box"></div>

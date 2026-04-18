@@ -2,8 +2,8 @@ from users.entity.useraccount import UserAccount
 from users.entity.user import User
 from users.entity.userprofile import UserProfile
 
-from users.control.useradminc import DisplayUserProfileController, UpdateUserProfileController, UpdateUserAccountController\
-,SuspendUserProfileController,CreateUserProfileController, ViewUserProfileController,SearchUserProfileController, ViewUserAccountController
+from users.control.useradminc import CreateUserAccountController, DisplayUserProfileController, UpdateUserProfileController, UpdateUserAccountController\
+,SuspendUserProfileController,CreateUserProfileController, ViewUserProfileController,SearchUserProfileController, ViewUserAccountController, LoginController
 
 
 
@@ -263,3 +263,70 @@ def view_account(account_name):
         return redirect(url_for('admin_view_profile.user_account_list'))
     # BCE BOUNDARY: displayViewResult()
     return render_template('UserAdminViewAccount.html', account=account)
+
+class CreateUserAccount:
+    def __init__(self):
+        self.controller = CreateUserAccountController()
+    def clickCreateAccount(self,full_name: str, email_address: str, phone_number: str, address: str, user_type: str, account_status: int, password: str):
+        if self.controller.createUserAccount(full_name, email_address, phone_number, address, user_type, account_status, password):
+            return self.displaySuccess()
+        else: 
+            return self.displayError()
+        
+    def displayError(self):
+        return 'Failed to create account. Please check the input and try again.'
+    
+    def displaySuccess(self):
+        return 'Account created successfully!'
+    
+
+@admin_profiles_bp.route('/create_account', methods=['GET'])
+def show_create_account():
+    return render_template('UserAdminCreateUserAccount.html')
+@admin_profiles_bp.route('/create_account', methods=['POST'])
+def create_user_account_route():
+    data = request.get_json()
+    email = data.get('email', '').strip()
+    name = data.get('name', '').strip()
+    phone = data.get('phone', '').strip()
+    address = data.get('address', '').strip()
+    hash_password = data.get('password', '').strip()
+    account_status = data.get('account_status', '').strip()
+    user_type = data.get('user_type', '').strip()
+    if UserAccount.userAccountExists(email):
+        return jsonify({
+            "success": False,
+            "message": "User account already exists."
+        }), 400
+    message = CreateUserAccount().clickCreateAccount(name, email, phone, address, user_type, account_status, hash_password)
+    return jsonify({'message': message})
+
+class LoginPage:
+    def clickLogin(self, email, password):
+        login_controller = LoginController()
+        if login_controller.login(email, password):
+            return self.displaySuccess()
+        else:
+            return self.displayError()
+        
+    def displayError(self):
+        return 'Login failed. Please check your email and password and try again.'
+    
+    def displaySuccess(self):
+        return 'Login successful! Welcome back.'
+
+@admin_profiles_bp.route('/login', methods=['GET'])
+def show_login():
+    return render_template('UserAdminLogin.html')
+@admin_profiles_bp.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    email = data.get('email', '').strip()
+    password = data.get('password', '').strip()
+
+    success = LoginController().login(email, password)
+
+    return jsonify({
+        "success": success,
+        "message": "Login successful! Welcome back." if success else "Login failed. Please check your email and password."
+    })

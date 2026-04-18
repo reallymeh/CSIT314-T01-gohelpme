@@ -17,7 +17,7 @@
     <div class="layout">
          <div class="sidebar">
             <a href="/admin/userprofile" class="nav-item active">User Profiles</a>
-            <a href="#" class="nav-item">User Accounts</a>
+            <a href="/admin/useraccount" class="nav-item">User Accounts</a>
             <a href="/admin/logout" class="nav-item logout">Log Out</a>
         </div>
         <div class="main">
@@ -30,7 +30,7 @@
                 </div>
 
                 <div class="card-body">
-                    <div class="form-group">
+                    <div class="input-group">
                         <label>Profile Name</label>
                         <input type="text" name="name" placeholder="Enter profile name" required>
                     </div>
@@ -56,7 +56,7 @@
                    
                    <div class="form-actions">
                         <button class="btn-primary" onclick="createProfile()">Create Profile</button>
-                        <button class="act-btn" onclick="window.location.href='/admin/userprofile'">Cancel</button>
+                        <button class="btn-primary" onclick="window.location.href='/admin/userprofile'">Cancel</button>
                     </div>
 
                     <div id="message" class="message-box"></div>
