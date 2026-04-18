@@ -62,6 +62,28 @@ class UserAccount:
 
       return False
     
+    @staticmethod
+    def updateUserAccount(user_id: str, user_data: 'UserAccount') -> bool:
+        """
+        Updates the user account in the database.
+        """
+        conn, cur = connect_db()
+        try:
+            cur.execute(
+                """UPDATE user_account 
+                SET full_name = ?, email_address = ?, phone_number = ?, address = ?, user_type = ?, account_status = ? 
+                WHERE id = ?""",
+                (user_data.full_name, user_data.email_address, user_data.phone_number,
+                user_data.address, user_data.user_type, user_data.account_status, user_id)
+            )
+            conn.commit()
+            return True
+        except Exception as e:
+            print(f"Database error updating user account: {e}")
+            return False
+        finally:
+            conn.close()
+        
 
 def getAccount(account_name: str) -> UserAccount | None:
     conn, cur = connect_db()

@@ -1,5 +1,4 @@
 from users.entity.useraccount import UserAccount
-from users.entity.user import User
 from users.entity.userprofile import UserProfile
 
 from users.control.useradminc import CreateUserAccountController, DisplayUserProfileController, UpdateUserProfileController, UpdateUserAccountController\

@@ -26,7 +26,7 @@
 
         <div class="main">
             <div class="page-title">Update User Account</div>
-            <div class="page-sub">Modify account details and status for ID: <strong>{{ user_id }}</strong></div>
+            <div class="page-sub">Modify account details and status for ID: <strong>{{ email }}</strong></div>
 
             <div class="profile-card update-form-wrapper">
                 <div class="card-top">
@@ -34,31 +34,33 @@
                 </div>
                 
                 <div class="card-body">
-                    <input type="hidden" id="userId" value="{{ user_id }}">
+                    <input type="hidden" id="originalEmail" value="{{ email }}">
 
+                    <!-- 1. Full Name -->
                     <div class="input-group">
                         <label class="form-label" for="name">Full Name *</label>
                         <input type="text" id="name" class="search-box form-input" required>
                     </div>
 
+                    <!-- 2. Email Address -->
+                    <div class="input-group">
+                        <label class="form-label" for="email">Email Address *</label>
+                        <input type="email" id="email" class="search-box form-input" required>
+                    </div>
+
+                    <!-- 3. Phone Number -->
                     <div class="input-group">
                         <label class="form-label" for="phone">Phone Number</label>
                         <input type="text" id="phone" class="search-box form-input">
                     </div>
 
+                    <!-- 4. Address -->
                     <div class="input-group">
                         <label class="form-label" for="address">Address</label>
                         <textarea id="address" class="search-box form-input" rows="2" style="resize: vertical; font-family: inherit;"></textarea>
                     </div>
 
-                    <div class="input-group">
-                        <label class="form-label" for="accountStatus">Account Status</label>
-                        <select id="accountStatus" class="search-box form-input">
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                        </select>
-                    </div>
-
+                    <!-- 5. User Type -->
                     <div class="input-group">
                         <label class="form-label" for="userType">User Type (Role)</label>
                         <select id="userType" class="search-box form-input">
@@ -69,13 +71,23 @@
                         </select>
                     </div>
 
+                    <!-- 6. Account Status -->
                     <div class="input-group">
-                        <label class="form-label" for="bio">Bio / Description</label>
-                        <textarea id="bio" class="search-box form-input" rows="3" style="resize: vertical; font-family: inherit;"></textarea>
+                        <label class="form-label" for="accountStatus">Account Status</label>
+                        <select id="accountStatus" class="search-box form-input">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+
+                    <!-- 7. Password -->
+                    <div class="input-group">
+                        <label class="form-label" for="password">Password</label>
+                        <input type="password" id="password" class="search-box form-input" placeholder="Leave blank to keep current password">
                     </div>
 
                     <div class="form-actions">
-                        <button class="btn-primary" onclick="submitAccountUpdate()">Save Updates</button>
+                        <button class="btn-primary" onclick="submitUpdate()">Save Updates</button>
                         <button class="btn-primary" onclick="window.location.href='/admin/useraccounts'">Cancel</button>
                     </div>
                     
@@ -84,51 +96,59 @@
             </div>
 
         </div>
-        </div>
+    </div>
+
     <script>
         async function fetchUserData() {
-            const userId = document.getElementById('userId').value;
+            const originalEmail = document.getElementById('originalEmail').value;
             try {
-                const response = await fetch(`/api/users/${userId}`);
+                const response = await fetch(`/api/users/${encodeURIComponent(originalEmail)}`);
                 if (response.ok) {
                     const result = await response.json();
                     const user = result.data;
                     
-                    document.getElementById('name').value = user.name || '';
-                    document.getElementById('phone').value = user.phone || '';
+                    document.getElementById('name').value = user.full_name || '';
+                    document.getElementById('email').value = user.email_address || '';
+                    document.getElementById('phone').value = user.phone_number || '';
                     document.getElementById('address').value = user.address || '';
-                    document.getElementById('accountStatus').value = user.accountStatus || 'active';
-                    document.getElementById('userType').value = user.userType || 'fund_raiser';
-                    document.getElementById('bio').value = user.bio || '';
+                    document.getElementById('userType').value = user.user_type || 'fund_raiser';
+                    document.getElementById('accountStatus').value = user.account_status || 'active';
+                    // Password field left empty for security
                 }
             } catch (error) {
-                console.error("Could not fetch initial user data:", error);
+                console.error("Could not fetch user data:", error);
             }
         }
 
         window.onload = fetchUserData;
 
-        async function submitAccountUpdate() {
-            const userId = document.getElementById('userId').value;
+        async function submitUpdate() {
+            const originalEmail = document.getElementById('originalEmail').value;
             const messageBox = document.getElementById('message');
 
             const updatedData = {
-                name: document.getElementById('name').value.trim(),
-                phone: document.getElementById('phone').value.trim(),
+                full_name: document.getElementById('name').value.trim(),
+                email_address: document.getElementById('email').value.trim(),
+                phone_number: document.getElementById('phone').value.trim(),
                 address: document.getElementById('address').value.trim(),
-                accountStatus: document.getElementById('accountStatus').value,
-                userType: document.getElementById('userType').value,
-                bio: document.getElementById('bio').value.trim()
+                user_type: document.getElementById('userType').value,
+                account_status: document.getElementById('accountStatus').value,
+                password: document.getElementById('password').value.trim()
             };
 
-            if (!updatedData.name) {
+            if (!updatedData.full_name || !updatedData.email_address) {
                 messageBox.style.color = "#A32D2D";
-                messageBox.innerText = "Error: Name is required.";
+                messageBox.innerText = "Error: Full Name and Email are required.";
                 return;
             }
             
+            // If password is empty, remove it from payload (don't update password)
+            if (!updatedData.password) {
+                delete updatedData.password;
+            }
+            
             try {
-                const response = await fetch(`/api/users/${userId}`, {
+                const response = await fetch(`/api/users/${encodeURIComponent(originalEmail)}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'

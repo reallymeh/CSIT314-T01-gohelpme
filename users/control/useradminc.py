@@ -1,9 +1,9 @@
 
-from users.entity.user import User
+from users.entity.useraccount import UserAccount
 from users.entity.userprofile import UserProfile, updateUserProfile, suspendProfile
 from users.entity.useraccount import UserAccount, getAccount
 
-from users.entity.user import User
+from users.entity.useraccount import UserAccount
 from dataclasses import dataclass
 from typing import List
 
@@ -32,20 +32,22 @@ class UpdateUserProfileController:
 class UpdateUserAccountController:
     def updateUserAccount(self, user_id: str, updated_data: dict) -> bool:
 
-        if not updated_data.get('name') or not updated_data.get('email'):
+        if not updated_data.get('name'):
             return False
 
-        updated_user = User(
-            user_id=user_id,
-            name=updated_data.get('name'),
-            email=updated_data.get('email'),
-            phone=updated_data.get('phone', ''),
+        # Use UserAccount from useraccount.py
+        updated_user = UserAccount(
+            full_name=updated_data.get('name'),
+            email_address=updated_data.get('email', ''),
+            phone_number=updated_data.get('phone', ''),
             address=updated_data.get('address', ''),
             user_type=updated_data.get('userType'),
-            bio=updated_data.get('bio', '')
+            account_status=updated_data.get('accountStatus', 1),
+            password=''  # Password not being updated here
         )
         
-        return User.updateUserAccount(user_id, updated_user)
+        # You'll need to create this method in useraccount.py
+        return UserAccount.updateUserAccount(user_id, updated_user)
     
 class SuspendUserProfileController:
     def suspendUserProfile(self, user_profile_name:str) -> bool:
