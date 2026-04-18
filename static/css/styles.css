@@ -318,4 +318,33 @@ a{
 
 .btn-search:hover {
     background-color: #0056b3;
+/* =====================
+   EMPTY STATE
+   ===================== */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+.empty-text {
+    font-size: 14px;
+    color: #666666;
+    text-align: center;
+}
+
+/* =====================
+   ACCOUNT CARD
+   ===================== */
+.account-card {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
 }

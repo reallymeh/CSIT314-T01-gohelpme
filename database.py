@@ -14,6 +14,27 @@ def init_db():
         )"
     )
 
+    # Create table for user account
+    cur.execute(
+    "CREATE TABLE IF NOT EXISTS user_account (\
+     full_name TEXT NOT NULL,\
+     email_address TEXT PRIMARY KEY,\
+     phone_number TEXT NOT NULL,\
+     address TEXT NOT NULL,\
+     user_type TEXT NOT NULL,\
+     account_status INTEGER NOT NULL,\
+     password TEXT NOT NULL\
+    )"
+    )
+
+    # sample test data
+    user_account_data = [
+        ('John Doe', 'johndoe@email.com', '+65 9123 4567', '123 Example Street', 'donee', 1, 'password123'),
+        ('Jane Smith', 'janesmith@email.com', '+65 9234 5678', '456 Example Avenue', 'fund raiser', 1, 'password123'),
+        ('Bob Lee', 'boblee@email.com', '+65 9345 6789', '789 Example Road', 'platform manager', 1, 'password123')
+    ]
+    cur.executemany("INSERT OR IGNORE INTO user_account VALUES(?, ?, ?, ?, ?, ?, ?)", user_account_data)
+
     # Populate user_profile table
 
     user_profile_data = [
