@@ -20,7 +20,7 @@
 
         <div class="sidebar">
             <a href="/admin/userprofile" class="nav-item active">User Profiles</a>
-            <a href="#" class="nav-item">User Accounts</a>
+            <a href="/admin/useraccount" class="nav-item">User Accounts</a>
             <a href="/admin/logout" class="nav-item logout">Log Out</a>
         </div>
 
@@ -36,23 +36,23 @@
                 <div class="card-body">
                     <input type="hidden" id="userProfileName" value="{{ user_profile_name }}">
 
-                    <div class="form-group">
+                    <div class="input-group">
                         <label class="form-label" for="profileType">Profile Type</label>
                         <input type="text" id="profileType" class="search-box form-input" value="{{ profile_id }}">
                     </div>
 
-                    <div class="form-group-large">
+                    <div class="input-group">
                         <label class="form-label" for="accessLevel">Access Level</label>
                         <input type="number" id="accessLevel" class="search-box form-input" min="1" max="4" placeholder="e.g., 1-4"></div>
 
-                    <div class="form-group-large">
+                    <div class="input-group">
                     <label class="form-label" for="description">Description</label>
                     <textarea id="description" class="search-box form-input" rows="3" style="resize: vertical; font-family: inherit;" placeholder="Enter profile description"></textarea>
                 </div>
 
                     <div class="form-actions">
                         <button class="btn-primary" onclick="submitUpdate()">Save Updates</button>
-                        <button class="act-btn" onclick="window.location.href='/admin/userprofile'">Cancel</button>
+                        <button class="btn-primary" onclick="window.location.href='/admin/userprofile'">Cancel</button>
                     </div>
                     
                     <div id="message" class="message-box"></div>

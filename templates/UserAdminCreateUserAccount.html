@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create User Account — Admin Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="topbar">
+        <span class="topbar-logo">Online Fundraising System — Admin Portal</span>
+        <div class="topbar-user">
+            <span id="admin-name">User Admin</span>
+            <div class="avatar">UA</div>
+        </div>
+    </div>
+
+    <div class="layout">
+
+         <div class="sidebar">
+            <a href="/admin/userprofile" class="nav-item">User Profiles</a>
+            <a href="/admin/useraccount" class="nav-item active">User Accounts</a>
+            <a href="/admin/logout" class="nav-item logout">Log Out</a>
+        </div>
+        
+        <div class="main">
+            <div class="page-title">Create User Account</div>
+            <div class="page-sub">Create a new user account with the following details:</div>
+
+            <div class="profile-card update-form-wrapper">
+                <div class="card-top">
+                    <div class="card-name">Account Details</div>
+                </div>
+
+                <div class="card-body">
+                    <div class="input-group">
+                        <label>Full Name *</label>
+                        <input type="text" name="name" placeholder="Enter full name" required>
+                    </div>
+
+                    <div class="input-group">
+                       <label>Email Address *</label>
+                       <input type="email" name="email" placeholder="Enter email" required>
+                    </div>
+
+                    <div class="input-group">
+                       <label>Phone Number *</label>
+                       <input type="tel" name="phone" placeholder="Enter phone number" required>
+                    </div>
+
+                    <div class="input-group">
+                      <label>Address</label>
+                      <textarea name="description" rows="3" placeholder="Enter address" required></textarea>
+                   </div>
+                    <div class="input-group">
+                       <label>User Type *</label>
+                       <select name="user_type" required>
+                         <option value="">Select user type</option>
+                         <option value="fund_raiser">fund raiser</option>
+                         <option value="donee">donee</option>
+                         <option value="platform_manager">platform manager</option>
+                         <option value="user_admin">user admin</option>
+                       </select>
+                    </div>
+
+                    <div class="input-group">
+                      <label>Account Status</label>
+                      <select name="account_status">
+                        <option value="">Select status</option>
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
+                      </select>
+                    </div>
+                    <div class="input-group">
+                       <label>Password *</label>
+                       <input type="password" name="password" placeholder="Enter password" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Confirm Password *</label>
+                        <input type="password" name="confirm_password" placeholder="Confirm password" required>
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn-primary" onclick="createUserAccount()">Create Account</button>
+                        <button class="btn-primary" onclick="window.location.href='/admin/useraccount'">Cancel</button>
+                    </div>
+
+                    <div id="message" class="message-box"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    
+
+</div>
+
+<script>
+    function createUserAccount() {
+        const name = document.querySelector('input[name="name"]').value;
+        const email = document.querySelector('input[name="email"]').value;
+        const phone = document.querySelector('input[name="phone"]').value;
+        const address = document.querySelector('textarea[name="description"]').value;
+        const userType = document.querySelector('select[name="user_type"]').value;
+        const accountStatus = document.querySelector('select[name="account_status"]').value;
+        const password = document.querySelector('input[name="password"]').value;
+        const confirmPassword = document.querySelector('input[name="confirm_password"]').value;
+        const messageBox = document.getElementById('message');
+
+         if (!name || !email || !phone || !userType || !password || !accountStatus || !confirmPassword) {
+            messageBox.style.color = "#A32D2D"; // Red error color
+            messageBox.innerText = "Error: All fields marked with * are required.";
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            messageBox.style.color = "#A32D2D"; // Red error color
+            messageBox.innerText = "Error: Passwords do not match.";
+            return;
+        }
+
+        const payload = {
+            email: email,
+            name: name,
+            phone: phone,
+            address: address,
+            password: password,
+            user_type: userType,
+            account_status: accountStatus
+        };
+        fetch('/admin/create_account', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);     // Show success or fail message
+                    location.reload();       // Refresh the page to update the list
+                })
+                .catch(() => {
+                    alert("Something went wrong!");
+                });
+        
+    }
+</script>
+
+</body>
+</html>

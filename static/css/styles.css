@@ -318,6 +318,7 @@ a{
 
 .btn-search:hover {
     background-color: #0056b3;
+}
 /* =====================
    EMPTY STATE
    ===================== */
@@ -347,4 +348,67 @@ a{
     border: 1px solid #e0e0e0;
     border-radius: 10px;
     overflow: hidden;
+}
+
+/*Login page*/
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 95vh;
+    background: linear-gradient(to right, #dbeafe, #f0f9ff);
+}
+
+.login-container {
+    background: white;
+    padding: 40px;
+    width: 380px;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.login-container h2 {
+    margin-bottom: 10px;
+    color: #1e293b;
+    font-size: 28px;
+}
+
+.subtitle {
+    color: #64748b;
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+.input-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    transition: 0.3s;
+    box-sizing: border-box;
+}
+
+.input-group input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 5px rgba(37, 99, 235, 0.2);
+}
+
+.profile-card update-form-wrapper {
+    max-width: 600px;
+
 }

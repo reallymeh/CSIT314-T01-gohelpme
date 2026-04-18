@@ -23,7 +23,8 @@ def init_db():
      address TEXT NOT NULL,\
      user_type TEXT NOT NULL,\
      account_status INTEGER NOT NULL,\
-     password TEXT NOT NULL\
+     password TEXT NOT NULL, \
+     FOREIGN KEY (user_type) REFERENCES user_profile(name)\
     )"
     )
 
