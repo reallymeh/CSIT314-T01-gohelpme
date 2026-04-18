@@ -37,78 +37,113 @@
             <div class="page-title">User Profiles</div>
             <div class="page-sub">View and manage all profile types on the platform</div>
 
-            <div class="toolbar">
+        <div class="toolbar">
+            <div class="search-group">
                 <input
                     class="search-box"
                     type="text"
                     id="search-input"
                     placeholder="Search profile type..."
-                    onkeyup="searchProfiles()"
                 />
-                {# BACKEND: url_for points to show_create_profile route in useradminb.py #}
-                <a href="{{ url_for('admin_view_profile.show_create_profile') }}" class="btn-primary">
-                    + Create Profile
-                </a>
+                <button class="btn-search" id="search-btn">Search</button>
             </div>
-
-            {# BACKEND: profiles list passed from DisplayUserProfileController #}
-            {# Each profile object has: name, access, status, description #}
-            <div class="grid" id="profile-grid">
-                {% for profile in profiles %}
-                <div class="profile-card" data-name="{{ profile.name | lower }}">
-                    <div class="card-top">
-                        <div class="icon-circle
-                            {% if profile.name == 'fund raiser' %}icon-fr
-                            {% elif profile.name == 'donee' %}icon-donee
-                            {% elif profile.name == 'platform manager' %}icon-pm
-                            {% elif profile.name == 'user admin' %}icon-admin
-                            {% endif %}">
-                            {{ profile.name[:2] | upper }}
-                        </div>
-                        <div>
-                            <div class="card-name">{{ profile.name | title }}</div>
-                            <div class="card-desc">{{ profile.description }}</div>
-                        </div>
-                    </div>
-                    <div class="card-actions">
-                        {# BACKEND: View button calls GET /admin/viewprofile/<name> → ViewUserProfile boundary #}
-                        <button class="act-btn view" onclick="window.location.href='/admin/viewprofile/{{ profile.name }}'">View</button>
-                        {# BACKEND: Update button calls GET /admin/updateprofile/<name> → UpdateUserProfile boundary #}
-                        <button class="act-btn" onclick="window.location.href='/admin/updateprofile/{{ profile.name }}'">Update</button>
-                        {# BACKEND: Suspend button calls POST /admin/suspend_user → SuspendUserProfile boundary #}
-                        <button class="act-btn danger" onclick="suspendProfile('{{ profile.name }}')">Suspend</button>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-
+            <a href="{{ url_for('admin_view_profile.show_create_profile') }}" class="btn-primary">
+                + Create Profile
+            </a>
         </div>
 
+        <div class="grid" id="profile-grid">
+            <!-- Initial profiles rendered by Jinja (server-side) -->
+            {% for profile in profiles %}
+            <div class="profile-card">
+                <div class="card-top">
+                    <div class="icon-circle 
+                        {% if profile.name | lower == 'fund raiser' %}icon-fr
+                        {% elif profile.name | lower == 'donee' %}icon-donee
+                        {% elif profile.name | lower == 'platform manager' %}icon-pm
+                        {% elif profile.name | lower == 'user admin' %}icon-admin
+                        {% endif %}">
+                        {{ profile.name[:2] | upper }}
+                    </div>
+                    <div>
+                        <div class="card-name">{{ profile.name | title }}</div>
+                        <div class="card-desc">{{ profile.description }}</div>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="act-btn view" onclick="window.location.href='/admin/viewprofile/{{ profile.name }}'">View</button>
+                    <button class="act-btn" onclick="window.location.href='/admin/updateprofile/{{ profile.name }}'">Update</button>
+                    <button class="act-btn danger" onclick="suspendProfile('{{ profile.name }}')">Suspend</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        </div>
     </div>
 
     <script>
-        // BCE BOUNDARY: DisplayUserProfile
-        // Called on page load — renders [UserProfile] list from DisplayUserProfileController
-        function displayUserProfile() {
-            const grid = document.getElementById('profile-grid');
-            grid.style.display = 'grid';
-        }
+        const searchInput = document.getElementById('search-input');
+        const searchBtn = document.getElementById('search-btn');
+        const profileGrid = document.getElementById('profile-grid');
 
-        // BCE BOUNDARY: SearchUserProfile
-        // Filters profile cards by name as user types in search box
-        function searchProfiles() {
-            const input = document.getElementById('search-input').value.toLowerCase();
-            const cards = document.querySelectorAll('.profile-card');
-            cards.forEach(card => {
-                const name = card.getAttribute('data-name');
-                card.style.display = name.includes(input) ? 'block' : 'none';
-            });
-        }
+         // Function to load profiles from backend
+        async function loadProfiles(query = '') {
+            try {
+                const response = await fetch(`/admin/search_profiles?q=${encodeURIComponent(query)}`);
+                const profiles = await response.json();
 
-        // BCE BOUNDARY: Call displayUserProfile() on page load
-        window.onload = function() {
-            displayUserProfile();
-        };
+                if (profiles.length === 0) {
+                    profileGrid.innerHTML = `<p class="no-results">No profiles found for "${query}".</p>`;
+                    return;
+                }
+
+                let html = '';
+                profiles.forEach(profile => {
+                    html += `
+                        <div class="profile-card">
+                            <div class="card-top">
+                                <div class="icon-circle 
+                                    ${profile.name.toLowerCase() === 'fund raiser' ? 'icon-fr' : ''}
+                                    ${profile.name.toLowerCase() === 'donee' ? 'icon-donee' : ''}
+                                    ${profile.name.toLowerCase() === 'platform manager' ? 'icon-pm' : ''}
+                                    ${profile.name.toLowerCase() === 'user admin' ? 'icon-admin' : ''}">
+                                    ${profile.name.substring(0, 2).toUpperCase()}
+                                </div>
+                                <div>
+                                    <div class="card-name">${profile.name}</div>
+                                    <div class="card-desc">${profile.description || ''}</div>
+                                </div>
+                            </div>
+                            <div class="card-actions">
+                                <button class="act-btn view" 
+                                        onclick="window.location.href='/admin/viewprofile/${encodeURIComponent(profile.name)}'">
+                                    View
+                                </button>
+                                <button class="act-btn" 
+                                        onclick="window.location.href='/admin/updateprofile/${encodeURIComponent(profile.name)}'">
+                                    Update
+                                </button>
+                                <button class="act-btn danger" 
+                                        onclick="suspendProfile('${profile.name}')">
+                                    Suspend
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+            profileGrid.innerHTML = html;
+        } catch (error) {
+            profileGrid.innerHTML = `<p class="error">Error loading profiles. Please try again later.</p>`;
+            console.error(error);
+        }
+    }
+
+        searchBtn.addEventListener('click', () => loadProfiles(searchInput.value.trim()));
+        searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') loadProfiles(searchInput.value.trim());
+        });
+
 
         // BCE BOUNDARY: SuspendUserProfile
         // Sends suspend request to SuspendUserProfileController via POST /admin/suspend_user
@@ -124,7 +159,8 @@
                 .then(data => {
                     // displaySuspendSuccess() or displaySuspendFail()
                     alert(data.message);
-                    location.reload();
+                    // Refresh current search after suspend
+                    loadProfiles(searchInput.value.trim());
                 })
                 .catch(() => {
                     alert("Something went wrong!");
