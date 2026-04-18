@@ -50,3 +50,20 @@ class SuspendUserProfileController:
 class ViewUserProfileController:
     def viewUserProfile(self, profile_name:str) -> UserProfile:
         return UserProfile.getProfile(profile_name)
+
+class SearchUserProfileController:
+    def search_profiles(self, query: str) -> List[UserProfile]:
+        all_profiles = UserProfile.getUserProfiles()
+        
+        if not query or query.strip() == "":
+            return all_profiles
+            
+        query = query.strip().lower()
+        
+        # filter logic, checks name and description to match against query
+        results = [
+            p for p in all_profiles
+            if query in p.name.lower() or 
+               (hasattr(p, 'description') and query in getattr(p, 'description', '').lower())
+        ]
+        return results
