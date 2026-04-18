@@ -254,7 +254,7 @@ class ViewUserAccount:
     def viewUserAccount(self, account_name: str) -> UserAccount | None:
         return self.controller.viewUserAccount(account_name)
 
-# Replace the hardcoded route with this
+# flask integration
 @admin_profiles_bp.route('/viewaccount/<account_name>', methods=['GET'])
 def view_account(account_name):
     account = ViewUserAccount().viewUserAccount(account_name)
