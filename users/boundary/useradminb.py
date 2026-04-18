@@ -1,7 +1,8 @@
 from users.entity.user import User
 from users.entity.userprofile import UserProfile
 
-from users.control.useradminc import DisplayUserProfileController, UpdateUserProfileController, UpdateUserAccountController, SuspendUserProfileController,CreateUserProfileController, ViewUserProfileController 
+from users.control.useradminc import DisplayUserProfileController, UpdateUserProfileController, UpdateUserAccountController\
+,SuspendUserProfileController,CreateUserProfileController, ViewUserProfileController,SearchUserProfileController 
 
 
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, abort
@@ -200,3 +201,26 @@ def user_profile(user_profile_name):
     return render_template('UserAdminViewProfile.html', 
                            profile=profile
                            )
+
+
+class SearchUserProfile:
+    def __init__(self):
+        self.controller = SearchUserProfileController()   
+
+    def search_profiles(self, query: str):
+        return self.controller.search_profiles(query)
+
+
+@admin_profiles_bp.route('/search_profiles', methods=['GET'])
+def search_user_profiles():
+    query = request.args.get('q', '').strip().lower()
+    
+    boundary = SearchUserProfile()
+    results = boundary.search_profiles(query)
+
+    data = [{
+        "name": p.name,
+        "description": getattr(p, 'description', '')
+    } for p in results]
+    
+    return jsonify(data)
