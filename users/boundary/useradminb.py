@@ -1,8 +1,8 @@
+from users.entity.useraccount import UserAccount
 from users.entity.user import User
 from users.entity.userprofile import UserProfile
 
-from users.control.useradminc import DisplayUserProfileController, UpdateUserProfileController, UpdateUserAccountController, SuspendUserProfileController,CreateUserProfileController, ViewUserProfileController 
-
+from users.control.useradminc import DisplayUserProfileController, UpdateUserProfileController, UpdateUserAccountController, SuspendUserProfileController,CreateUserProfileController, ViewUserProfileController, ViewUserAccountController
 
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, abort
 
@@ -208,16 +208,33 @@ def user_profile(user_profile_name):
 def user_account_list():
     return render_template('UserAdminAccounts.html')
 
-# ========== BCE BOUNDARY: ViewUserAccount ==========
+# BCE BOUNDARY: ViewUserAccount
 # User Story: As a user admin, I want to view user account so that I can view the user's details
-# HARDCODED — backend needs to integrate the following:
-# 1. Create ViewUserAccountController in useradminc.py
-# 2. Create getAccount(account_name: str) function in useraccount entity
-# 3. Replace hardcoded return below with:
-#    account = ViewUserAccount().viewUserAccount(account_name)
-#    if account is None:
-#        return redirect(url_for('admin_view_profile.user_account_list'))
-#    return render_template('UserAdminViewAccount.html', account=account)
+# Sequence: User Admin clicks View → ViewUserAccount(Boundary) → ViewUserAccountController(Controller) → UserAccount(Entity)
+class ViewUserAccount:
+    def __init__(self):
+        self.controller = ViewUserAccountController()
+
+    # BCE BOUNDARY: displayViewResult()
+    # called when controller returns UserAccount object
+    def displayViewResult(self, account: UserAccount):
+        return account
+
+    # BCE BOUNDARY: displayViewFail()
+    # called when controller returns None
+    # redirects back to user accounts page
+    def displayViewFail(self):
+        return None
+
+    def viewUserAccount(self, account_name: str) -> UserAccount | None:
+        return self.controller.viewUserAccount(account_name)
+
+# Replace the hardcoded route with this
 @admin_profiles_bp.route('/viewaccount/<account_name>', methods=['GET'])
 def view_account(account_name):
-    return render_template('UserAdminViewAccount.html')
+    account = ViewUserAccount().viewUserAccount(account_name)
+    if account is None:
+        # BCE BOUNDARY: displayViewFail()
+        return redirect(url_for('admin_view_profile.user_account_list'))
+    # BCE BOUNDARY: displayViewResult()
+    return render_template('UserAdminViewAccount.html', account=account)

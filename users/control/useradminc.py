@@ -1,5 +1,5 @@
-from users.entity.user import User
 from users.entity.userprofile import UserProfile, updateUserProfileDB, suspendProfile
+from users.entity.useraccount import UserAccount, getAccount
 from users.entity.user import User
 from dataclasses import dataclass
 from typing import List
@@ -16,8 +16,6 @@ class CreateUserProfileController:
         return UserProfile.createUserProfile(name, access_level, status, description)
 
 
-
-@dataclass
 @dataclass
 class UpdateUserProfileController:
     def updateUserProfile(self, profile_id: str, new_name: str, new_access_level: int, new_description: str) -> bool:  # Added description
@@ -26,6 +24,7 @@ class UpdateUserProfileController:
             return False
             
         return updateUserProfileDB(profile_id, new_name, new_access_level, new_description)  # Added description
+    
 @dataclass
 class UpdateUserAccountController:
     def updateUserAccount(self, user_id: str, updated_data: dict) -> bool:
@@ -52,3 +51,12 @@ class SuspendUserProfileController:
 class ViewUserProfileController:
     def viewUserProfile(self, profile_name:str) -> UserProfile:
         return UserProfile.getProfile(profile_name)
+
+# BCE CONTROLLER: ViewUserAccountController
+# User Story: As a user admin, I want to view user account so that I can view the user's details
+# Receives account_name from ViewUserAccount boundary
+# Calls getAccount() from UserAccount entity
+# Returns UserAccount object or None back to boundary
+class ViewUserAccountController:
+    def viewUserAccount(self, account_name: str) -> UserAccount | None:
+        return getAccount(account_name)

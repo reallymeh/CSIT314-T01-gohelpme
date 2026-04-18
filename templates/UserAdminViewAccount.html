@@ -13,7 +13,7 @@
     {# Sequence: User Admin clicks View → ViewUserAccount(Boundary) → ViewUserAccountController(Controller) → UserAccount(Entity) #}
     {# Flask route: GET /admin/viewaccount/<account_name> in useradminb.py #}
     {# BACKEND: account object is passed from ViewUserAccountController via render_template('UserAdminViewAccount.html', account=account) #}
-    {# BACKEND: account object has: full_name, email_address, phone_number, address, user_type, account_status, description #}
+    {# BACKEND: account object has: full_name, email_address, phone_number, address, user_type, account_status, password #}
 
     <div class="topbar">
         <span class="topbar-logo">Online Fundraising System — Admin Portal</span>
@@ -88,9 +88,9 @@
                         <span class="field-val status-active">Active</span>
                     </div>
                     <div class="field-row">
-                        <span class="field-label">Description</span>
-                        {# BACKEND: Replace with {{ account.description }} #}
-                        <span class="field-val">User who receives funds from fundraising campaigns</span>
+                        <span class="field-label">Password</span>
+                        {# BACKEND: Replace with {{ account.password }} #}
+                        <span class="field-val">••••••••</span>
                     </div>
                 </div>
 
