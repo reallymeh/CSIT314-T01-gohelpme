@@ -323,9 +323,21 @@ def login():
     email = data.get('email', '').strip()
     password = data.get('password', '').strip()
 
-    success = LoginController().login(email, password)
-
+    login_controller = LoginController()
+    success = login_controller.login(email, password)
+    user_type = login_controller.getUserType(email) if success else None
+    normalized_user_type = user_type.strip().lower() if user_type else ""
+    role_redirects = {
+        "admin": url_for('admin_view_profile.user_profile_list'),
+        "user_admin": url_for('admin_view_profile.user_profile_list'),
+        "platform_manager": url_for('user.homepage'),
+        "fund_raiser": url_for('user.homepage'),
+        "donee": url_for('user.homepage'),
+    }
+    redirect_url = role_redirects.get(normalized_user_type, url_for('user.homepage'))
     return jsonify({
         "success": success,
-        "message": "Login successful! Welcome back." if success else "Login failed. Please check your email and password."
+        "message": "Login successful! Welcome back." if success else "Login failed. Please check your email and password.",
+        "redirect_url": redirect_url if success else None,
+        "user_type": user_type if success else None
     })
