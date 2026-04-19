@@ -13,7 +13,7 @@ class UserAccount:
     user_type: str
     account_status: int
     password: str
-
+    # Create user account
     @staticmethod
     def createUserAccount(full_name: str, email_address: str, phone_number: str, address: str, user_type: str, account_status: int, password: str) -> bool:
         try:
@@ -42,12 +42,13 @@ class UserAccount:
         ).fetchone()
         conn.close()
         return row is not None
+    # Login method for user account
     @staticmethod
     def login(email_address: str, password: str) -> bool:
       conn, cur = connect_db()
 
       cur.execute(
-        "SELECT password FROM user_account WHERE email_address = ?",
+        "SELECT password FROM user_account WHERE email_address = ? AND account_status = 1",
         (email_address,)
      )
       result = cur.fetchone()
@@ -61,6 +62,24 @@ class UserAccount:
             return True
 
       return False
+
+    @staticmethod
+    def getUserType(email_address: str) -> str | None:
+      conn, cur = connect_db()
+
+      cur.execute(
+        "SELECT user_type FROM user_account WHERE email_address = ? AND account_status = 1",
+        (email_address,)
+     )
+      result = cur.fetchone()
+      conn.close()
+
+      if result:
+        return result[0]
+
+      return None
+
+    
     
     @staticmethod
     def updateUserAccount(user_id: str, user_data: 'UserAccount') -> bool:
