@@ -30,6 +30,7 @@ def init_db():
 
     # sample test data
     user_account_data = [
+        ('John Doe', 'admin@email.com', '+65 9123 4567', '123 Example Street', 'admin', 1, 'password123'),
         ('John Doe', 'johndoe@email.com', '+65 9123 4567', '123 Example Street', 'donee', 1, 'password123'),
         ('Jane Smith', 'janesmith@email.com', '+65 9234 5678', '456 Example Avenue', 'fund raiser', 1, 'password123'),
         ('Bob Lee', 'boblee@email.com', '+65 9345 6789', '789 Example Road', 'platform manager', 1, 'password123')

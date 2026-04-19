@@ -57,7 +57,7 @@ class UserAccount:
         stored_password = result[0]
 
         # compare passwords
-        if stored_password == password:   # ⚠️ plain text (not secure)
+        if stored_password == password:   # plain text (not secure)
             return True
 
       return False
