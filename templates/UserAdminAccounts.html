@@ -11,9 +11,7 @@
     {# BCE BOUNDARY: SearchUserAccount #}
     {# User Story: As a user admin, I want to search a user account by name so that I can get a user's information quickly #}
     {# Sequence: User Admin searches → SearchUserAccount(Boundary) → SearchUserAccountController(Controller) → UserAccount(Entity) #}
-    {# Flask route: GET /admin/useraccount?name=<name> in useradminb.py #}
-    {# BACKEND: accounts list is passed from SearchUserAccountController via render_template('UserAdminAccounts.html', accounts=accounts) #}
-    {# BACKEND: Each account object has: full_name, email_address, phone_number, address, user_type, account_status, description #}
+    {# Flask route: GET /admin/api/accounts?q=<n> in useradminb.py #}
 
     <div class="topbar">
         <span class="topbar-logo">Online Fundraising System — Admin Portal</span>
@@ -29,7 +27,7 @@
         <div class="sidebar">
             <a href="/admin/userprofile" class="nav-item">User Profiles</a>
             <a href="/admin/useraccount" class="nav-item active">User Accounts</a>
-            {# BACKEND: /logout route should clear session #}
+            {# BACKEND: /logout route clears session #}
             <a href="/admin/logout" class="nav-item logout">Log Out</a>
         </div>
 
@@ -38,7 +36,6 @@
             <div class="page-sub">Search for a user account by name</div>
 
             <div class="toolbar">
-                {# BACKEND: On form submit, calls GET /admin/useraccount?name=<name> → SearchUserAccountController #}
                 <form id="search-form" onsubmit="searchAccount(event)" style="display:flex; gap:10px; align-items:center;">
                     <input
                         class="search-box"
@@ -48,47 +45,16 @@
                     />
                     <button type="submit" class="btn-primary">Search</button>
                 </form>
-                {# BACKEND: url_for points to show_create_account route in useradminb.py #}
                 <a href="/admin/create_account" class="btn-primary">+ Create Account</a>
             </div>
 
-            {# BACKEND: displaySearchResult() — renders account cards when results are found #}
-            {# BACKEND: displaySearchFail() — shows no results message when accounts list is empty #}
-
-            <!-- empty state — shown by default before any search is performed -->
+            <!-- empty state — shown before any search is performed -->
             <div id="empty-state" class="empty-state">
                 <div class="empty-text">Search for a user account by name to view results</div>
             </div>
 
             <!-- results grid — hidden by default, shown after search -->
-            <!-- BACKEND: Replace hardcoded card below with Jinja2 loop -->
-            <!-- {% for account in accounts %} -->
-            <!-- <div class="account-card" data-name="{{ account.full_name | lower }}"> -->
-            <!-- {% endfor %} -->
-            <div id="results-grid" class="grid" style="display:none;">
-
-                <!-- hardcoded example card for frontend preview -->
-                <div class="account-card">
-                    <div class="card-top">
-                        <div class="icon-circle icon-donee">JD</div>
-                        <div>
-                            {# BACKEND: Replace with {{ account.full_name }} #}
-                            <div class="card-name">John Doe</div>
-                            {# BACKEND: Replace with {{ account.user_type | title }} #}
-                            <div class="card-desc">Donee</div>
-                        </div>
-                    </div>
-                    <div class="card-actions">
-                        {# BACKEND: View button calls GET /admin/viewaccount/<full_name> → ViewUserAccount boundary #}
-                        <button class="act-btn view" onclick="window.location.href='/admin/viewaccount/John Doe'">View</button>
-                        {# BACKEND: Update button calls GET /admin/updateaccount/<full_name> → UpdateUserAccount boundary #}
-                        <button class="act-btn" onclick="window.location.href='/admin/updateaccount/John Doe'">Update</button>
-                        {# BACKEND: Suspend button calls POST /admin/suspend_account → SuspendUserAccount boundary #}
-                        <button class="act-btn danger" onclick="suspendAccount('John Doe')">Suspend</button>
-                    </div>
-                </div>
-
-            </div>
+            <div id="results-grid" class="grid" style="display:none;"></div>
 
         </div>
 
@@ -96,70 +62,118 @@
 
     <script>
         // BCE BOUNDARY: SearchUserAccount
-        // searchAccount() — called when search form is submitted
-        // sends search request to SearchUserAccountController via GET /admin/useraccount?name=<name>
-        function searchAccount(event) {
+        // Calls GET /admin/api/accounts?q=<input> → SearchUserAccountController → UserAccount.searchAccounts()
+        async function searchAccount(event) {
             event.preventDefault();
             const input = document.getElementById('search-input').value.trim();
 
-            if (input === '') {
-                // show empty state if search box is empty
+            try {
+                const response = await fetch('/admin/api/accounts?q=' + encodeURIComponent(input));
+                if (!response.ok) throw new Error('Server error');
+                const accounts = await response.json();
+
+                if (accounts.length === 0) {
+                    displaySearchFail();
+                } else {
+                    displaySearchResult(accounts);
+                }
+            } catch (error) {
+                console.error('Search failed:', error);
                 document.getElementById('empty-state').style.display = 'block';
+                document.getElementById('empty-state').querySelector('.empty-text').textContent =
+                    'Failed to connect to the server. Please try again.';
                 document.getElementById('results-grid').style.display = 'none';
-                return;
             }
-
-            // BACKEND: Replace this block with a fetch call to GET /admin/useraccount?name=<name>
-            // fetch('/admin/useraccount?name=' + input)
-            //     .then(response => response.json())
-            //     .then(data => {
-            //         if (data.accounts.length === 0) {
-            //             displaySearchFail();
-            //         } else {
-            //             displaySearchResult(data.accounts);
-            //         }
-            //     });
-
-            // frontend only — show hardcoded result for preview
-            document.getElementById('empty-state').style.display = 'none';
-            document.getElementById('results-grid').style.display = 'grid';
         }
 
         // BCE BOUNDARY: displaySearchResult()
-        // called when SearchUserAccountController returns matching accounts
-        function displaySearchResult() {
+        // Renders account cards dynamically from the accounts array returned by the controller.
+        function displaySearchResult(accounts) {
             document.getElementById('empty-state').style.display = 'none';
-            document.getElementById('results-grid').style.display = 'grid';
+            const grid = document.getElementById('results-grid');
+            grid.innerHTML = '';
+
+            accounts.forEach(account => {
+                const initials = account.full_name
+                    .split(' ')
+                    .map(w => w[0])
+                    .join('')
+                    .substring(0, 2)
+                    .toUpperCase();
+
+                const userTypeClass = account.user_type
+                    ? 'icon-' + account.user_type.toLowerCase().replace(/\s+/g, '_')
+                    : 'icon-default';
+
+                const statusLabel = account.account_status === 1 ? 'Active' : 'Inactive';
+
+                const card = document.createElement('div');
+                card.className = 'account-card';
+                card.innerHTML = `
+                    <div class="card-top">
+                        <div class="icon-circle ${userTypeClass}">${initials}</div>
+                        <div>
+                            <div class="card-name">${account.full_name}</div>
+                            <div class="card-desc">${account.user_type} &mdash; ${statusLabel}</div>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="act-btn view"
+                            onclick="window.location.href='/admin/viewaccount/${encodeURIComponent(account.full_name)}'">
+                            View
+                        </button>
+                        <button class="act-btn"
+                            onclick="window.location.href='/admin/updateaccount/${encodeURIComponent(account.email_address)}'">
+                            Update
+                        </button>
+                        <button class="act-btn danger"
+                            onclick="suspendAccount('${account.full_name}')">
+                            Suspend
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            grid.style.display = 'grid';
         }
 
         // BCE BOUNDARY: displaySearchFail()
-        // called when SearchUserAccountController returns empty list
+        // Called when SearchUserAccountController returns an empty list.
         function displaySearchFail() {
             document.getElementById('results-grid').style.display = 'none';
+            document.getElementById('results-grid').innerHTML = '';
             document.getElementById('empty-state').style.display = 'block';
-            document.getElementById('empty-state').querySelector('.empty-text').textContent = 'No accounts found for that name.';
+            document.getElementById('empty-state').querySelector('.empty-text').textContent =
+                'No accounts found for that name.';
         }
 
         // BCE BOUNDARY: SuspendUserAccount
-        // sends suspend request to SuspendUserAccountController via POST /admin/suspend_account
-        // calls displaySuspendSuccess() or displaySuspendFail() based on response
+        // BACKEND: Hook to POST /admin/suspend_account → SuspendUserAccount boundary
         function suspendAccount(accountName) {
             if (confirm("Are you sure you want to suspend " + accountName + "?")) {
-                // BACKEND: Hook to POST /admin/suspend_account → SuspendUserAccount boundary
-                // fetch('/admin/suspend_account', {
-                //     method: 'POST',
-                //     headers: { 'Content-Type': 'application/json' },
-                //     body: JSON.stringify({ account_name: accountName })
-                // })
-                // .then(response => response.json())
-                // .then(data => {
-                //     // displaySuspendSuccess() or displaySuspendFail()
-                //     alert(data.message);
-                //     location.reload();
-                // });
-                alert("Suspend " + accountName + " coming soon!");
+                fetch('/admin/suspend_account', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ account_name: accountName })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    // Re-run the current search to refresh the grid
+                    document.getElementById('search-form').dispatchEvent(new Event('submit'));
+                })
+                .catch(() => alert('Failed to suspend account. Please try again.'));
             }
         }
+        window.onload = async function () {
+        const accounts = await fetch('/admin/api/accounts?q=').then(r => r.json());
+        if (accounts.length === 0) {
+            displaySearchFail();
+        } else {
+            displaySearchResult(accounts);
+        }
+    };
     </script>
 
 </body>

@@ -106,8 +106,11 @@
         })
         .then(response => response.json())
         .then(data => {
-            alert(data.message);     // Show success or fail message
-                    location.reload();       // Refresh the page to update the list
+            messageBox.style.color = "#3B6D11";
+            messageBox.innerText = "Success: Profile created successfully.";
+            setTimeout(() => {
+                window.location.href = '/admin/userprofile';
+            }, 2000);
                 })
                 .catch(() => {
                     alert("Something went wrong!");

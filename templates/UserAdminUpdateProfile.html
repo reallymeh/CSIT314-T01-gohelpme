@@ -63,7 +63,7 @@
         </div>
     <script>
         async function fetchProfileData() {
-            const userProfileName = document.getElementById('profileId').value;
+            const userProfileName = document.getElementById('userProfileName').value;  // was 'profileId' — wrong id
             try {
                 const response = await fetch(`/admin/api/profiles/${userProfileName}`);
                 if (response.ok) {
@@ -80,14 +80,30 @@
 
         async function submitUpdate() {
             const userProfileName = document.getElementById('userProfileName').value;
-            const newProfileType = document.getElementById('profileType').value;
+            const newProfileType = document.getElementById('profileType').value.trim();
             const newAccessLevel = document.getElementById('accessLevel').value;
-            const newDescription = document.getElementById('description').value;
+            const newDescription = document.getElementById('description').value.trim();
             const messageBox = document.getElementById('message');
 
+            // Validate — no empty fields allowed
+            if (!newProfileType) {
+                messageBox.style.color = "#A32D2D";
+                messageBox.innerText = "Error: Name cannot be empty.";
+                return;
+            }
+            if (!newAccessLevel) {
+                messageBox.style.color = "#A32D2D";
+                messageBox.innerText = "Error: Access Level cannot be empty.";
+                return;
+            }
             if (newAccessLevel < 1 || newAccessLevel > 4) {
                 messageBox.style.color = "#A32D2D";
                 messageBox.innerText = "Error: Access Level must be between 1 and 4.";
+                return;
+            }
+            if (!newDescription) {
+                messageBox.style.color = "#A32D2D";
+                messageBox.innerText = "Error: Description cannot be empty.";
                 return;
             }
 
@@ -100,9 +116,7 @@
             try {
                 const response = await fetch(`/admin/api/profiles/${userProfileName}`, {
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
 
@@ -111,7 +125,6 @@
                 if (response.ok) {
                     messageBox.style.color = "#3B6D11";
                     messageBox.innerText = "Success! " + result.message;
-                    
                     setTimeout(() => {
                         window.location.href = '/admin/userprofile';
                     }, 2000);

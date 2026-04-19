@@ -3,98 +3,100 @@ from users.entity.useraccount import UserAccount
 from users.entity.userprofile import UserProfile, updateUserProfile, suspendProfile
 from users.entity.useraccount import UserAccount, getAccount
 
-from users.entity.useraccount import UserAccount
 from dataclasses import dataclass
 from typing import List
 
 @dataclass
 class DisplayUserProfileController:
     def displayUserProfile(self) -> List[UserProfile]:
-        # talk to entity 
         return UserProfile.getUserProfiles()
 
-#Create user profile 
 class CreateUserProfileController:
-    def createUserProfile(self, name:str, access_level:int, status:int, description:str) -> bool:
+    def createUserProfile(self, name: str, access_level: int, status: int, description: str) -> bool:
         return UserProfile.createUserProfile(name, access_level, status, description)
-
 
 @dataclass
 class UpdateUserProfileController:
-    def updateUserProfile(self, user_profile_name: str, new_name: str, new_access_level: int, new_description: str) -> bool:  # Added description
+    def updateUserProfile(self, user_profile_name: str, new_name: str, new_access_level: int, new_description: str) -> bool:
         if new_access_level < 1 or new_access_level > 4:
             print(f"Validation Error: Access level {new_access_level} is out of bounds (1-4).")
             return False
-            
-        return updateUserProfile(user_profile_name, new_name, new_access_level, new_description)  # Added description
-    
+        return updateUserProfile(user_profile_name, new_name, new_access_level, new_description)
+
 @dataclass
 class UpdateUserAccountController:
-    def updateUserAccount(self, user_id: str, updated_data: dict) -> bool:
-
+    def updateUserAccount(self, email_address: str, updated_data: dict) -> bool:
+        """
+        Validates and applies account updates.
+        updated_data keys: name, email, phone, address, userType, accountStatus, password (optional)
+        Identified by email_address (primary key).
+        """
         if not updated_data.get('name'):
             return False
 
-        # Use UserAccount from useraccount.py
         updated_user = UserAccount(
             full_name=updated_data.get('name'),
-            email_address=updated_data.get('email', ''),
+            email_address=updated_data.get('email', email_address),
             phone_number=updated_data.get('phone', ''),
             address=updated_data.get('address', ''),
-            user_type=updated_data.get('userType'),
-            account_status=updated_data.get('accountStatus', 1),
-            password=''  # Password not being updated here
+            user_type=updated_data.get('userType', ''),
+            account_status=int(updated_data.get('accountStatus', 1)),
+            password=updated_data.get('password', '')  # empty string = don't update
         )
-        
-        # You'll need to create this method in useraccount.py
-        return UserAccount.updateUserAccount(user_id, updated_user)
-    
+
+        return UserAccount.updateUserAccount(email_address, updated_user)
+
 class SuspendUserProfileController:
-    def suspendUserProfile(self, user_profile_name:str) -> bool:
+    def suspendUserProfile(self, user_profile_name: str) -> bool:
         return suspendProfile(user_profile_name)
 
 class ViewUserProfileController:
-    def viewUserProfile(self, profile_name:str) -> UserProfile:
+    def viewUserProfile(self, profile_name: str) -> UserProfile:
         return UserProfile.getProfile(profile_name)
 
 class SearchUserProfileController:
     def search_profiles(self, query: str) -> List[UserProfile]:
         all_profiles = UserProfile.getUserProfiles()
-        
+
         if not query or query.strip() == "":
             return all_profiles
-            
+
         query = query.strip().lower()
-        
-        # filter logic, checks name and description to match against query
         results = [
             p for p in all_profiles
-            if query in p.name.lower() or 
+            if query in p.name.lower() or
                (hasattr(p, 'description') and query in getattr(p, 'description', '').lower())
         ]
         return results
+
 # BCE CONTROLLER: ViewUserAccountController
-# User Story: As a user admin, I want to view user account so that I can view the user's details
-# Receives account_name from ViewUserAccount boundary
-# Calls getAccount() from UserAccount entity
-# Returns UserAccount object or None back to boundary
 class ViewUserAccountController:
     def viewUserAccount(self, account_name: str) -> UserAccount | None:
         return getAccount(account_name)
+
+# BCE CONTROLLER: SearchUserAccountController
+class SearchUserAccountController:
+    def searchUserAccounts(self, query: str) -> List[UserAccount]:
+        return UserAccount.searchAccounts(query)
+
+# BCE CONTROLLER: GetUserAccountController
+class GetUserAccountController:
+    def getUserAccount(self, email_address: str) -> UserAccount | None:
+        return UserAccount.getAccountByEmail(email_address)
+
 class CreateUserAccountController:
     def createUserAccount(self, full_name: str, email_address: str, phone_number: str, address: str, user_type: str, account_status: int, password: str) -> bool:
-         # Basic validation
         if not email_address or not password:
             return False
         return UserAccount.createUserAccount(full_name, email_address, phone_number, address, user_type, account_status, password)
 
 class LoginController:
     def login(self, email_address: str, password: str) -> bool:
-            if not email_address or not password:
-                return False
-            return UserAccount.login(email_address, password)
+        if not email_address or not password:
+            return False
+        return UserAccount.login(email_address, password)
 
     def getUserType(self, email_address: str) -> str | None:
-            if not email_address:
-                return None
-            return UserAccount.getUserType(email_address)
+        if not email_address:
+            return None
+        return UserAccount.getUserType(email_address)
