@@ -142,7 +142,25 @@ class UserAccount:
             return False
         finally:
             conn.close()
-
+    @staticmethod
+    def suspendAccount(email_address: str) -> bool:
+        """Sets account_status = 0 for the given email address."""
+        conn, cur = None, None
+        try:
+            conn, cur = connect_db()
+            cur.execute(
+                "UPDATE user_account SET account_status = 0 WHERE email_address = ?",
+                (email_address,)
+            )
+            conn.commit()
+            return cur.rowcount > 0
+        except Exception:
+            return False
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
 
 def getAccount(account_name: str) -> UserAccount | None:
     """Fetch account by full_name (used by ViewUserAccount)."""
@@ -156,3 +174,5 @@ def getAccount(account_name: str) -> UserAccount | None:
     if row is None:
         return None
     return UserAccount(row[0], row[1], row[2], row[3], row[4], row[5], row[6])
+
+

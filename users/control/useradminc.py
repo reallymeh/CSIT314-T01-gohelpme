@@ -90,6 +90,11 @@ class CreateUserAccountController:
             return False
         return UserAccount.createUserAccount(full_name, email_address, phone_number, address, user_type, account_status, password)
 
+# BCE CONTROLLER: SuspendUserAccountController
+class SuspendUserAccountController:
+    def suspendUserAccount(self, email_address: str) -> bool:
+        return UserAccount.suspendAccount(email_address)
+    
 class LoginController:
     def login(self, email_address: str, password: str) -> bool:
         if not email_address or not password:

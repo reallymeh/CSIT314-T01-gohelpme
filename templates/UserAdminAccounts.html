@@ -127,7 +127,7 @@
                             Update
                         </button>
                         <button class="act-btn danger"
-                            onclick="suspendAccount('${account.full_name}')">
+                            onclick="suspendAccount('${account.email_address}', '${account.full_name}')">
                             Suspend
                         </button>
                     </div>
@@ -150,17 +150,16 @@
 
         // BCE BOUNDARY: SuspendUserAccount
         // BACKEND: Hook to POST /admin/suspend_account → SuspendUserAccount boundary
-        function suspendAccount(accountName) {
-            if (confirm("Are you sure you want to suspend " + accountName + "?")) {
+        function suspendAccount(emailAddress, fullName) {
+            if (confirm("Are you sure you want to suspend " + fullName + "?")) {
                 fetch('/admin/suspend_account', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ account_name: accountName })
+                    body: JSON.stringify({ email_address: emailAddress })
                 })
                 .then(response => response.json())
                 .then(data => {
                     alert(data.message);
-                    // Re-run the current search to refresh the grid
                     document.getElementById('search-form').dispatchEvent(new Event('submit'));
                 })
                 .catch(() => alert('Failed to suspend account. Please try again.'));

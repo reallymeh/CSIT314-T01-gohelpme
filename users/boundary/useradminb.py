@@ -7,7 +7,8 @@ from users.control.useradminc import (
     SuspendUserProfileController, CreateUserProfileController,
     ViewUserProfileController, SearchUserProfileController,
     ViewUserAccountController, LoginController,
-    SearchUserAccountController, GetUserAccountController
+    SearchUserAccountController, GetUserAccountController,
+    SuspendUserAccountController
 )
 
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for
@@ -55,7 +56,6 @@ class GetUserAccount:
 
     def getUserAccount(self, email_address: str) -> UserAccount | None:
         return self.controller.getUserAccount(email_address)
-
 
 # flask integration
 admin_profiles_bp = Blueprint('admin_view_profile', __name__, url_prefix='/admin')
@@ -336,7 +336,23 @@ class CreateUserAccount:
     def displaySuccess(self):
         return 'Account created successfully!'
 
+# BCE BOUNDARY: SuspendUserAccount
+class SuspendUserAccount:
+    def __init__(self):
+        self.controller = SuspendUserAccountController()
 
+    def displaySuspendSuccess(self):
+        return "Account suspended successfully."
+
+    def displaySuspendFail(self):
+        return "Failed to suspend account."
+
+    def suspendUserAccount(self, email_address: str) -> str:
+        if self.controller.suspendUserAccount(email_address):
+            return self.displaySuspendSuccess()
+        else:
+            return self.displaySuspendFail()
+        
 @admin_profiles_bp.route('/create_account', methods=['GET'])
 def show_create_account():
     return render_template('UserAdminCreateUserAccount.html')
@@ -357,6 +373,14 @@ def create_user_account_route():
     message = CreateUserAccount().clickCreateAccount(name, email, phone, address, user_type, account_status, hash_password)
     return jsonify({'message': message})
 
+@admin_profiles_bp.route('/suspend_account', methods=['POST'])
+def suspend_account():
+    data = request.get_json()
+    print("Suspend payload received:", data)
+    email_address = data.get('email_address')
+    print("Email to suspend:", email_address)
+    message = SuspendUserAccount().suspendUserAccount(email_address)
+    return jsonify({'message': message})
 
 class LoginPage:
     def clickLogin(self, email, password):
