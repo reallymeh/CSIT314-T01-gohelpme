@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FRA Categories — Online Fundraising System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+    {# BCE BOUNDARY: DisplayFRACategory + SearchFRACategory #}
+    {# User Stories: #36 View FRA Categories, #39 Search FRA Categories #}
+    {# Flask route: GET /manager/categories in platform_managerb.py #}
+    {# BACKEND: categories list passed from DisplayFRACategoryController via render_template('PlatformManagerCategories.html', categories=categories) #}
+    {# BACKEND: Each category object has: name, description, status #}
+
+    <div class="topbar">
+        <span class="topbar-logo">Online Fundraising System — Platform Manager Portal</span>
+        <div class="topbar-user">
+            {# BACKEND: Replace "Platform Manager" with logged-in manager's username from session #}
+            <span id="manager-name">Platform Manager</span>
+            <div class="avatar">PM</div>
+        </div>
+    </div>
+
+    <div class="layout">
+
+        <div class="sidebar">
+            <a href="/manager/categories" class="nav-item active">FRA Categories</a>
+            {# BACKEND: /logout route should clear session #}
+            <a href="/logout" class="nav-item logout">Log Out</a>
+        </div>
+
+        <div class="main" id="DisplayFRACategory">
+            <div class="page-title">FRA Categories</div>
+            <div class="page-sub">View and manage all fundraising activity categories</div>
+
+            <div class="toolbar">
+                {# BCE BOUNDARY: SearchFRACategory #}
+                {# BACKEND: On form submit, calls GET /manager/categories?name=<name> → SearchFRACategoryController #}
+                <form id="search-form" onsubmit="searchCategory(event)" style="display:flex; gap:10px; align-items:center;">
+                    <input
+                        class="search-box"
+                        type="text"
+                        id="search-input"
+                        placeholder="Search category..."
+                    />
+                    <button type="submit" class="btn-primary">Search</button>
+                </form>
+                {# BCE BOUNDARY: CreateFRACategory #}
+                {# BACKEND: url_for points to show_create_category route in platform_managerb.py #}
+                <a href="/manager/create_category" class="btn-primary">+ Create Category</a>
+            </div>
+
+            {# BACKEND: displayFRACategory() renders all category cards #}
+            {# BACKEND: Replace hardcoded cards below with Jinja2 loop #}
+            {# {% for category in categories %} #}
+            {# <div class="profile-card" data-name="{{ category.name | lower }}"> #}
+            {# {% endfor %} #}
+            <div class="grid" id="category-grid">
+
+                <!-- hardcoded card 1: Equipment -->
+                <div class="profile-card" data-name="equipment">
+                    <div class="card-top">
+                        <div class="icon-circle icon-fr">EQ</div>
+                        <div>
+                            {# BACKEND: Replace with {{ category.name | title }} #}
+                            <div class="card-name">Equipment</div>
+                            {# BACKEND: Replace with {{ category.description }} #}
+                            <div class="card-desc">Donation of equipment</div>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        {# BACKEND: View button calls GET /manager/viewcategory/<name> → ViewFRACategory boundary #}
+                        <button class="act-btn view" onclick="window.location.href='/manager/viewcategory/equipment'">View</button>
+                        {# BACKEND: Update button calls GET /manager/updatecategory/<name> → UpdateFRACategory boundary #}
+                        <button class="act-btn" onclick="window.location.href='/manager/updatecategory/equipment'">Update</button>
+                        {# BACKEND: Suspend button calls POST /manager/suspend_category → SuspendFRACategory boundary #}
+                        <button class="act-btn danger" onclick="suspendCategory('equipment')">Suspend</button>
+                    </div>
+                </div>
+
+                <!-- hardcoded card 2: Cash -->
+                <div class="profile-card" data-name="cash">
+                    <div class="card-top">
+                        <div class="icon-circle icon-donee">CA</div>
+                        <div>
+                            {# BACKEND: Replace with {{ category.name | title }} #}
+                            <div class="card-name">Cash</div>
+                            {# BACKEND: Replace with {{ category.description }} #}
+                            <div class="card-desc">Cash donation</div>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="act-btn view" onclick="window.location.href='/manager/viewcategory/cash'">View</button>
+                        <button class="act-btn" onclick="window.location.href='/manager/updatecategory/cash'">Update</button>
+                        <button class="act-btn danger" onclick="suspendCategory('cash')">Suspend</button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        // =====================
+        // BCE BOUNDARY: DisplayFRACategory
+        // Called on page load — renders [FRACategory] list from DisplayFRACategoryController
+        // =====================
+        function displayFRACategory() {
+            const grid = document.getElementById('category-grid');
+            grid.style.display = 'grid';
+        }
+
+        // =====================
+        // BCE BOUNDARY: SearchFRACategory
+        // HARDCODED — backend needs to:
+        // 1. In searchCategory() — uncomment the fetch block, delete the "frontend only" line
+        // 2. Flask route: GET /manager/categories?name=<name> → SearchFRACategoryController
+        // =====================
+        function searchCategory(event) {
+            event.preventDefault();
+            const input = document.getElementById('search-input').value.trim().toLowerCase();
+
+            if (input === '') {
+                displayFRACategory();
+                return;
+            }
+
+            // BACKEND: Replace this block with fetch call to GET /manager/categories?name=<name>
+            // fetch('/manager/categories?name=' + input)
+            //     .then(response => response.json())
+            //     .then(data => {
+            //         if (data.categories.length === 0) {
+            //             displaySearchFail();
+            //         } else {
+            //             displaySearchResult(data.categories);
+            //         }
+            //     });
+
+            // frontend only — filter hardcoded cards by name
+            const cards = document.querySelectorAll('.profile-card');
+            cards.forEach(card => {
+                const name = card.getAttribute('data-name');
+                card.style.display = name.includes(input) ? 'block' : 'none';
+            });
+        }
+
+        // BCE BOUNDARY: displaySearchResult()
+        // called when SearchFRACategoryController returns matching categories
+        function displaySearchResult() {
+            document.getElementById('category-grid').style.display = 'grid';
+        }
+
+        // BCE BOUNDARY: displaySearchFail()
+        // called when SearchFRACategoryController returns empty list
+        function displaySearchFail() {
+            const cards = document.querySelectorAll('.profile-card');
+            cards.forEach(card => card.style.display = 'none');
+        }
+
+        // =====================
+        // BCE BOUNDARY: SuspendFRACategory
+        // HARDCODED — backend needs to:
+        // uncomment fetch block, delete hardcoded alert line
+        // Flask route: POST /manager/suspend_category → SuspendFRACategoryController
+        // =====================
+        function suspendCategory(categoryName) {
+            if (confirm("Are you sure you want to suspend " + categoryName + "?")) {
+                // BACKEND: Hook to POST /manager/suspend_category → SuspendFRACategory boundary
+                // fetch('/manager/suspend_category', {
+                //     method: 'POST',
+                //     headers: { 'Content-Type': 'application/json' },
+                //     body: JSON.stringify({ category_name: categoryName })
+                // })
+                // .then(response => response.json())
+                // .then(data => {
+                //     // displaySuspendSuccess() or displaySuspendFail()
+                //     alert(data.message);
+                //     location.reload();
+                // });
+                alert("Suspend " + categoryName + " coming soon!");
+            }
+        }
+
+        // BCE BOUNDARY: Call displayFRACategory() on page load
+        window.onload = function() {
+            displayFRACategory();
+        };
+    </script>
+
+</body>
+</html>

@@ -15,7 +15,7 @@ class FRACategory:
             conn, cur = connect_db()
             try:
                 cur.execute(
-                    "INSERT INTO user_profile (name, description) VALUES (?, ?)",
+                    "INSERT INTO fra_category (name, description) VALUES (?, ?)",
                     (cat_name, description)
                 )
                 conn.commit()

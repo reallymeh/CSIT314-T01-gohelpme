@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Category — Online Fundraising System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+    {# BCE BOUNDARY: CreateFRACategory #}
+    {# User Story: #35 As a platform management, I want to create FRA categories so that I can create a new category for FRA #}
+    {# Sequence: Platform Manager submits form → CreateFRACategory(Boundary) → CreateFRACategoryController(Controller) → FRACategory(Entity) #}
+    {# Flask route: POST /manager/create_category in platform_managerb.py #}
+    {# BACKEND: On successful POST, CreateFRACategoryController calls FRACategory.createCategory(name, description) #}
+    {# BACKEND: Returns displaySuccess() or displayFailure() based on result #}
+
+    <div class="topbar">
+        <span class="topbar-logo">Online Fundraising System — Platform Manager Portal</span>
+        <div class="topbar-user">
+            {# BACKEND: Replace "Platform Manager" with logged-in manager's username from session #}
+            <span id="manager-name">Platform Manager</span>
+            <div class="avatar">PM</div>
+        </div>
+    </div>
+
+    <div class="layout">
+
+        <div class="sidebar">
+            <a href="/manager/categories" class="nav-item active">FRA Categories</a>
+            {# BACKEND: /logout route should clear session #}
+            <a href="/logout" class="nav-item logout">Log Out</a>
+        </div>
+
+        {# BACKEND: displaySuccess() — shows success message when category is created #}
+        {# BACKEND: displayFailure() — shows error message when category already exists or creation fails #}
+        <div class="main" id="CreateFRACategory">
+
+            <a href="/manager/categories" class="back-link">← Back to FRA Categories</a>
+
+            <div class="page-title">Create Category</div>
+            <div class="page-sub">Add a new FRA category to the platform</div>
+
+            <div class="detail-card">
+                <div class="detail-body">
+
+                    <div id="message-box" style="display:none; padding:10px; border-radius:6px; margin-bottom:16px; font-size:13px;"></div>
+
+                    <div class="field-row" style="flex-direction:column; align-items:flex-start; gap:6px;">
+                        <label class="field-label" for="category-name">Category Name</label>
+                        <input
+                            class="search-box"
+                            type="text"
+                            id="category-name"
+                            placeholder="Enter category name..."
+                            style="width:100%;"
+                        />
+                    </div>
+
+                    <div class="field-row" style="flex-direction:column; align-items:flex-start; gap:6px; margin-top:12px;">
+                        <label class="field-label" for="category-desc">Description</label>
+                        <textarea
+                            class="search-box"
+                            id="category-desc"
+                            placeholder="Enter category description..."
+                            style="width:100%; height:80px; resize:vertical;"
+                        ></textarea>
+                    </div>
+
+                </div>
+
+                <div class="detail-actions">
+                    {# BACKEND: Submit button calls POST /manager/create_category → CreateFRACategory boundary #}
+                    <button class="btn-primary" onclick="createCategory()">Create Category</button>
+                    <button class="act-btn" onclick="window.location.href='/manager/categories'">Cancel</button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        // =====================
+        // BCE BOUNDARY: CreateFRACategory
+        // createCategory() — called when Create Category button is pressed
+        // sends POST request to CreateFRACategoryController via /manager/create_category
+        // calls displaySuccess() or displayFailure() based on response
+        // BACKEND: uncomment fetch block, delete hardcoded alert line
+        // =====================
+        function createCategory() {
+            const name = document.getElementById('category-name').value.trim();
+            const description = document.getElementById('category-desc').value.trim();
+
+            if (name === '') {
+                showMessage('Category name cannot be empty.', false);
+                return;
+            }
+
+            // BACKEND: Hook to POST /manager/create_category → CreateFRACategory boundary
+            fetch('/manager/create_category', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name, description: description })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // BCE BOUNDARY: displaySuccess()
+                    showMessage(data.message, true);
+                } else {
+                    // BCE BOUNDARY: displayFailure()
+                    showMessage(data.message, false);
+                }
+            })
+            .catch(() => {
+                showMessage('Something went wrong!', false);
+            });
+        }
+
+        // BCE BOUNDARY: displaySuccess() — shows green success message
+        // BCE BOUNDARY: displayFailure() — shows red error message
+        function showMessage(message, success) {
+            const box = document.getElementById('message-box');
+            box.style.display = 'block';
+            box.style.backgroundColor = success ? '#EAF3DE' : '#FCEBEB';
+            box.style.color = success ? '#3B6D11' : '#A32D2D';
+            box.style.border = success ? '1px solid #C0DD97' : '1px solid #F7C1C1';
+            box.textContent = message;
+        }
+
+        window.onload = function() {
+            document.getElementById('message-box').style.display = 'none';
+        };
+    </script>
+
+</body>
+</html>

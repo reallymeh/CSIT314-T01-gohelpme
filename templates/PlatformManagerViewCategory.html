@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Category — Online Fundraising System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+    {# BCE BOUNDARY: ViewFRACategory #}
+    {# User Story: #36 As a platform management, I want to view FRA categories so that I can view the FRA categories I created #}
+    {# Sequence: Platform Manager clicks View → ViewFRACategory(Boundary) → ViewFRACategoryController(Controller) → FRACategory(Entity) #}
+    {# Flask route: GET /manager/viewcategory/<category_name> in platform_managerb.py #}
+    {# BACKEND: category object passed from ViewFRACategoryController via render_template('PlatformManagerViewCategory.html', category=category) #}
+    {# BACKEND: category object has: name, description, status #}
+
+    <div class="topbar">
+        <span class="topbar-logo">Online Fundraising System — Platform Manager Portal</span>
+        <div class="topbar-user">
+            {# BACKEND: Replace "Platform Manager" with logged-in manager's username from session #}
+            <span id="manager-name">Platform Manager</span>
+            <div class="avatar">PM</div>
+        </div>
+    </div>
+
+    <div class="layout">
+
+        <div class="sidebar">
+            <a href="/manager/categories" class="nav-item active">FRA Categories</a>
+            {# BACKEND: /logout route should clear session #}
+            <a href="/logout" class="nav-item logout">Log Out</a>
+        </div>
+
+        {# BACKEND: displayViewResult() renders this card when category is found #}
+        {# BACKEND: displayViewFail() redirects back to categories page if category is None #}
+        <div class="main" id="ViewFRACategory">
+
+            <a href="/manager/categories" class="back-link">← Back to FRA Categories</a>
+
+            <div class="page-title">View Category</div>
+            <div class="page-sub">Detailed information for selected FRA category</div>
+
+            <div class="detail-card">
+                <div class="detail-top">
+                    {# BACKEND: Replace hardcoded initials with {{ category.name[:2] | upper }} #}
+                    <div class="icon-circle icon-fr">EQ</div>
+                    <div>
+                        {# BACKEND: Replace with {{ category.name | title }} #}
+                        <div class="detail-title">Equipment</div>
+                        {# BACKEND: Replace with {{ category.description }} #}
+                        <div class="detail-desc">Donation of equipment</div>
+                    </div>
+                </div>
+
+                <div class="detail-body">
+                    <div class="field-row">
+                        <span class="field-label">Category Name</span>
+                        {# BACKEND: Replace with {{ category.name | title }} #}
+                        <span class="field-val">Equipment</span>
+                    </div>
+                    <div class="field-row">
+                        <span class="field-label">Description</span>
+                        {# BACKEND: Replace with {{ category.description }} #}
+                        <span class="field-val">Donation of equipment</span>
+                    </div>
+                    <div class="field-row">
+                        <span class="field-label">Status</span>
+                        {# BACKEND: Replace with {% if category.status == 1 %}status-active{% else %}status-suspended{% endif %} #}
+                        {# BACKEND: Replace "Active" with {% if category.status == 1 %}Active{% else %}Inactive{% endif %} #}
+                        <span class="field-val status-active">Active</span>
+                    </div>
+                </div>
+
+            </div>
+            {# No Update or Suspend buttons here — actions are on the FRA Categories dashboard only #}
+
+        </div>
+
+    </div>
+
+    <script>
+        // =====================
+        // BCE BOUNDARY: ViewFRACategory
+        // HARDCODED — backend needs to:
+        // 1. Add GET /manager/viewcategory/<category_name> route in platform_managerb.py
+        // 2. Pass real category object via render_template('PlatformManagerViewCategory.html', category=category)
+        // 3. Replace all hardcoded values with Jinja2 variables as indicated by {# BACKEND #} comments
+        // 4. displayViewResult() and displayViewFail() can be removed once Flask renders server-side
+        // =====================
+
+        // BCE BOUNDARY: displayViewResult()
+        // renders FRACategory details returned from ViewFRACategoryController
+        function displayViewResult() {
+            const card = document.querySelector('.detail-card');
+            if (card) {
+                card.style.display = 'block';
+            }
+        }
+
+        // BCE BOUNDARY: displayViewFail()
+        // called when ViewFRACategoryController returns None
+        // redirects back to categories page
+        function displayViewFail() {
+            alert("Category not found!");
+            window.location.href = '/manager/categories';
+        }
+
+        // BCE BOUNDARY: Call displayViewResult() on page load
+        window.onload = function() {
+            displayViewResult();
+        };
+    </script>
+
+</body>
+</html>
