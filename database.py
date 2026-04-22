@@ -28,6 +28,14 @@ def init_db():
     )"
     )
 
+    # Create table for user profiles
+    cur.execute(
+        "CREATE TABLE IF NOT EXISTS fra_category (\
+         name TEXT PRIMARY KEY,\
+         description TEXT\
+        )"
+    )
+
     # sample test data
     user_account_data = [
         ('John Doe', 'admin@email.com', '+65 9123 4567', '123 Example Street', 'admin', 1, 'password123'),
@@ -36,7 +44,7 @@ def init_db():
         ('Bob Lee', 'boblee@email.com', '+65 9345 6789', '789 Example Road', 'platform manager', 1, 'password123')
     ]
     cur.executemany("INSERT OR IGNORE INTO user_account VALUES(?, ?, ?, ?, ?, ?, ?)", user_account_data)
-
+    conn.commit()
     # Populate user_profile table
 
     user_profile_data = [
@@ -46,9 +54,15 @@ def init_db():
     ('donee', 4, 1, "User who receives funds from fundraising campaigns" )
     ]
     cur.executemany("INSERT OR IGNORE INTO user_profile VALUES(?, ?, ?, ?)", user_profile_data)
-
     conn.commit()
 
+    fra_category_data = [
+        ('equipment', 'donation of equipment'),
+        ('cash', 'cash donation')
+    ]
+    cur.executemany("INSERT OR IGNORE INTO fra_category VALUES(?, ?)", fra_category_data)
+    conn.commit()
+    
     cur.close()
     conn.close()
 
