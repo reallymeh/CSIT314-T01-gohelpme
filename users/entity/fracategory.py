@@ -39,3 +39,17 @@ class FRACategory:
         conn.close()
         
         return res is not None
+    
+    @staticmethod
+    def getCategory(category_name: str) -> "FRACategory | None":
+        conn, cur = connect_db()
+        result = cur.execute(
+            "SELECT * FROM fra_category WHERE name = ?", (category_name,)
+        )
+        row = result.fetchone()
+        cur.close()
+        conn.close()
+
+        if row is None:
+            return None
+        return FRACategory(row[0], row[1])

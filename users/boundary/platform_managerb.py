@@ -1,4 +1,4 @@
-from users.control.platform_managerc import CreateFRACategoryController
+from users.control.platform_managerc import CreateFRACategoryController, ViewFRACategoryController
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for
 
 platform_manager_bp = Blueprint('platform_manager', __name__, url_prefix='/manager')
@@ -42,8 +42,26 @@ def create_category():
         return jsonify({'success': False, 'message': boundary.displayFailure()})
 
 # ========== BCE BOUNDARY: ViewFRACategory ==========
-# HARDCODED — backend needs to integrate ViewFRACategoryController
+# User Story: #36 As a platform management, I want to view FRA categories
+class ViewFRACategoryBoundary:
+    def __init__(self):
+        self.controller = ViewFRACategoryController()
+
+    def displayViewResult(self, category: FRACategory):
+        return category
+
+    def displayViewFail(self):
+        return None
+
+    def viewFRACategory(self, category_name: str):
+        return self.controller.viewFRACategory(category_name)
+
+# ========== BCE BOUNDARY: ViewFRACategory ==========
 @platform_manager_bp.route('/viewcategory/<category_name>', methods=['GET'])
 def view_category(category_name):
-    # BACKEND: Replace with ViewFRACategoryBoundary().viewFRACategory(category_name)
-    return render_template('PlatformManagerViewCategory.html')
+    category = ViewFRACategoryBoundary().viewFRACategory(category_name)
+    if category is None:
+        # BCE BOUNDARY: displayViewFail()
+        return redirect(url_for('platform_manager.category_list'))
+    # BCE BOUNDARY: displayViewResult()
+    return render_template('PlatformManagerViewCategory.html', category=category)
