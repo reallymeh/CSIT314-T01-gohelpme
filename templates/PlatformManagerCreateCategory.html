@@ -8,11 +8,11 @@
 </head>
 <body>
 
-    {# BCE BOUNDARY: CreateFRACategory #}
+    {# BCE BOUNDARY: CreateFRACategoryBoundary #}
     {# User Story: #35 As a platform management, I want to create FRA categories so that I can create a new category for FRA #}
-    {# Sequence: Platform Manager submits form → CreateFRACategory(Boundary) → CreateFRACategoryController(Controller) → FRACategory(Entity) #}
+    {# Sequence: Platform Manager submits form → CreateFRACategoryBoundary(Boundary) → CreateFRACategoryController(Controller) → FRACategory(Entity) #}
     {# Flask route: POST /manager/create_category in platform_managerb.py #}
-    {# BACKEND: On successful POST, CreateFRACategoryController calls FRACategory.createCategory(name, description) #}
+    {# BACKEND: On successful POST, CreateFRACategoryController calls FRACategory.createCategory(name, description, status) #}
     {# BACKEND: Returns displaySuccess() or displayFailure() based on result #}
 
     <div class="topbar">
@@ -32,8 +32,6 @@
             <a href="/logout" class="nav-item logout">Log Out</a>
         </div>
 
-        {# BACKEND: displaySuccess() — shows success message when category is created #}
-        {# BACKEND: displayFailure() — shows error message when category already exists or creation fails #}
         <div class="main" id="CreateFRACategory">
 
             <a href="/manager/categories" class="back-link">← Back to FRA Categories</a>
@@ -67,10 +65,19 @@
                         ></textarea>
                     </div>
 
+                    <div class="field-row" style="flex-direction:column; align-items:flex-start; gap:6px; margin-top:12px;">
+                        <label class="field-label" for="category-status">Status</label>
+                        {# BACKEND: status 1 = Active, 0 = Inactive #}
+                        <select class="search-box" id="category-status" style="width:100%;">
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                    </div>
+
                 </div>
 
                 <div class="detail-actions">
-                    {# BACKEND: Submit button calls POST /manager/create_category → CreateFRACategory boundary #}
+                    {# BACKEND: Submit button calls POST /manager/create_category → CreateFRACategoryBoundary #}
                     <button class="btn-primary" onclick="createCategory()">Create Category</button>
                     <button class="act-btn" onclick="window.location.href='/manager/categories'">Cancel</button>
                 </div>
@@ -82,26 +89,26 @@
 
     <script>
         // =====================
-        // BCE BOUNDARY: CreateFRACategory
+        // BCE BOUNDARY: CreateFRACategoryBoundary
         // createCategory() — called when Create Category button is pressed
         // sends POST request to CreateFRACategoryController via /manager/create_category
         // calls displaySuccess() or displayFailure() based on response
-        // BACKEND: uncomment fetch block, delete hardcoded alert line
         // =====================
         function createCategory() {
             const name = document.getElementById('category-name').value.trim();
             const description = document.getElementById('category-desc').value.trim();
+            const status = parseInt(document.getElementById('category-status').value);
 
             if (name === '') {
                 showMessage('Category name cannot be empty.', false);
                 return;
             }
 
-            // BACKEND: Hook to POST /manager/create_category → CreateFRACategory boundary
+            // BACKEND: Hook to POST /manager/create_category → CreateFRACategoryBoundary
             fetch('/manager/create_category', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: name, description: description })
+                body: JSON.stringify({ name: name, description: description, status: status })
             })
             .then(response => response.json())
             .then(data => {

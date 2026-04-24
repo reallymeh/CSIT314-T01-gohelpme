@@ -32,8 +32,9 @@ def init_db():
     cur.execute(
         "CREATE TABLE IF NOT EXISTS fra_category (\
          name TEXT PRIMARY KEY,\
-         description TEXT\
-        )"
+         description TEXT,\
+         status INTEGER NOT NULL\
+                    )"
     )
 
     # sample test data
@@ -57,10 +58,10 @@ def init_db():
     conn.commit()
 
     fra_category_data = [
-        ('equipment', 'donation of equipment'),
-        ('cash', 'cash donation')
+        ('equipment', 'donation of equipment', 1),
+        ('cash', 'cash donation', 1)
     ]
-    cur.executemany("INSERT OR IGNORE INTO fra_category VALUES(?, ?)", fra_category_data)
+    cur.executemany("INSERT OR IGNORE INTO fra_category VALUES(?, ?, ?)", fra_category_data)
     conn.commit()
     
     cur.close()

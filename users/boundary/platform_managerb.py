@@ -9,8 +9,8 @@ class CreateFRACategoryBoundary:
     def __init__(self):
         self.controller = CreateFRACategoryController()
 
-    def createFRACategory(self, cat_name: str, description: str) -> bool:
-        return self.controller.createFRACategory(cat_name, description)
+    def createFRACategory(self, cat_name: str, description: str, status: int) -> bool:
+        return self.controller.createFRACategory(cat_name, description, status)
 
     def displaySuccess(self):
         return 'Category created successfully!'
@@ -20,9 +20,6 @@ class CreateFRACategoryBoundary:
 
 @platform_manager_bp.route('/categories', methods=['GET'])
 def category_list():
-    # BACKEND: Replace hardcoded return with DisplayFRACategoryController
-    # categories = DisplayFRACategoryBoundary().displayFRACategory()
-    # return render_template('PlatformManagerCategories.html', categories=categories)
     return render_template('PlatformManagerCategories.html')
 
 @platform_manager_bp.route('/create_category', methods=['GET'])
@@ -34,9 +31,10 @@ def create_category():
     data = request.get_json()
     name = data.get('name', '').strip()
     description = data.get('description', '').strip()
+    status = int(data.get('status', 1))
 
     boundary = CreateFRACategoryBoundary()
-    if boundary.createFRACategory(name, description):
+    if boundary.createFRACategory(name, description, status):
         return jsonify({'success': True, 'message': boundary.displaySuccess()})
     else:
         return jsonify({'success': False, 'message': boundary.displayFailure()})
@@ -47,21 +45,14 @@ class ViewFRACategoryBoundary:
     def __init__(self):
         self.controller = ViewFRACategoryController()
 
-    def displayViewResult(self, category: FRACategory):
+    def displayViewResult(self, category):
         return category
-
-    def displayViewFail(self):
-        return None
 
     def viewFRACategory(self, category_name: str):
         return self.controller.viewFRACategory(category_name)
 
-# ========== BCE BOUNDARY: ViewFRACategory ==========
 @platform_manager_bp.route('/viewcategory/<category_name>', methods=['GET'])
 def view_category(category_name):
     category = ViewFRACategoryBoundary().viewFRACategory(category_name)
-    if category is None:
-        # BCE BOUNDARY: displayViewFail()
-        return redirect(url_for('platform_manager.category_list'))
     # BCE BOUNDARY: displayViewResult()
     return render_template('PlatformManagerViewCategory.html', category=category)

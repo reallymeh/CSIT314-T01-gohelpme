@@ -8,12 +8,12 @@
 </head>
 <body>
 
-    {# BCE BOUNDARY: ViewFRACategory #}
+    {# BCE BOUNDARY: ViewFRACategoryBoundary #}
     {# User Story: #36 As a platform management, I want to view FRA categories so that I can view the FRA categories I created #}
-    {# Sequence: Platform Manager clicks View → ViewFRACategory(Boundary) → ViewFRACategoryController(Controller) → FRACategory(Entity) #}
+    {# Sequence: Platform Manager clicks View → ViewFRACategoryBoundary(Boundary) → ViewFRACategoryController(Controller) → FRACategory(Entity) #}
     {# Flask route: GET /manager/viewcategory/<category_name> in platform_managerb.py #}
     {# BACKEND: category object passed from ViewFRACategoryController via render_template('PlatformManagerViewCategory.html', category=category) #}
-    {# BACKEND: category object has: name, description, status #}
+    {# BACKEND: category object has: category_name, description, status #}
 
     <div class="topbar">
         <span class="topbar-logo">Online Fundraising System — Platform Manager Portal</span>
@@ -33,7 +33,6 @@
         </div>
 
         {# BACKEND: displayViewResult() renders this card when category is found #}
-        {# BACKEND: displayViewFail() redirects back to categories page if category is None #}
         <div class="main" id="ViewFRACategory">
 
             <a href="/manager/categories" class="back-link">← Back to FRA Categories</a>
@@ -41,38 +40,30 @@
             <div class="page-title">View Category</div>
             <div class="page-sub">Detailed information for selected FRA category</div>
 
-            <div class="detail-card">
-                <div class="detail-top">
-                    {# BACKEND: Replace hardcoded initials with {{ category.name[:2] | upper }} #}
-                    <div class="icon-circle icon-fr">EQ</div>
-                    <div>
-                        {# BACKEND: Replace with {{ category.name | title }} #}
-                        <div class="detail-title">Equipment</div>
-                        {# BACKEND: Replace with {{ category.description }} #}
-                        <div class="detail-desc">Donation of equipment</div>
-                    </div>
+            <div class="detail-top">
+                <div class="icon-circle icon-fr">{{ category.category_name[:2] | upper }}</div>
+                <div>
+                    <div class="detail-title">{{ category.category_name | title }}</div>
+                    <div class="detail-desc">{{ category.description }}</div>
                 </div>
+            </div>
 
                 <div class="detail-body">
                     <div class="field-row">
                         <span class="field-label">Category Name</span>
-                        {# BACKEND: Replace with {{ category.name | title }} #}
-                        <span class="field-val">Equipment</span>
+                        <span class="field-val">{{ category.category_name | title }}</span>
                     </div>
                     <div class="field-row">
                         <span class="field-label">Description</span>
-                        {# BACKEND: Replace with {{ category.description }} #}
-                        <span class="field-val">Donation of equipment</span>
+                        <span class="field-val">{{ category.description }}</span>
                     </div>
                     <div class="field-row">
                         <span class="field-label">Status</span>
-                        {# BACKEND: Replace with {% if category.status == 1 %}status-active{% else %}status-suspended{% endif %} #}
-                        {# BACKEND: Replace "Active" with {% if category.status == 1 %}Active{% else %}Inactive{% endif %} #}
-                        <span class="field-val status-active">Active</span>
+                        <span class="field-val {% if category.status == 1 %}status-active{% else %}status-suspended{% endif %}">
+                            {% if category.status == 1 %}Active{% else %}Inactive{% endif %}
+                        </span>
                     </div>
                 </div>
-
-            </div>
             {# No Update or Suspend buttons here — actions are on the FRA Categories dashboard only #}
 
         </div>
@@ -80,30 +71,14 @@
     </div>
 
     <script>
-        // =====================
-        // BCE BOUNDARY: ViewFRACategory
-        // HARDCODED — backend needs to:
-        // 1. Add GET /manager/viewcategory/<category_name> route in platform_managerb.py
-        // 2. Pass real category object via render_template('PlatformManagerViewCategory.html', category=category)
-        // 3. Replace all hardcoded values with Jinja2 variables as indicated by {# BACKEND #} comments
-        // 4. displayViewResult() and displayViewFail() can be removed once Flask renders server-side
-        // =====================
-
-        // BCE BOUNDARY: displayViewResult()
+        // BCE BOUNDARY: ViewFRACategoryBoundary
+        // displayViewResult() — called on page load
         // renders FRACategory details returned from ViewFRACategoryController
         function displayViewResult() {
             const card = document.querySelector('.detail-card');
             if (card) {
                 card.style.display = 'block';
             }
-        }
-
-        // BCE BOUNDARY: displayViewFail()
-        // called when ViewFRACategoryController returns None
-        // redirects back to categories page
-        function displayViewFail() {
-            alert("Category not found!");
-            window.location.href = '/manager/categories';
         }
 
         // BCE BOUNDARY: Call displayViewResult() on page load
