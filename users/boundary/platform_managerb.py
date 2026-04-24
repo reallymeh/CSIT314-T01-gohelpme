@@ -45,14 +45,18 @@ class ViewFRACategoryBoundary:
     def __init__(self):
         self.controller = ViewFRACategoryController()
 
-    def displayViewResult(self, category):
-        return category
-
-    def viewFRACategory(self, category_name: str):
+    # viewFRACategory(): void — receives category_name and passes to controller
+    def viewFRACategory(self, category_name: str) -> None:
         return self.controller.viewFRACategory(category_name)
+
+    # displayViewResult(): void — triggers rendering of category details
+    def displayViewResult(self, category) -> None:
+        pass
 
 @platform_manager_bp.route('/viewcategory/<category_name>', methods=['GET'])
 def view_category(category_name):
-    category = ViewFRACategoryBoundary().viewFRACategory(category_name)
-    # BCE BOUNDARY: displayViewResult()
+    boundary = ViewFRACategoryBoundary()
+    category = boundary.viewFRACategory(category_name)
+    # BCE BOUNDARY: displayViewResult() — renders category details
+    boundary.displayViewResult(category)
     return render_template('PlatformManagerViewCategory.html', category=category)
