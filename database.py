@@ -28,12 +28,31 @@ def init_db():
     )"
     )
 
+    # Create table for FRA
+    cur.execute(
+        "CREATE TABLE IF NOT EXISTS fra ( \
+        fraId TEXT PRIMARY KEY, \
+        title TEXT NOT NULL, \
+        description TEXT NOT NULL, \
+        category TEXT NOT NULL, \
+        targetAmount INTEGER NOT NULL, \
+        collectedAmount INTEGER DEFAULT 0, \
+        startDate TEXT NOT NULL, \
+        endDate TEXT NOT NULL, \
+        status INTEGER NOT NULL, \
+        viewCount INTEGER DEFAULT 0, \
+        location TEXT NOT NULL, \
+        created_by TEXT, \
+        FOREIGN KEY (created_by) REFERENCES user_account(email_address)\
+    )"
+    )
+    
     # sample test data
     user_account_data = [
-        ('John Doe', 'admin@email.com', '+65 9123 4567', '123 Example Street', 'admin', 1, 'password123'),
-        ('John Doe', 'johndoe@email.com', '+65 9123 4567', '123 Example Street', 'donee', 1, 'password123'),
-        ('Jane Smith', 'janesmith@email.com', '+65 9234 5678', '456 Example Avenue', 'fund raiser', 1, 'password123'),
-        ('Bob Lee', 'boblee@email.com', '+65 9345 6789', '789 Example Road', 'platform manager', 1, 'password123')
+        ('Alice Ang', 'admin1@email.com', '+65 9123 4567', '123 Example Street', 'admin', 1, 'password123'),
+        ('Bob Lee', 'donee1@email.com', '+65 9123 4567', '123 Example Street', 'donee', 1, 'password123'),
+        ('Jane Smith', 'fundraiser1@email.com', '+65 9234 5678', '456 Example Avenue', 'fund raiser', 1, 'password123'),
+        ('John Doe', 'platformmanager1@email.com', '+65 9345 6789', '789 Example Road', 'platform manager', 1, 'password123')
     ]
     cur.executemany("INSERT OR IGNORE INTO user_account VALUES(?, ?, ?, ?, ?, ?, ?)", user_account_data)
 
@@ -47,6 +66,16 @@ def init_db():
     ]
     cur.executemany("INSERT OR IGNORE INTO user_profile VALUES(?, ?, ?, ?)", user_profile_data)
 
+    fra_data = [
+    ("FRA001", "Education Fund 2026", "Support students with tuition fees", "Education", 10000, 4500,
+        "2026-01-01", "2026-12-31", 1, 120, "Admiralty Link Singapore","janesmith@email.com"),
+    ("FRA002", "Medical Aid Fund", "Help patients with hospital bills", "Medical", 20000, 12300,
+        "2026-02-01", "2026-10-30", 1, 98, "Steven Road Singapore", "janesmith@email.com"),
+    ("FRA003", "Charity Relief Fund", "Community support for families", "Charity", 5000, 5000,
+        "2025-05-01","2025-12-31", 0, 210, "Bedok North Singapore", "janesmith@email.com")
+    ]
+    cur.executemany("""INSERT OR IGNORE INTO fra VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", fra_data)
+    
     conn.commit()
 
     cur.close()

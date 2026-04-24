@@ -413,11 +413,11 @@ def login():
     user_type = login_controller.getUserType(email) if success else None
     normalized_user_type = user_type.strip().lower() if user_type else ""
     role_redirects = {
-        "admin": url_for('admin_view_profile.user_profile_list'),
-        "user_admin": url_for('admin_view_profile.user_profile_list'),
-        "platform_manager": url_for('user.homepage'),
-        "fund_raiser": url_for('user.homepage'),
-        "donee": url_for('user.homepage'),
+    "admin": url_for('admin_view_profile.user_profile_list'),
+    "user_admin": url_for('admin_view_profile.user_profile_list'),
+    "platform manager": url_for('user.homepage'),
+    "fund raiser": url_for('fundraiser.homepage'),
+    "donee": url_for('user.homepage'),
     }
     redirect_url = role_redirects.get(normalized_user_type, url_for('user.homepage'))
     return jsonify({
