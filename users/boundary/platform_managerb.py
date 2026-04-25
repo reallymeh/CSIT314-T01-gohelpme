@@ -1,4 +1,5 @@
 from users.control.platform_managerc import CreateFRACategoryController, ViewFRACategoryController
+from users.entity.fracategory import FRACategory
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for
 
 platform_manager_bp = Blueprint('platform_manager', __name__, url_prefix='/manager')
@@ -45,18 +46,12 @@ class ViewFRACategoryBoundary:
     def __init__(self):
         self.controller = ViewFRACategoryController()
 
-    # viewFRACategory(): void — receives category_name and passes to controller
-    def viewFRACategory(self, category_name: str) -> None:
+    # viewFRACategory(): FRACategory — receives category_name and returns FRACategory from controller
+    def viewFRACategory(self, category_name: str) -> FRACategory:
         return self.controller.viewFRACategory(category_name)
-
-    # displayViewResult(): void — triggers rendering of category details
-    def displayViewResult(self, category) -> None:
-        pass
 
 @platform_manager_bp.route('/viewcategory/<category_name>', methods=['GET'])
 def view_category(category_name):
-    boundary = ViewFRACategoryBoundary()
-    category = boundary.viewFRACategory(category_name)
-    # BCE BOUNDARY: displayViewResult() — renders category details
-    boundary.displayViewResult(category)
+    category = ViewFRACategoryBoundary().viewFRACategory(category_name)
+    # BCE BOUNDARY: displayViewResult() — Flask renders category details via Jinja2
     return render_template('PlatformManagerViewCategory.html', category=category)
