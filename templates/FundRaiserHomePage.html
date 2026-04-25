@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fundraiser Dashboard</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+    <span class="topbar-logo">Online Fundraising System — Fund Raiser Portal</span>
+
+    <div class="topbar-user">
+        <span>Fund Raiser</span>
+        <div class="avatar">FR</div>
+    </div>
+</div>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <a href="/fundraiser/homepage" class="nav-item active">Dashboard</a>
+        <a href="/fundraiser/logout" class="nav-item logout">Log Out</a>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+
+        <div class="page-title">My Fundraising Activities</div>
+        <div class="page-sub">All your FRA campaigns</div>
+
+        <!-- TOOLBAR -->
+        <div class="toolbar" style="display:flex; justify-content:space-between; align-items:center;">
+
+            <!-- SEARCH -->
+            <div class="search-group">
+                <input class="search-box" type="text" placeholder="Search FRA title...">
+                <button class="btn-primary">Search</button>
+            </div>
+
+            <!-- CREATE BUTTON -->
+            <a href="/fundraiser/create" class="btn-primary">
+                + Create FRA
+            </a>
+
+        </div>
+
+        <!-- GRID -->
+        <div class="grid">
+
+            {% for fra in fra_data %}
+
+            <div class="profile-card">
+
+                <!-- TOP -->
+                <div class="card-top">
+                    <div class="icon-circle icon-fr">
+                        {{ fra.title[:2] | upper }}
+                    </div>
+
+                    <div>
+                        <div class="card-name">{{ fra.title }}</div>
+
+                        <!-- GREY DESCRIPTION -->
+                        <div style="font-size:12px; color:grey; margin-top:2px;">
+                            {{ fra.description }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="card-actions">
+
+                    <button class="act-btn view" onclick="window.location.href='/fundraiser/view/{{ fra.fraId }}'">
+                    View
+                    </button>
+                    <button class="act-btn" onclick="window.location.href='/fundraiser/update/{{ fra.fraId }}'">
+                    Update
+                    </button>
+
+                    <button class="act-btn" onclick="suspendFRA('{{ fra.fraId }}')"
+                            style="color:red; border:1px solid red;">
+                        Suspend
+                    </button>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>
+
+<script>
+function suspendFRA(fraId) {
+    fetch(`/fundraiser/suspend/${fraId}`, {
+        method: 'POST'
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        alert(data.message);
+
+        if (data.success) {
+            location.reload();
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Suspend failed");
+    });
+}
+</script>

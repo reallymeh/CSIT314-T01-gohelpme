@@ -37,6 +37,26 @@ def init_db():
                     )"
     )
 
+    # Create table for FRA
+    cur.execute(
+        "CREATE TABLE IF NOT EXISTS fra ( \
+        id INTEGER PRIMARY KEY AUTOINCREMENT, \
+        fraId TEXT UNIQUE, \
+        title TEXT NOT NULL, \
+        description TEXT NOT NULL, \
+        category TEXT NOT NULL, \
+        target_amount INTEGER NOT NULL, \
+        collected_amount INTEGER DEFAULT 0, \
+        start_date TEXT NOT NULL, \
+        end_date TEXT NOT NULL, \
+        status INTEGER NOT NULL, \
+        view_count INTEGER DEFAULT 0, \
+        location TEXT NOT NULL, \
+        created_by TEXT, \
+        FOREIGN KEY (created_by) REFERENCES user_account(email_address)\
+    )"
+    )
+    
     # sample test data
     user_account_data = [
         ('John Doe', 'admin@email.com', '+65 9123 4567', '123 Example Street', 'admin', 1, 'password123'),
@@ -64,6 +84,20 @@ def init_db():
     cur.executemany("INSERT OR IGNORE INTO fra_category VALUES(?, ?, ?)", fra_category_data)
     conn.commit()
     
+    fra_data = [
+    ("FRA001", "Education Fund 2026", "Support students with tuition fees", "Education", 10000, 4500,
+        "2026-01-01", "2026-12-31", 1, 120, "Admiralty Link Singapore","fundraiser1@email.com"),
+    ("FRA002", "Medical Aid Fund", "Help patients with hospital bills", "Medical", 20000, 12300,
+        "2026-02-01", "2026-10-30", 1, 98, "Steven Road Singapore", "fundraiser1@email.com"),
+    ("FRA003", "Charity Relief Fund", "Community support for families", "Charity", 5000, 5000,
+        "2025-05-01","2025-12-31", 0, 210, "Bedok North Singapore", "fundraiser1@email.com")
+    ]
+    cur.executemany("""INSERT OR IGNORE INTO fra (fraId, title, description, category, target_amount, collected_amount,
+    start_date, end_date, status, view_count, location, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, fra_data)    
+    
+    conn.commit()
+
     cur.close()
     conn.close()
 
