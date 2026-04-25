@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create FRA — Fundraiser Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body>
+
+<div class="topbar">
+    <span class="topbar-logo">Online Fundraising System — Fund Raiser Portal</span>
+    <div class="topbar-user">
+        <span id="fundraiser-name">Fund Raiser</span>
+        <div class="avatar">FR</div>
+    </div>
+</div>
+
+<div class="layout">
+
+    <div class="sidebar">
+        <a href="/fundraiser/homepage" class="nav-item">Dashboard</a>
+        <a href="/fundraiser/logout" class="nav-item logout">Log Out</a>
+    </div>
+
+    <div class="main">
+
+        <div class="page-title">Create Fundraising Activity</div>
+        <div class="page-sub">Fill in the details below to create a new FRA:</div>
+
+        <div class="profile-card update-form-wrapper">
+
+            <div class="card-top">
+                <div class="card-name">FRA Details</div>
+            </div>
+
+            <div class="card-body">
+
+                <div class="input-group">
+                    <label>Title</label>
+                    <input type="text" name="title" placeholder="Enter title" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Description</label>
+                    <textarea name="description" rows="3" placeholder="Enter description" required></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label>Category</label>
+                    <input type="text" name="category" placeholder="e.g. Education / Medical / Charity" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Target Amount</label>
+                    <input type="number" name="target_amount" placeholder="Enter target amount" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Start Date</label>
+                    <input type="date" name="start_date" required>
+                </div>
+
+                <div class="input-group">
+                    <label>End Date</label>
+                    <input type="date" name="end_date" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Status</label>
+                    <select name="status" required>
+                        <option value="">Select status</option>
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>Location</label>
+                    <input type="text" name="location" placeholder="Enter location" required>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn-primary" onclick="createFRA()">Create FRA</button>
+                    <button class="btn-primary" onclick="window.location.href='/fundraiser/homepage'">Cancel</button>
+                </div>
+
+                <div id="message" class="message-box"></div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+function createFRA() {
+
+    const title = document.querySelector('input[name="title"]').value;
+    const description = document.querySelector('textarea[name="description"]').value;
+    const category = document.querySelector('input[name="category"]').value;
+    const target_amount = document.querySelector('input[name="target_amount"]').value;
+    const start_date = document.querySelector('input[name="start_date"]').value;
+    const end_date  = document.querySelector('input[name="end_date"]').value;
+    const status = document.querySelector('select[name="status"]').value;
+    const location = document.querySelector('input[name="location"]').value;
+
+    const messageBox = document.getElementById('message');
+
+    if (!title || !description || !category || !target_amount || !start_date || !end_date || !location || status === "") {
+        messageBox.style.color = "#A32D2D";
+        messageBox.innerText = "Error: All fields are required.";
+        return;
+    }
+
+    const payload = {
+        title: title,
+        description: description,
+        category: category,
+        target_amount: Number(target_amount),  
+        start_date: start_date,
+        end_date: end_date,
+        status: Number(status), 
+        location: location
+    };
+
+    fetch('/fundraiser/create', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        if (data.success) {
+            messageBox.style.color = "#3B6D11";
+            messageBox.innerText = "Success: FRA created successfully.";
+
+            setTimeout(() => {
+                window.location.href = '/fundraiser/homepage';
+            }, 2000);
+
+        } else {
+            messageBox.style.color = "#A32D2D";
+            messageBox.innerText = data.message;
+        }
+    })
+    .catch(() => {
+        alert("Something went wrong!");
+    });
+}
+</script>
+
+</body>
+</html>
