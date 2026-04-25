@@ -89,8 +89,11 @@
 
 <script>
 function updateFRA(event) {
-    
+
     event.preventDefault(); 
+
+    const messageBox = document.getElementById('message'); // ❗必须加
+
     console.log("fraId =", document.getElementById('fraId').value);
 
     const payload = {
@@ -111,10 +114,18 @@ function updateFRA(event) {
     })
     .then(res => res.json())
     .then(data => {
-        alert(data.message);
 
         if (data.success) {
-            window.location.href = '/fundraiser/homepage';
+            messageBox.style.color = "#3B6D11";
+            messageBox.innerText = "Success: FRA updated successfully.";
+
+            setTimeout(() => {
+                window.location.href = '/fundraiser/homepage';
+            }, 2000);
+
+        } else {
+            messageBox.style.color = "#A32D2D";
+            messageBox.innerText = data.message;
         }
     })
     .catch(err => {

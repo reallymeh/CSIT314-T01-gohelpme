@@ -69,11 +69,11 @@ def init_db():
 
     fra_data = [
     ("FRA001", "Education Fund 2026", "Support students with tuition fees", "Education", 10000, 4500,
-        "2026-01-01", "2026-12-31", 1, 120, "Admiralty Link Singapore","janesmith@email.com"),
+        "2026-01-01", "2026-12-31", 1, 120, "Admiralty Link Singapore","fundraiser1@email.com"),
     ("FRA002", "Medical Aid Fund", "Help patients with hospital bills", "Medical", 20000, 12300,
-        "2026-02-01", "2026-10-30", 1, 98, "Steven Road Singapore", "janesmith@email.com"),
+        "2026-02-01", "2026-10-30", 1, 98, "Steven Road Singapore", "fundraiser1@email.com"),
     ("FRA003", "Charity Relief Fund", "Community support for families", "Charity", 5000, 5000,
-        "2025-05-01","2025-12-31", 0, 210, "Bedok North Singapore", "janesmith@email.com")
+        "2025-05-01","2025-12-31", 0, 210, "Bedok North Singapore", "fundraiser1@email.com")
     ]
     cur.executemany("""INSERT OR IGNORE INTO fra (fraId, title, description, category, target_amount, collected_amount,
     start_date, end_date, status, view_count, location, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)

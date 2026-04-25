@@ -145,3 +145,29 @@ class FRA:
 
         finally:
             conn.close()
+            
+
+    '''
+    User Story #18: As a Fund Raiser, I want to suspend a FRA so that I can stop the fund raising activity.
+    '''
+    @staticmethod
+    def suspendFRA(fraId):
+        conn, cur = connect_db()
+
+        try:
+            cur.execute("""
+                UPDATE fra
+                SET status = 0
+                WHERE fraId = ?
+            """, (fraId,))
+
+            conn.commit()
+
+            return cur.rowcount > 0
+
+        except Exception as e:
+            print("SUSPEND ERROR:", e)
+            return False
+
+        finally:
+            conn.close()

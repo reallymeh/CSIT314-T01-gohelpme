@@ -84,7 +84,7 @@
                     Update
                     </button>
 
-                    <button class="act-btn"
+                    <button class="act-btn" onclick="suspendFRA('{{ fra.fraId }}')"
                             style="color:red; border:1px solid red;">
                         Suspend
                     </button>
@@ -102,3 +102,24 @@
 
 </body>
 </html>
+
+<script>
+function suspendFRA(fraId) {
+    fetch(`/fundraiser/suspend/${fraId}`, {
+        method: 'POST'
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        alert(data.message);
+
+        if (data.success) {
+            location.reload();
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Suspend failed");
+    });
+}
+</script>

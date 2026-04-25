@@ -78,3 +78,12 @@ class UpdateFRAController:
         except Exception as e:
             print("UPDATE ERROR:", e)
             return False
+        
+
+'''
+User Story #18: As a Fund Raiser, I want to suspend a FRA so that I can stop the fund raising activity.
+'''
+class SuspendFRAController:
+
+    def suspendFRA(self, fraId):
+        return FRA.suspendFRA(fraId)
