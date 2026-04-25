@@ -7,6 +7,8 @@ from users.boundary.fundraiserb import fundraiser_bp
 def create_app():
     app = Flask(__name__)
     
+    app.secret_key = "csit314_secret_key"
+    
     with app.app_context():
         init_db()
     app.register_blueprint(admin_profiles_bp)

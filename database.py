@@ -31,16 +31,17 @@ def init_db():
     # Create table for FRA
     cur.execute(
         "CREATE TABLE IF NOT EXISTS fra ( \
-        fraId TEXT PRIMARY KEY, \
+        id INTEGER PRIMARY KEY AUTOINCREMENT, \
+        fraId TEXT UNIQUE, \
         title TEXT NOT NULL, \
         description TEXT NOT NULL, \
         category TEXT NOT NULL, \
-        targetAmount INTEGER NOT NULL, \
-        collectedAmount INTEGER DEFAULT 0, \
-        startDate TEXT NOT NULL, \
-        endDate TEXT NOT NULL, \
+        target_amount INTEGER NOT NULL, \
+        collected_amount INTEGER DEFAULT 0, \
+        start_date TEXT NOT NULL, \
+        end_date TEXT NOT NULL, \
         status INTEGER NOT NULL, \
-        viewCount INTEGER DEFAULT 0, \
+        view_count INTEGER DEFAULT 0, \
         location TEXT NOT NULL, \
         created_by TEXT, \
         FOREIGN KEY (created_by) REFERENCES user_account(email_address)\
@@ -74,7 +75,9 @@ def init_db():
     ("FRA003", "Charity Relief Fund", "Community support for families", "Charity", 5000, 5000,
         "2025-05-01","2025-12-31", 0, 210, "Bedok North Singapore", "janesmith@email.com")
     ]
-    cur.executemany("""INSERT OR IGNORE INTO fra VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", fra_data)
+    cur.executemany("""INSERT OR IGNORE INTO fra (fraId, title, description, category, target_amount, collected_amount,
+    start_date, end_date, status, view_count, location, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, fra_data)    
     
     conn.commit()
 

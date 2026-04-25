@@ -77,8 +77,12 @@
                 <!-- ACTIONS -->
                 <div class="card-actions">
 
-                    <button class="act-btn view">View</button>
-                    <button class="act-btn">Update</button>
+                    <button class="act-btn view" onclick="window.location.href='/fundraiser/view/{{ fra.fraId }}'">
+                    View
+                    </button>
+                    <button class="act-btn" onclick="window.location.href='/fundraiser/update/{{ fra.fraId }}'">
+                    Update
+                    </button>
 
                     <button class="act-btn"
                             style="color:red; border:1px solid red;">

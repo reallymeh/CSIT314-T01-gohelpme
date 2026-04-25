@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from database import connect_db
 from typing import List
+from flask import session
 
 @dataclass
 class FRA:
@@ -13,12 +14,12 @@ class FRA:
     title: str
     description: str
     category: str
-    targetAmount: int
-    collectedAmount: int
-    startDate: str
-    endDate: str
+    target_amount: int
+    collected_amount: int
+    start_date: str
+    end_date: str
     status: int  # e.g., 1 for Active, 0 for Suspended/Closed
-    viewCount: int
+    view_count: int
     location: str
 
     '''Dashboard: Fund Raiser Home Page'''
@@ -28,9 +29,9 @@ class FRA:
 
         cur.execute("""
             SELECT fraId, title, description, category,
-                   targetAmount, collectedAmount,
-                   startDate, endDate, status,
-                   viewCount, location
+                   target_amount, collected_amount,
+                   start_date, end_date, status,
+                   view_count, location
             FROM fra
         """)
 
@@ -39,28 +40,108 @@ class FRA:
 
         return rows
     
+    
     '''
     User Story #15: As a Fund Raiser, I want to create a FRA so that I can share my story and start receiving donations.
     '''
     @staticmethod
-    def createFRA(fraId: str, title: str, description: str, category: str, targetAmount: int, collectedAmount: int, \
-                    startDate: str, endDate: str, status: int, viewCount: int, location: str) -> bool:
+    def createFRA(title: str, description: str, category: str,
+                target_amount: int, collected_amount: int,
+                start_date: str, end_date: str,
+                status: int, view_count: int, location: str):
+
         conn, cur = connect_db()
+
+        created_by = session.get("email_address")
 
         cur.execute("""
             INSERT INTO fra (
-                fraId, title, description, category,
-                targetAmount, collectedAmount,
-                startDate, endDate, status,
-                viewCount, location
+                title, description, category,
+                target_amount, collected_amount,
+                start_date, end_date, status,
+                view_count, location, created_by
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (fraId, title, description, category, targetAmount,collectedAmount,
-            startDate, endDate, status, viewCount, location))
+        """, (
+            title, description, category,
+            target_amount, collected_amount,
+            start_date, end_date, status,
+            view_count, location,
+            created_by
+        ))
+
+        new_id = cur.lastrowid
+        fraId = f"FRA{new_id:03d}"
+
+        cur.execute("""
+            UPDATE fra
+            SET fraId = ?
+            WHERE id = ?
+        """, (fraId, new_id))
 
         conn.commit()
         conn.close()
 
         return True
+        
+    '''
+    User Story #16: As a Fund Raiser, I want to view a FRA so that I can know my fund raising progress.
+    '''
+    @staticmethod
+    def viewFRA(fraId):
+        conn, cur = connect_db()
+
+        cur.execute("SELECT * FROM fra WHERE fraId = ?", (fraId,))
+        row = cur.fetchone()
+
+        conn.close()
+
+        if row:
+            return {
+                "fraId": row[1],
+                "title": row[2],
+                "description": row[3],
+                "category": row[4],
+                "target_amount": row[5],
+                "collected_amount": row[6],
+                "start_date": row[7],
+                "end_date": row[8],
+                "status": row[9],
+                "view_count": row[10],
+                "location": row[11],
+            }
+
+        return None
     
     
+    '''
+    User Story #17: As a Fund Raiser, I want to update a FRA so that I can show my current status and need.
+    '''
+    @staticmethod
+    def updateFRA(fraId, title, description, category,
+                target_amount, start_date, end_date, location):
+
+        conn, cur = connect_db()
+
+        try:
+            cur.execute("""
+                UPDATE fra
+                SET title = ?, description = ?, category = ?,
+                    target_amount = ?, start_date = ?, end_date = ?,
+                    location = ?
+                WHERE fraId = ?
+            """, (
+                title, description, category,
+                target_amount, start_date, end_date,
+                location, fraId
+            ))
+
+            conn.commit()
+            return True
+
+        except Exception as e:
+            print("DB UPDATE ERROR:", e)
+            return False
+
+        finally:
+            conn.close()

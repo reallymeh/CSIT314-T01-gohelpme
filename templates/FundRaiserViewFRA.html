@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View FRA — Fundraiser Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+    {# BCE BOUNDARY: ViewFRA #}
+    {# User Story #16: As a Fund Raiser, I want to view a FRA so that I can know my fund raising progress. #}
+    {# Sequence: User clicks View → ViewFRAPage(Boundary) → ViewFRAController(Controller) → FRA(Entity) #}
+    {# Flask route: GET /fundraiser/view/<fraId> #}
+
+    <div class="topbar">
+        <span class="topbar-logo">Online Fundraising System — Fund Raiser Portal</span>
+        <div class="topbar-user">
+            <span id="fundraiser-name">Fund Raiser</span>
+            <div class="avatar">FR</div>
+        </div>
+    </div>
+
+    <div class="layout">
+
+        <div class="sidebar">
+            <a href="/fundraiser/homepage" class="nav-item active">Dashboard</a>
+            <a href="/fundraiser/logout" class="nav-item logout">Log Out</a>
+        </div>
+
+        <div class="main" id="ViewFRA">
+
+            <button onclick="window.location.href='/fundraiser/homepage'" 
+                    class="btn-primary" style="margin-bottom: 20px;">
+                &#8592; Back to Dashboard
+            </button>
+
+            <div class="page-title">View Fundraising Activity</div>
+            <div class="page-sub">Detailed information for selected FRA</div>
+
+            {% if fra %}
+            <div class="detail-card">
+
+                <div class="detail-top">
+                    <div class="card-top">
+                        <div class="icon-circle icon-fr">
+                            {{ fra.title[:2] | upper }}
+                        </div>
+
+                        <div>
+                            <div class="detail-title">{{ fra.title }}</div>
+                            <div class="detail-desc">{{ fra.description }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-body">
+
+                    <div class="field-row">
+                        <span class="field-label">Category</span>
+                        <span class="field-val">{{ fra.category }}</span>
+                    </div>
+
+                    <div class="field-row">
+                        <span class="field-label">Target Amount</span>
+                        <span class="field-val">S$ {{ fra.target_amount }}</span>
+                    </div>
+
+                    <div class="field-row">
+                        <span class="field-label">Collected Amount</span>
+                        <span class="field-val">S$ {{ fra.collected_amount }}</span>
+                    </div>
+
+                    <div class="field-row">
+                        <span class="field-label">Start Date</span>
+                        <span class="field-val">{{ fra.start_date }}</span>
+                    </div>
+
+                    <div class="field-row">
+                        <span class="field-label">End Date</span>
+                        <span class="field-val">{{ fra.end_date }}</span>
+                    </div>
+
+                    <div class="field-row">
+                        <span class="field-label">Status</span>
+                        <span class="field-val {{ 'status-active' if fra.status == 1 else 'status-suspended' }}">
+                            {{ 'Active' if fra.status == 1 else 'Inactive' }}
+                        </span>
+                    </div>
+
+                    <div class="field-row">
+                        <span class="field-label">Location</span>
+                        <span class="field-val">{{ fra.location }}</span>
+                    </div>
+
+                </div>
+
+            </div>
+            {% else %}
+            <div class="error-message">
+                <p>Failed to load FRA details</p>
+            </div>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</body>
+</html>
+

@@ -11,7 +11,7 @@ from users.control.useradminc import (
     SuspendUserAccountController
 )
 
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session
 from typing import List
 
 
@@ -412,6 +412,11 @@ def login():
     success = login_controller.login(email, password)
     user_type = login_controller.getUserType(email) if success else None
     normalized_user_type = user_type.strip().lower() if user_type else ""
+    
+    if success:
+        session["email_address"] = email
+        session["user_type"] = user_type
+    
     role_redirects = {
     "admin": url_for('admin_view_profile.user_profile_list'),
     "user_admin": url_for('admin_view_profile.user_profile_list'),
