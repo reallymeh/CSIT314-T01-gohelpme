@@ -46,9 +46,11 @@ class FRA:
     '''
     @staticmethod
     def createFRA(title: str, description: str, category: str,
-                target_amount: int, collected_amount: int,
-                start_date: str, end_date: str,
-                status: int, view_count: int, location: str):
+                target_amount: int, start_date: str, end_date: str,
+                status: int, location: str):
+
+        collected_amount = 0
+        view_count = 0
 
         conn, cur = connect_db()
 
@@ -88,7 +90,7 @@ class FRA:
     User Story #16: As a Fund Raiser, I want to view a FRA so that I can know my fund raising progress.
     '''
     @staticmethod
-    def viewFRA(fraId):
+    def viewFRA(fraId: str):
         conn, cur = connect_db()
 
         cur.execute("SELECT * FROM fra WHERE fraId = ?", (fraId,))

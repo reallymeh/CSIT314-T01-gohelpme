@@ -72,7 +72,7 @@ class ViewFRAPage:
     def __init__(self):
         self.controller = ViewFRAController()
 
-    def displayFRA(self, fraId: int):
+    def displayFRA(self, fraId: str):
         fra = self.controller.viewFRA(fraId)
 
         if fra:
@@ -80,8 +80,6 @@ class ViewFRAPage:
         else:
             return None
 
-    def displayError(self):
-        return "FRA not found"
     
 # Link to View FRA page once clicked on "View" button for each FRA in the Fund Raiser Homepage
 @fundraiser_bp.route('/view/<fraId>', methods=['GET'])
