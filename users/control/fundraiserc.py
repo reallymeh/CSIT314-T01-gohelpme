@@ -87,3 +87,12 @@ class SuspendFRAController:
 
     def suspendFRA(self, fraId):
         return FRA.suspendFRA(fraId)
+    
+
+'''
+User Story #19: As a Fund Raiser, I want to search a FRA so that I can manage and update specific FRA efficiently.
+'''
+class SearchFRAController:
+
+    def searchFRA(self, name):
+        return FRA.searchFRA(name)

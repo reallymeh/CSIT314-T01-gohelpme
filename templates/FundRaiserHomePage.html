@@ -40,8 +40,8 @@
 
             <!-- SEARCH -->
             <div class="search-group">
-                <input class="search-box" type="text" placeholder="Search FRA title...">
-                <button class="btn-primary">Search</button>
+                <input type="text" id="searchInput" placeholder="Search FRA title...">
+                <button onclick="searchFRA()">Search</button>
             </div>
 
             <!-- CREATE BUTTON -->
@@ -52,7 +52,7 @@
         </div>
 
         <!-- GRID -->
-        <div class="grid">
+        <div class="grid" id="fra-container">
 
             {% for fra in fra_data %}
 
@@ -120,6 +120,73 @@ function suspendFRA(fraId) {
     .catch(err => {
         console.error(err);
         alert("Suspend failed");
+    });
+}
+
+function searchFRA() {
+    const name = document.getElementById('searchInput').value;
+
+    fetch('/fundraiser/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name })
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        const container = document.querySelector('.grid');
+        container.innerHTML = "";
+
+        if (data.data.length === 0) {
+            container.innerHTML = "<p>No FRA found</p>";
+            return;
+        }
+
+        data.data.forEach(fra => {
+            container.innerHTML += `
+            <div class="profile-card">
+
+                <div class="card-top">
+                    <div class="icon-circle icon-fr">
+                        ${fra.title.substring(0,2).toUpperCase()}
+                    </div>
+
+                    <div>
+                        <div class="card-name">${fra.title}</div>
+
+                        <div style="font-size:12px; color:grey; margin-top:2px;">
+                            ${fra.description}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-actions">
+
+                    <button class="act-btn view"
+                        onclick="window.location.href='/fundraiser/view/${fra.fraId}'">
+                        View
+                    </button>
+
+                    <button class="act-btn"
+                        onclick="window.location.href='/fundraiser/update/${fra.fraId}'">
+                        Update
+                    </button>
+
+                    <button class="act-btn"
+                        onclick="suspendFRA('${fra.fraId}')"
+                        style="color:red; border:1px solid red;">
+                        Suspend
+                    </button>
+
+                </div>
+
+            </div>
+            `;
+        });
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Search failed");
     });
 }
 </script>

@@ -171,3 +171,38 @@ class FRA:
 
         finally:
             conn.close()
+            
+
+    '''
+    User Story #19: As a Fund Raiser, I want to search a FRA so that I can manage and update specific FRA efficiently.
+    '''
+    @staticmethod
+    def searchFRA(name):
+        conn, cur = connect_db()
+
+        cur.execute("""
+            SELECT * FROM fra
+            WHERE title LIKE ?
+        """, ('%' + name + '%',))
+
+        rows = cur.fetchall()
+        conn.close()
+
+        result = []
+
+        for row in rows:
+            result.append({
+                "fraId": row[1],
+                "title": row[2],
+                "description": row[3],
+                "category": row[4],
+                "target_amount": row[5],
+                "collected_amount": row[6],
+                "start_date": row[7],
+                "end_date": row[8],
+                "status": row[9],
+                "view_count": row[10],
+                "location": row[11]
+            })
+
+        return result

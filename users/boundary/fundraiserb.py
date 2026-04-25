@@ -1,6 +1,6 @@
 # FRA Boundary
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for
-from users.control.fundraiserc import CreateFRAController, FRAController, ViewFRAController, UpdateFRAController, SuspendFRAController
+from users.control.fundraiserc import CreateFRAController, FRAController, ViewFRAController, UpdateFRAController, SuspendFRAController, SearchFRAController
 
 fundraiser_bp = Blueprint('fundraiser', __name__, url_prefix='/fundraiser')
 
@@ -178,7 +178,31 @@ def suspend_fra(fraId):
 '''
 User Story #19: As a Fund Raiser, I want to search a FRA so that I can manage and update specific FRA efficiently.
 '''
+class SearchFRAPage:
 
+    def __init__(self):
+        self.controller = SearchFRAController()
+
+    def searchFRA(self, name):
+        return self.controller.searchFRA(name)
+
+    def displayNoResult(self):
+        return "No FRA found"
+
+@fundraiser_bp.route('/search', methods=['POST'])
+def search_fra():
+    data = request.get_json()
+    name = data.get('name', '')
+
+    page = SearchFRAPage()
+    results = page.searchFRA(name)
+
+    return jsonify({
+        "success": True,
+        "data": results,
+        "message": "" if results else page.displayNoResult()
+    })
+    
 # Logout functionality for Fund Raiser
 class LogoutPage:
     def logout(self):
