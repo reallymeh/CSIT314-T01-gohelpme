@@ -1,4 +1,4 @@
-from users.control.platform_managerc import CreateFRACategoryController, ViewFRACategoryController
+from users.control.platform_managerc import CreateFRACategoryController, ViewFRACategoryController, UpdateFRACategoryController
 from users.entity.fracategory import FRACategory
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for
 
@@ -55,3 +55,14 @@ def view_category(category_name):
     category = ViewFRACategoryBoundary().viewFRACategory(category_name)
     # BCE BOUNDARY: displayViewResult() — Flask renders category details via Jinja2
     return render_template('PlatformManagerViewCategory.html', category=category)
+
+# ========== BCE BOUNDARY: UpdateFRACategory ==========
+# User Story: #37 As a platform management, I want to update FRA categories
+# HARDCODED — backend needs to:
+# 1. Replace hardcoded return with real category data pre-filled
+# 2. Add POST route to process update
+# category = ViewFRACategoryBoundary().viewFRACategory(category_name)
+# return render_template('PlatformManagerUpdateCategory.html', category=category)
+@platform_manager_bp.route('/updatecategory/<category_name>', methods=['GET'])
+def show_update_category(category_name):
+    return render_template('PlatformManagerUpdateCategory.html')

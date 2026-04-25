@@ -50,3 +50,24 @@ class FRACategory:
         if row is None:
             return None
         return FRACategory(row[0], row[1], row[2])
+    
+    # check for backend for this user story
+    @staticmethod
+    def updateFRACategory(old_name: str, new_name: str, description: str, status: int) -> bool:
+        conn, cur = connect_db()
+        try:
+            cur.execute(
+                "UPDATE fra_category SET name = ?, description = ?, status = ? WHERE name = ?",
+                (new_name, description, status, old_name)
+            )
+            conn.commit()
+            if cur.rowcount == 0:
+                return False
+            return True
+        except Exception as e:
+            print(e)
+            conn.rollback()
+            return False
+        finally:
+            cur.close()
+            conn.close()
