@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Favourites — Donee Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        .progress-bar-bg  { background:#e0e0e0; border-radius:4px; height:8px; margin-top:4px; }
+        .progress-bar-fill{ background:#1D9E75; height:8px; border-radius:4px; }
+    </style>
+</head>
+<body>
+
+{# BCE BOUNDARY: SearchFavouritePage #}
+{# User Story #4 (Donee): As a Donee, I want to search FRA in favourite list by name #}
+{#   so that I can find a specific FRA within the favourite list. #}
+{# User Story #5 (Donee): As a Donee, I want to view FRA in favourite list #}
+{#   so that I can view all FRA within the favourite list. #}
+{# Sequence: Donee searches/views → SearchFavouritePage(Boundary) #}
+{#           → SearchFavouriteController / ViewFavouriteListController → Favourite(Entity) #}
+{# Flask route: POST /donee/api/search_favourites in doneeb.py #}
+
+<!-- TOP BAR -->
+<div class="topbar">
+    <span class="topbar-logo">Online Fundraising System — Donee Portal</span>
+    <div class="topbar-user">
+        <span>Donee</span>
+        <div class="avatar">DN</div>
+    </div>
+</div>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <a href="/donee/homepage"         class="nav-item">Search FRAs</a>
+        <a href="/donee/favourites"        class="nav-item active">My Favourites</a>
+        <a href="/donee/donation_history"  class="nav-item">Donation History</a>
+        <a href="/user/logout"             class="nav-item logout">Log Out</a>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+
+        <div class="page-title">My Favourite FRAs</div>
+        <div class="page-sub">Search or browse the fundraising activities you have saved</div>
+
+        <!-- SEARCH TOOLBAR (US4) — empty search shows all (US5) -->
+        <div class="toolbar" style="justify-content:flex-start;">
+            <div class="search-group">
+                <input type="text" id="searchInput"
+                       class="search-box"
+                       placeholder="Search favourites by name..."
+                       style="width:280px;">
+                <button class="btn-primary" onclick="searchFavourites()">Search</button>
+            </div>
+        </div>
+
+        <!-- INITIAL LOAD STATE -->
+        <div id="loading-state" class="empty-state" style="display:none;">
+            <div class="empty-text">Loading your favourites…</div>
+        </div>
+
+        <!-- NO RESULTS STATE -->
+        <div id="no-result-state" class="empty-state" style="display:none;">
+            <div class="empty-text" id="no-result-msg">No favourites found.</div>
+        </div>
+
+        <!-- RESULTS GRID -->
+        <div class="grid" id="fav-container" style="display:none;"></div>
+
+    </div>
+</div>
+
+<script>
+/* ── US5: View all favourites on page load ──────────────────────────────────
+   Calls with empty name so the boundary returns all favourites.
+   ─────────────────────────────────────────────────────────────────────────── */
+window.onload = () => searchFavourites();
+
+/* ── US4/US5: Search or view favourites ────────────────────────────────────
+   BCE BOUNDARY: SearchFavouritePage
+   Calls POST /donee/api/search_favourites
+         → SearchFavouriteController → Favourite.searchFavourites()
+   Empty name → ViewFavouriteListController → Favourite.searchFavourites("") = all
+   ─────────────────────────────────────────────────────────────────────────── */
+function searchFavourites() {
+    const name = document.getElementById('searchInput').value.trim();
+
+    hideAll();
+    document.getElementById('loading-state').style.display = 'flex';
+
+    fetch('/donee/api/search_favourites', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name })
+    })
+    .then(res => res.json())
+    .then(data => {
+        hideAll();
+
+        if (!data.data || data.data.length === 0) {
+            document.getElementById('no-result-msg').textContent = data.message;
+            document.getElementById('no-result-state').style.display = 'flex';
+            return;
+        }
+
+        renderFavCards(data.data);
+    })
+    .catch(err => { console.error(err); alert('Failed to load favourites. Please try again.'); });
+}
+
+function renderFavCards(favs) {
+    const container = document.getElementById('fav-container');
+    container.innerHTML = '';
+
+    favs.forEach(f => {
+        const pct = f.target_amount > 0
+            ? Math.min(100, Math.round(f.collected_amount / f.target_amount * 100))
+            : 0;
+        const statusLabel = f.status === 1 ? 'Active' : 'Inactive';
+        const statusClass = f.status === 1 ? 'status-active' : 'status-suspended';
+
+        container.innerHTML += `
+        <div class="profile-card">
+            <div class="card-top">
+                <div class="icon-circle icon-donee">
+                    ${f.title.substring(0, 2).toUpperCase()}
+                </div>
+                <div>
+                    <div class="card-name">${esc(f.title)}</div>
+                    <div class="card-desc">${esc(f.category)} &nbsp;|&nbsp; Saved: ${esc(f.saved_date)}</div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="field-row">
+                    <span class="field-label">Description</span>
+                    <span class="field-val" style="max-width:60%;text-align:right;">
+                        ${esc(f.description.length > 60 ? f.description.substring(0,60) + '…' : f.description)}
+                    </span>
+                </div>
+                <div class="field-row">
+                    <span class="field-label">Target</span>
+                    <span class="field-val">S$ ${f.target_amount.toLocaleString()}</span>
+                </div>
+                <div class="field-row">
+                    <span class="field-label">Collected</span>
+                    <span class="field-val">S$ ${f.collected_amount.toLocaleString()}</span>
+                </div>
+                <div style="padding:4px 0 8px;">
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" style="width:${pct}%;"></div>
+                    </div>
+                    <div style="font-size:11px;color:#888;margin-top:3px;">${pct}% funded</div>
+                </div>
+                <div class="field-row">
+                    <span class="field-label">Period</span>
+                    <span class="field-val">${esc(f.start_date)} → ${esc(f.end_date)}</span>
+                </div>
+                <div class="field-row">
+                    <span class="field-label">Status</span>
+                    <span class="field-val ${statusClass}">${statusLabel}</span>
+                </div>
+            </div>
+
+            <div class="card-actions">
+                <!-- US2 entry point from favourites: view full detail -->
+                <button class="act-btn"
+                        onclick="window.location.href='/donee/view/${esc(f.fraId)}'">
+                    View Details
+                </button>
+            </div>
+        </div>`;
+    });
+
+    container.style.display = 'grid';
+}
+
+function hideAll() {
+    document.getElementById('loading-state').style.display   = 'none';
+    document.getElementById('no-result-state').style.display = 'none';
+    document.getElementById('fav-container').style.display   = 'none';
+}
+
+function esc(str) {
+    const d = document.createElement('div');
+    d.appendChild(document.createTextNode(String(str)));
+    return d.innerHTML;
+}
+</script>
+
+</body>
+</html>

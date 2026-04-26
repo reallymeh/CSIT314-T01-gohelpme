@@ -4,6 +4,7 @@ from users.boundary.useradminb import admin_profiles_bp
 from users.boundary.platform_managerb import platform_manager_bp
 from users.boundary.fundraiserb import fundraiser_bp
 from users.boundary.userb import user_bp
+from users.boundary.doneeb import donee_bp
 
 def create_app():
     app = Flask(__name__)
@@ -17,6 +18,7 @@ def create_app():
     app.register_blueprint(platform_manager_bp)
     app.register_blueprint(fundraiser_bp)
     app.register_blueprint(user_bp)
+    app.register_blueprint(donee_bp)
 
     '''# Redirect to login page when accessing root URL
     @app.route('/')
@@ -24,7 +26,7 @@ def create_app():
         return redirect('/admin/login')
     return app
     '''
-    
+
     return app
 
 if __name__ == '__main__':

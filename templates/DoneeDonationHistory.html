@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donation History — Donee Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: flex-end;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+        }
+        .filter-group { display:flex; flex-direction:column; gap:4px; }
+        .filter-group label { font-size:12px; color:#666; font-weight:600; }
+        .filter-group select,
+        .filter-group input[type="date"] {
+            padding: 8px 12px;
+            font-size: 13px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background: #fff;
+            color: #1a1a1a;
+        }
+        .filter-group select:focus,
+        .filter-group input[type="date"]:focus { outline:none; border-color:#378ADD; }
+
+        /* History table */
+        .history-table { width:100%; border-collapse:collapse; background:#fff;
+                         border:1px solid #e0e0e0; border-radius:10px; overflow:hidden; }
+        .history-table th {
+            background:#1a3a5c; color:#fff; padding:12px 16px;
+            font-size:13px; text-align:left; font-weight:600;
+        }
+        .history-table td { padding:11px 16px; font-size:13px; border-bottom:1px solid #f0f0f0; }
+        .history-table tr:last-child td { border-bottom:none; }
+        .history-table tr:hover td { background:#f7faff; }
+        .amount-cell { font-weight:bold; color:#1D9E75; }
+
+        /* Summary bar */
+        .summary-bar {
+            display:flex; gap:24px; background:#fff;
+            border:1px solid #e0e0e0; border-radius:10px;
+            padding:14px 20px; margin-bottom:16px; font-size:13px;
+        }
+        .summary-item label { color:#888; display:block; font-size:11px; }
+        .summary-item span  { font-weight:bold; font-size:15px; color:#1a1a1a; }
+    </style>
+</head>
+<body>
+
+{# BCE BOUNDARY: SearchDonationHistoryPage #}
+{# User Story # (Donee): As a Donee, I want to search history of donation by FRA category and date period #}
+{#   so that I can find a specific FRA that I had donated. #}
+{# User Story # (Donee): As a Donee, I want to view history of donation #}
+{#   so that I can evaluate the impact of my donation and consider another donation. #}
+{# Sequence: Donee filters/views → SearchDonationHistoryPage(Boundary) #}
+{#           → SearchDonationHistoryController / ViewDonationHistoryController → DonationHistory(Entity) #}
+{# Flask route: POST /donee/api/search_history in doneeb.py #}
+
+<!-- TOP BAR -->
+<div class="topbar">
+    <span class="topbar-logo">Online Fundraising System — Donee Portal</span>
+    <div class="topbar-user">
+        <span>Donee</span>
+        <div class="avatar">DN</div>
+    </div>
+</div>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <a href="/donee/homepage"         class="nav-item">Search FRAs</a>
+        <a href="/donee/favourites"        class="nav-item">My Favourites</a>
+        <a href="/donee/donation_history"  class="nav-item active">Donation History</a>
+        <a href="/user/logout"             class="nav-item logout">Log Out</a>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+
+        <div class="page-title">My Donation History</div>
+        <div class="page-sub">Search by FRA category and date period, or view all past donations</div>
+
+        <!-- FILTER BAR (US6) — all filters optional; blank = view all (US7) -->
+        <div class="filter-bar">
+
+            <!-- Category filter (US6) -->
+            <div class="filter-group">
+                <label>FRA Category</label>
+                <select id="filterCategory">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat }}">{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Date-from filter (US6) -->
+            <div class="filter-group">
+                <label>Date From</label>
+                <input type="date" id="filterDateFrom">
+            </div>
+
+            <!-- Date-to filter (US6) -->
+            <div class="filter-group">
+                <label>Date To</label>
+                <input type="date" id="filterDateTo">
+            </div>
+
+            <div class="filter-group" style="justify-content:flex-end;">
+                <label>&nbsp;</label>
+                <div style="display:flex;gap:8px;">
+                    <button class="btn-primary" onclick="searchHistory()">Search</button>
+                    <button class="act-btn"     onclick="clearFilters()">Clear</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SUMMARY BAR (updates dynamically) -->
+        <div class="summary-bar" id="summary-bar" style="display:none;">
+            <div class="summary-item">
+                <label>Records Found</label>
+                <span id="summary-count">0</span>
+            </div>
+            <div class="summary-item">
+                <label>Total Donated</label>
+                <span id="summary-total">S$ 0.00</span>
+            </div>
+        </div>
+
+        <!-- NO RESULTS -->
+        <div id="no-result-state" class="empty-state" style="display:none;">
+            <div class="empty-text" id="no-result-msg">No donation records found.</div>
+        </div>
+
+        <!-- HISTORY TABLE (US7 view) -->
+        <div id="table-wrapper" style="display:none; overflow-x:auto;">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>FRA ID</th>
+                        <th>FRA Title</th>
+                        <th>Category</th>
+                        <th>Amount (S$)</th>
+                        <th>Donation Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="history-tbody"></tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<script>
+/* ── US7: Load all history on page open ─────────────────────────────────────
+   No filters = ViewDonationHistoryController → DonationHistory.searchHistory()
+   with empty params, returning all records.
+   ─────────────────────────────────────────────────────────────────────────── */
+window.onload = () => searchHistory();
+
+/* ── US6/US7: Search / view donation history ────────────────────────────────
+   BCE BOUNDARY: SearchDonationHistoryPage
+   Calls POST /donee/api/search_history
+         → SearchDonationHistoryController → DonationHistory.searchHistory()
+   All filters optional — blank category + blank dates = US7 (view all).
+   ─────────────────────────────────────────────────────────────────────────── */
+function searchHistory() {
+    const category  = document.getElementById('filterCategory').value;
+    const date_from = document.getElementById('filterDateFrom').value;
+    const date_to   = document.getElementById('filterDateTo').value;
+
+    hideAll();
+
+    fetch('/donee/api/search_history', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category, date_from, date_to })
+    })
+    .then(res => res.json())
+    .then(data => {
+        hideAll();
+
+        if (!data.data || data.data.length === 0) {
+            document.getElementById('no-result-msg').textContent = data.message;
+            document.getElementById('no-result-state').style.display = 'flex';
+            return;
+        }
+
+        renderTable(data.data);
+    })
+    .catch(err => { console.error(err); alert('Failed to load history. Please try again.'); });
+}
+
+function renderTable(records) {
+    const tbody = document.getElementById('history-tbody');
+    tbody.innerHTML = '';
+
+    let total = 0;
+    records.forEach((r, i) => {
+        total += r.amount;
+        tbody.innerHTML += `
+        <tr>
+            <td>${i + 1}</td>
+            <td>${esc(r.fraId)}</td>
+            <td>${esc(r.fra_title)}</td>
+            <td>${esc(r.fra_category)}</td>
+            <td class="amount-cell">${r.amount.toLocaleString('en-SG', {minimumFractionDigits:2})}</td>
+            <td>${esc(r.donation_date)}</td>
+            <td>
+                <!-- US2 entry point: view the FRA this donation was for -->
+                <button class="act-btn"
+                        onclick="window.location.href='/donee/view/${esc(r.fraId)}'">
+                    View FRA
+                </button>
+            </td>
+        </tr>`;
+    });
+
+    // Update summary bar
+    document.getElementById('summary-count').textContent = records.length;
+    document.getElementById('summary-total').textContent =
+        'S$ ' + total.toLocaleString('en-SG', { minimumFractionDigits: 2 });
+    document.getElementById('summary-bar').style.display  = 'flex';
+    document.getElementById('table-wrapper').style.display = 'block';
+}
+
+function clearFilters() {
+    document.getElementById('filterCategory').value  = '';
+    document.getElementById('filterDateFrom').value  = '';
+    document.getElementById('filterDateTo').value    = '';
+    searchHistory();   // re-run with no filters = US7 (view all)
+}
+
+function hideAll() {
+    document.getElementById('summary-bar').style.display    = 'none';
+    document.getElementById('no-result-state').style.display = 'none';
+    document.getElementById('table-wrapper').style.display   = 'none';
+}
+
+function esc(str) {
+    const d = document.createElement('div');
+    d.appendChild(document.createTextNode(String(str)));
+    return d.innerHTML;
+}
+</script>
+
+</body>
+</html>

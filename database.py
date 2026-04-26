@@ -98,6 +98,49 @@ def init_db():
     
     conn.commit()
 
+    # Donee: Favourite list 
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS donee_favourite (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            donee_email TEXT    NOT NULL,
+            fraId       TEXT    NOT NULL,
+            saved_date  TEXT    NOT NULL DEFAULT (date('now')),
+            UNIQUE(donee_email, fraId),
+            FOREIGN KEY (donee_email) REFERENCES user_account(email_address),
+            FOREIGN KEY (fraId)       REFERENCES fra(fraId)
+        )
+    """)
+
+    # Donee: Donation history
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS donation_history (
+            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            donee_email  TEXT    NOT NULL,
+            fraId        TEXT    NOT NULL,
+            fra_title    TEXT    NOT NULL,
+            fra_category TEXT    NOT NULL,
+            amount       REAL    NOT NULL,
+            donation_date TEXT   NOT NULL,
+            FOREIGN KEY (donee_email) REFERENCES user_account(email_address),
+            FOREIGN KEY (fraId)       REFERENCES fra(fraId)
+        )
+    """)
+
+    # Sample donation history for test donee
+    donation_seed = [
+        ("johndoe@email.com", "FRA001", "Education Fund 2026", "Education", 150.00, "2026-02-10"),
+        ("johndoe@email.com", "FRA002", "Medical Aid Fund",    "Medical",   300.00, "2026-03-05"),
+        ("johndoe@email.com", "FRA001", "Education Fund 2026", "Education",  75.00, "2026-04-01"),
+    ]
+    cur.executemany(
+        "INSERT OR IGNORE INTO donation_history "
+        "(donee_email, fraId, fra_title, fra_category, amount, donation_date) "
+        "VALUES (?, ?, ?, ?, ?, ?)",
+        donation_seed
+    )
+
+    conn.commit()
+
     cur.close()
     conn.close()
 

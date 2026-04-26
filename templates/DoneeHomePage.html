@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donee — Search FRAs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+{# BCE BOUNDARY: SearchFRAPage #}
+{# User Story #1 (Donee): As a Donee, I want to search all FRA by name #}
+{#   so that I can find a specific FRA that I am interested in. #}
+{# Sequence: Donee searches → SearchFRAPage(Boundary) #}
+{#           → SearchFRAController(Controller) → FRA(Entity) #}
+{# Flask route: POST /donee/api/search_fra in doneeb.py #}
+
+{% if message %}
+<div id="alert-box">{{ message }}</div>
+{% endif %}
+
+<!-- TOP BAR -->
+<div class="topbar">
+    <span class="topbar-logo">Online Fundraising System — Donee Portal</span>
+    <div class="topbar-user">
+        <span>Donee</span>
+        <div class="avatar">DN</div>
+    </div>
+</div>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <a href="/donee/homepage"         class="nav-item active">Search FRAs</a>
+        <a href="/donee/favourites"        class="nav-item">My Favourites</a>
+        <a href="/donee/donation_history"  class="nav-item">Donation History</a>
+        <a href="/user/logout"             class="nav-item logout">Log Out</a>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+
+        <div class="page-title">Search Fund Raising Activities</div>
+        <div class="page-sub">Find an active fundraising activity by name</div>
+
+        <!-- SEARCH TOOLBAR (US1) -->
+        <div class="toolbar" style="justify-content: flex-start;">
+            <div class="search-group">
+                <input type="text" id="searchInput"
+                       class="search-box"
+                       placeholder="Search FRA by name..."
+                       style="width:280px;">
+                <button class="btn-primary" onclick="searchFRA()">Search</button>
+            </div>
+        </div>
+
+        <!-- EMPTY STATE (initial load prompt) -->
+        <div id="empty-state" class="empty-state">
+            <div class="empty-text">Enter a name above and click Search to find fundraising activities.</div>
+        </div>
+
+        <!-- NO RESULTS STATE -->
+        <div id="no-result-state" class="empty-state" style="display:none;">
+            <div class="empty-text" id="no-result-msg">No active fundraising activities found.</div>
+        </div>
+
+        <!-- RESULTS GRID -->
+        <div class="grid" id="fra-container" style="display:none;"></div>
+
+    </div>
+</div>
+
+<script>
+/* ── US1: Search all active FRAs by name ───────────────────────────────────
+   BCE BOUNDARY: SearchFRAPage
+   Calls POST /donee/api/search_fra → SearchFRAController → FRA.searchActiveFRA()
+   ─────────────────────────────────────────────────────────────────────────── */
+function searchFRA() {
+    const name = document.getElementById('searchInput').value.trim();
+
+    fetch('/donee/api/search_fra', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name })
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('empty-state').style.display    = 'none';
+        document.getElementById('no-result-state').style.display = 'none';
+        document.getElementById('fra-container').style.display   = 'none';
+
+        if (!data.data || data.data.length === 0) {
+            document.getElementById('no-result-msg').textContent = data.message;
+            document.getElementById('no-result-state').style.display = 'flex';
+            return;
+        }
+
+        renderFRACards(data.data);
+    })
+    .catch(err => { console.error(err); alert('Search failed. Please try again.'); });
+}
+
+/* ── US2 entry point: clicking View navigates to /donee/view/<fraId> ───────
+   BCE BOUNDARY: ViewFRAPage (rendered in DoneeViewFRA.html)
+   ─────────────────────────────────────────────────────────────────────────── */
+function renderFRACards(fras) {
+    const container = document.getElementById('fra-container');
+    container.innerHTML = '';
+
+    fras.forEach(fra => {
+        const pct = fra.target_amount > 0
+            ? Math.min(100, Math.round(fra.collected_amount / fra.target_amount * 100))
+            : 0;
+
+        const statusLabel = fra.status === 1 ? 'Active' : 'Inactive';
+        const statusClass = fra.status === 1 ? 'status-active' : 'status-suspended';
+
+        container.innerHTML += `
+        <div class="profile-card">
+            <div class="card-top">
+                <div class="icon-circle icon-donee">
+                    ${fra.title.substring(0, 2).toUpperCase()}
+                </div>
+                <div>
+                    <div class="card-name">${esc(fra.title)}</div>
+                    <div class="card-desc">${esc(fra.category)} &nbsp;|&nbsp; ${esc(fra.location)}</div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="field-row">
+                    <span class="field-label">Description</span>
+                    <span class="field-val" style="max-width:60%;text-align:right;">
+                        ${esc(fra.description.length > 60 ? fra.description.substring(0,60) + '…' : fra.description)}
+                    </span>
+                </div>
+                <div class="field-row">
+                    <span class="field-label">Target</span>
+                    <span class="field-val">S$ ${fra.target_amount.toLocaleString()}</span>
+                </div>
+                <div class="field-row">
+                    <span class="field-label">Collected</span>
+                    <span class="field-val">S$ ${fra.collected_amount.toLocaleString()} (${pct}%)</span>
+                </div>
+                <div class="field-row">
+                    <span class="field-label">Period</span>
+                    <span class="field-val">${esc(fra.start_date)} → ${esc(fra.end_date)}</span>
+                </div>
+                <div class="field-row">
+                    <span class="field-label">Status</span>
+                    <span class="field-val ${statusClass}">${statusLabel}</span>
+                </div>
+            </div>
+
+            <div class="card-actions">
+                <!-- US2 entry point: navigate to DoneeViewFRA.html -->
+                <button class="act-btn"
+                        onclick="window.location.href='/donee/view/${esc(fra.fraId)}'">
+                    View Details
+                </button>
+            </div>
+        </div>`;
+    });
+
+    container.style.display = 'grid';
+}
+
+function esc(str) {
+    const d = document.createElement('div');
+    d.appendChild(document.createTextNode(String(str)));
+    return d.innerHTML;
+}
+
+// Also load all active FRAs on page open (empty search = all)
+window.onload = () => searchFRA();
+</script>
+
+</body>
+</html>

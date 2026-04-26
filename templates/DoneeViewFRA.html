@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View FRA — Donee Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        .detail-card  { background:#fff; border:1px solid #e0e0e0; border-radius:10px; overflow:hidden; max-width:760px; }
+        .detail-top   { padding:20px 24px; border-bottom:1px solid #e0e0e0; display:flex; justify-content:space-between; align-items:flex-start; gap:16px; }
+        .detail-title { font-size:18px; font-weight:bold; color:#1a1a1a; }
+        .detail-desc  { font-size:13px; color:#666; margin-top:4px; line-height:1.6; }
+        .detail-body  { padding:4px 0; }
+        .progress-bar-bg  { background:#e0e0e0; border-radius:4px; height:10px; margin-top:6px; }
+        .progress-bar-fill{ background:#1D9E75; height:10px; border-radius:4px; }
+        .fav-btn-saved { padding:8px 18px; font-size:13px; background-color:#1D9E75;
+                         color:#fff; border:none; border-radius:6px; cursor:default; }
+        .fav-btn-save  { padding:8px 18px; font-size:13px; background-color:#1a3a5c;
+                         color:#fff; border:none; border-radius:6px; cursor:pointer; }
+        .fav-btn-save:hover { background-color:#142e4a; }
+        #toast { display:none; position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
+                 padding:10px 24px; border-radius:8px; font-size:14px; color:#fff; z-index:999; }
+    </style>
+</head>
+<body>
+
+{# BCE BOUNDARY: ViewFRAPage #}
+{# User Story #2 (Donee): As a Donee, I want to view a FRA #}
+{#   so that I can view existing FRA information that needs donation. #}
+{# Sequence: Donee clicks View → ViewFRAPage(Boundary) #}
+{#           → ViewFRAController(Controller) → FRA(Entity) #}
+{# Flask route: GET /donee/view/<fraId> in doneeb.py #}
+{# #}
+{# BCE BOUNDARY: SaveFavouritePage (Save button below — US3) #}
+{# User Story #3 (Donee): As a Donee, I want to save a FRA to favourite list #}
+{#   so that I can decide a donation later. #}
+{# Sequence: Donee clicks Save → SaveFavouritePage(Boundary) #}
+{#           → SaveFavouriteController(Controller) → Favourite(Entity) #}
+{# Flask route: POST /donee/save_favourite in doneeb.py #}
+
+<!-- TOP BAR -->
+<div class="topbar">
+    <span class="topbar-logo">Online Fundraising System — Donee Portal</span>
+    <div class="topbar-user">
+        <span>Donee</span>
+        <div class="avatar">DN</div>
+    </div>
+</div>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <a href="/donee/homepage"         class="nav-item active">Search FRAs</a>
+        <a href="/donee/favourites"        class="nav-item">My Favourites</a>
+        <a href="/donee/donation_history"  class="nav-item">Donation History</a>
+        <a href="/user/logout"             class="nav-item logout">Log Out</a>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main" id="ViewFRA">
+
+        <button onclick="window.history.back()"
+                class="btn-primary" style="margin-bottom:20px;">
+            &#8592; Back
+        </button>
+
+        <div class="page-title">Fund Raising Activity Details</div>
+        <div class="page-sub">Detailed information for this fundraising campaign</div>
+
+        {% if fra %}
+        <div class="detail-card">
+
+            <!-- US2: FRA header + US3: Save button -->
+            <div class="detail-top">
+                <div style="display:flex; gap:14px; align-items:flex-start;">
+                    <div class="icon-circle icon-donee" style="flex-shrink:0;">
+                        {{ fra.title[:2] | upper }}
+                    </div>
+                    <div>
+                        <div class="detail-title">{{ fra.title }}</div>
+                        <div class="detail-desc">{{ fra.description }}</div>
+                    </div>
+                </div>
+
+                <!-- US3: Save to Favourites button -->
+                {% if is_favourited %}
+                    <button class="fav-btn-saved" disabled>&#9733; Saved to Favourites</button>
+                {% else %}
+                    <button class="fav-btn-save" id="fav-btn"
+                            onclick="saveFavourite('{{ fra.fraId }}')">
+                        &#9734; Save to Favourites
+                    </button>
+                {% endif %}
+            </div>
+
+            <!-- US2: FRA field details -->
+            <div class="detail-body">
+
+                <div class="field-row" style="padding:10px 24px;">
+                    <span class="field-label">Category</span>
+                    <span class="field-val">{{ fra.category }}</span>
+                </div>
+
+                <div class="field-row" style="padding:10px 24px;">
+                    <span class="field-label">Location</span>
+                    <span class="field-val">{{ fra.location }}</span>
+                </div>
+
+                <div class="field-row" style="padding:10px 24px;">
+                    <span class="field-label">Target Amount</span>
+                    <span class="field-val">S$ {{ "{:,}".format(fra.target_amount) }}</span>
+                </div>
+
+                <div class="field-row" style="padding:10px 24px;">
+                    <span class="field-label">Amount Collected</span>
+                    <span class="field-val">S$ {{ "{:,}".format(fra.collected_amount) }}</span>
+                </div>
+
+                <!-- Progress bar -->
+                <div style="padding:10px 24px 16px;">
+                    {% set pct = [(fra.collected_amount / fra.target_amount * 100)|int, 100]|min if fra.target_amount > 0 else 0 %}
+                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#666; margin-bottom:4px;">
+                        <span>Funding Progress</span>
+                        <span>{{ pct }}%</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" style="width:{{ pct }}%;"></div>
+                    </div>
+                </div>
+
+                <div class="field-row" style="padding:10px 24px;">
+                    <span class="field-label">Start Date</span>
+                    <span class="field-val">{{ fra.start_date }}</span>
+                </div>
+
+                <div class="field-row" style="padding:10px 24px;">
+                    <span class="field-label">End Date</span>
+                    <span class="field-val">{{ fra.end_date }}</span>
+                </div>
+
+                <div class="field-row" style="padding:10px 24px;">
+                    <span class="field-label">Status</span>
+                    <span class="field-val {{ 'status-active' if fra.status == 1 else 'status-suspended' }}">
+                        {{ 'Active' if fra.status == 1 else 'Inactive' }}
+                    </span>
+                </div>
+
+                <div class="field-row" style="padding:10px 24px;">
+                    <span class="field-label">Total Views</span>
+                    <span class="field-val">{{ fra.view_count }}</span>
+                </div>
+
+            </div>
+        </div>
+
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-text">FRA not found or could not be loaded.</div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<!-- Toast notification -->
+<div id="toast"></div>
+
+<script>
+/* ── US3: Save FRA to favourite list ────────────────────────────────────────
+   BCE BOUNDARY: SaveFavouritePage
+   Calls POST /donee/save_favourite → SaveFavouriteController → Favourite.saveFavourite()
+   ─────────────────────────────────────────────────────────────────────────── */
+function saveFavourite(fraId) {
+    fetch('/donee/save_favourite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fraId })
+    })
+    .then(res => res.json())
+    .then(data => {
+        showToast(data.message, data.success);
+
+        if (data.success) {
+            // Replace button to reflect saved state (US3 feedback)
+            const btn = document.getElementById('fav-btn');
+            if (btn) {
+                btn.outerHTML = '<button class="fav-btn-saved" disabled>&#9733; Saved to Favourites</button>';
+            }
+        }
+    })
+    .catch(err => { console.error(err); showToast('Error saving favourite.', false); });
+}
+
+function showToast(msg, success) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.style.backgroundColor = success ? '#1D9E75' : '#A32D2D';
+    toast.style.display = 'block';
+    setTimeout(() => { toast.style.display = 'none'; }, 3000);
+}
+</script>
+
+</body>
+</html>
