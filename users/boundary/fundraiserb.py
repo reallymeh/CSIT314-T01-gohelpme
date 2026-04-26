@@ -179,16 +179,3 @@ def suspend_fra(fraId):
 '''
 User Story #19: As a Fund Raiser, I want to search a FRA so that I can manage and update specific FRA efficiently.
 '''
-
-'''User Story #24: As a Fund Raiser, I want to log out my user account so that I can end a session.
-'''
-# Logout functionality for Fund Raiser
-class LogoutPage:
-    def logout(self):
-        return 'You have logged out successfully!'
-
-@fundraiser_bp.route('/logout')
-def logout():
-    page = LogoutPage()
-    message = page.logout()
-    return redirect(url_for('user.homepage', message=message))
