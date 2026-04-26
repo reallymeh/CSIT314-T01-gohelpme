@@ -1,4 +1,4 @@
-from users.control.platform_managerc import CreateFRACategoryController, ViewFRACategoryController, UpdateFRACategoryController
+from users.control.platform_managerc import CreateFRACategoryController, ViewFRACategoryController, UpdateFRACategoryController, ViewAllFRACategoryController
 from users.entity.fracategory import FRACategory
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for
 
@@ -18,10 +18,6 @@ class CreateFRACategoryBoundary:
 
     def displayFailure(self):
         return 'Failed to create category. Category may already exist.'
-
-@platform_manager_bp.route('/categories', methods=['GET'])
-def category_list():
-    return render_template('PlatformManagerCategories.html')
 
 @platform_manager_bp.route('/create_category', methods=['GET'])
 def show_create_category():
@@ -115,3 +111,18 @@ def update_category_post(category_name):
     )
     
     return jsonify(result)
+
+class ViewAllFRACategoryBoundary:
+    def __init__(self):
+        self.controller = ViewAllFRACategoryController()
+    
+    def viewAllFRACategory(self):
+        return self.controller.viewAllFRACategory()
+    
+@platform_manager_bp.route('/categories', methods=['GET'])
+def view_all_category():
+    boundary = ViewAllFRACategoryBoundary()
+    categories = boundary.viewAllFRACategory()
+    print(categories)
+    return render_template('PlatformManagerCategories.html', categories=categories)
+
