@@ -63,6 +63,55 @@ def view_category(category_name):
 # 2. Add POST route to process update
 # category = ViewFRACategoryBoundary().viewFRACategory(category_name)
 # return render_template('PlatformManagerUpdateCategory.html', category=category)
+
+class UpdateFRACategoryBoundary:
+    def __init__(self):
+        self.controller = UpdateFRACategoryController()
+    
+    def displayUpdateSucess(self):
+        message = "Update Successful!"
+        return {"success": True, "message": message}
+
+    def displayUpdateFail(self):
+        message = "Update Failed!"
+        return {"success": False, "message": message}
+    
+    def updateFRACategory(self, old_name:str, new_name:str, description: str, status:int) -> FRACategory:
+        if self.controller.updateFRACategory(old_name, new_name, description, status):
+            return self.displayUpdateSucess()
+        
+        else:
+            return self.displayUpdateFail()
+
 @platform_manager_bp.route('/updatecategory/<category_name>', methods=['GET'])
-def show_update_category(category_name):
-    return render_template('PlatformManagerUpdateCategory.html')
+def update_category(category_name):
+    boundary = UpdateFRACategoryBoundary()
+    category = FRACategory.getCategory(category_name)
+    
+    if category is None:
+        return "Category not found", 404
+    
+    # Pass the category object to the template
+    return render_template(
+        'PlatformManagerUpdateCategory.html',
+        category=category
+    )
+
+@platform_manager_bp.route('/updatecategory/<category_name>', methods=['POST'])
+def update_category_post(category_name):
+    boundary = UpdateFRACategoryBoundary()
+    
+    data = request.get_json()
+    
+    new_name = data.get('new_name')
+    description = data.get('description')
+    status = data.get('status')
+    
+    result = boundary.updateFRACategory(
+        old_name=category_name,
+        new_name=new_name,
+        description=description,
+        status=status
+    )
+    
+    return jsonify(result)
