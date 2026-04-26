@@ -1,6 +1,6 @@
 # FRA Boundary
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for
-from users.control.fundraiserc import CreateFRAController, FRAController, ViewFRAController, UpdateFRAController, SuspendFRAController, SearchFRAController
+from users.control.fundraiserc import CreateFRAController, FRAController, ViewFRAController, UpdateFRAController, SuspendFRAController, SearchFRAController, SearchCompletedFRAHistoryController
 
 fundraiser_bp = Blueprint('fundraiser', __name__, url_prefix='/fundraiser')
 
@@ -202,4 +202,39 @@ def search_fra():
         "message": "" if results else page.displayNoResult()
     })
     
+''' User Story #22: As a Fund Raiser, I want to search history of completed FRA by service category and date period so that I can search for the past FRA that is completed.
+'''
+@fundraiser_bp.route('/history', methods=['GET'])
+def view_history():
+    return render_template('FundRaiserHistoy.html')
+class SearchCompletedFRAHistoryPage: 
+    def __init__(self): 
+        self.controller = SearchCompletedFRAHistoryController()
+    
+    def searchCompletedFRAHistory(self, category, start_date, end_date):
+        return self.controller.searchCompletedFRAHistory(category, start_date, end_date)
+    def displaySearchFailed(self):
+        return "Search failed. Please try again."
 
+@fundraiser_bp.route('/history/search', methods=['POST'])
+def search_completed_fra_history():
+    data = request.get_json(silent=True) or {}
+    category = data.get('category', '')
+    start_date = data.get('start_date', '')
+    end_date = data.get('end_date', '')
+
+    page = SearchCompletedFRAHistoryPage()
+
+    if not category or not start_date or not end_date:
+        return jsonify({
+            "success": False,
+            "data": [],
+            "message": page.displaySearchFailed()
+        })
+    
+    results = page.searchCompletedFRAHistory(category, start_date, end_date)
+    return jsonify({
+        "success": True,
+        "data": results,
+        "message": "" if results else page.displaySearchFailed()
+    })

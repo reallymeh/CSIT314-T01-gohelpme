@@ -93,3 +93,10 @@ class SearchFRAController:
 
     def searchFRA(self, name):
         return FRA.searchFRA(name)
+    
+''' 
+User Story #22: As a Fund Raiser, I want to search history of completed FRA by service category and date period so that I can search for the past FRA that is completed.
+'''
+class SearchCompletedFRAHistoryController: 
+    def searchCompletedFRAHistory(self, category, start_date, end_date):
+        return FRA.searchCompletedFRAHistory(category, start_date, end_date)

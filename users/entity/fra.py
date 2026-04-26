@@ -208,3 +208,38 @@ class FRA:
             })
 
         return result
+    ''' 
+    User Story #22: As a Fund Raiser, I want to search history of completed FRA by service category and date period so that I can search for the past FRA that is completed.
+    '''
+    @staticmethod 
+    def searchCompletedFRAHistory(category, start_date, end_date):
+        conn, cur = connect_db()
+
+        cur.execute("""
+            SELECT * FROM fra
+            WHERE LOWER(category) LIKE LOWER(?)
+              AND end_date BETWEEN ? AND ?
+              AND status = 0
+        """, ('%' + category.strip() + '%', start_date, end_date))
+
+        rows = cur.fetchall()
+        conn.close()
+
+        result = []
+
+        for row in rows:
+            result.append({
+                "fraId": row[1],
+                "title": row[2],
+                "description": row[3],
+                "category": row[4],
+                "target_amount": row[5],
+                "collected_amount": row[6],
+                "start_date": row[7],
+                "end_date": row[8],
+                "status": row[9],
+                "view_count": row[10],
+                "location": row[11]
+            })
+
+        return result
