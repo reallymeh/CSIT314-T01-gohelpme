@@ -9,8 +9,9 @@ fundraiser_bp = Blueprint('fundraiser', __name__, url_prefix='/fundraiser')
 def homepage():
     controller = FRAController()
     fra_data = controller.get_all_fra()
+    message = request.args.get('message')
 
-    return render_template('FundRaiserHomePage.html', fra_data=fra_data)
+    return render_template('FundRaiserHomePage.html', fra_data=fra_data, message=message)
     
     
 '''
@@ -201,13 +202,4 @@ def search_fra():
         "message": "" if results else page.displayNoResult()
     })
     
-# Logout functionality for Fund Raiser
-class LogoutPage:
-    def logout(self):
-        return 'You have logged out successfully!'
 
-@fundraiser_bp.route('/logout')
-def logout():
-    page = LogoutPage()
-    message = page.logout()
-    return redirect(url_for('user.homepage', message=message))

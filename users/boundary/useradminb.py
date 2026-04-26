@@ -6,7 +6,7 @@ from users.control.useradminc import (
     UpdateUserProfileController, UpdateUserAccountController,
     SuspendUserProfileController, CreateUserProfileController,
     ViewUserProfileController, SearchUserProfileController,
-    ViewUserAccountController, LoginController,
+    ViewUserAccountController, 
     SearchUserAccountController, GetUserAccountController,
     SuspendUserAccountController
 )
@@ -67,7 +67,8 @@ update_user_account = UpdateUserAccount()
 def user_profile_list():
     display_profile = DisplayUserProfile()
     profiles = display_profile.displayUserProfile()
-    return render_template('UserAdminProfiles.html', profiles=profiles)
+    message = request.args.get('message')
+    return render_template('UserAdminProfiles.html', profiles=profiles, message=message)
 
 
 # Create user profile
@@ -247,16 +248,7 @@ def suspend_user():
     return jsonify({'message': message})
 
 
-class LogoutPage:
-    def logout(self):
-        return 'You have logged out successfully!'
 
-
-@admin_profiles_bp.route('/logout')
-def logout():
-    page = LogoutPage()
-    message = page.logout()
-    return redirect(url_for('user.homepage', message=message))
 
 
 class ViewUserProfile:
@@ -382,47 +374,3 @@ def suspend_account():
     message = SuspendUserAccount().suspendUserAccount(email_address)
     return jsonify({'message': message})
 
-class LoginPage:
-    def clickLogin(self, email, password):
-        login_controller = LoginController()
-        if login_controller.login(email, password):
-            return self.displaySuccess()
-        else:
-            return self.displayError()
-
-    def displayError(self):
-        return 'Login failed. Please check your email and password and try again.'
-
-    def displaySuccess(self):
-        return 'Login successful! Welcome back.'
-
-
-@admin_profiles_bp.route('/login', methods=['GET'])
-def show_login():
-    return render_template('UserAdminLogin.html')
-
-
-@admin_profiles_bp.route('/login', methods=['POST'])
-def login():
-    data = request.get_json()
-    email = data.get('email', '').strip()
-    password = data.get('password', '').strip()
-
-    login_controller = LoginController()
-    success = login_controller.login(email, password)
-    user_type = login_controller.getUserType(email) if success else None
-    normalized_user_type = user_type.strip().lower() if user_type else ""
-    role_redirects = {
-        "admin": url_for('admin_view_profile.user_profile_list'),
-        "user_admin": url_for('admin_view_profile.user_profile_list'),
-        "platform_manager": url_for('user.homepage'),
-        "fund_raiser": url_for('user.homepage'),
-        "donee": url_for('user.homepage'),
-    }
-    redirect_url = role_redirects.get(normalized_user_type, url_for('user.homepage'))
-    return jsonify({
-        "success": success,
-        "message": "Login successful! Welcome back." if success else "Login failed. Please check your email and password.",
-        "redirect_url": redirect_url if success else None,
-        "user_type": user_type if success else None
-    })

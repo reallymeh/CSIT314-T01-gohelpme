@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
+    {% if message %}
+      <div id="alert-box">{{ message }}</div>
+    {% endif %}
 
     {# BCE BOUNDARY: DisplayUserProfile #}
     {# User Story: As a user admin, I want to view user profiles so that I can view the different types of user profiles #}
@@ -30,7 +33,7 @@
             <a href="/admin/userprofile" class="nav-item active">User Profiles</a>
             <a href="/admin/useraccount" class="nav-item">User Accounts</a>
             {# BACKEND: /logout route should clear session #}
-            <a href="/admin/logout" class="nav-item logout">Log Out</a>
+            <a href="/user/logout" class="nav-item logout">Log Out</a>
         </div>
 
         <div class="main" id="DisplayUserProfile">
@@ -167,6 +170,14 @@
                 });
             }
         }
+    </script>
+    <script>
+        setTimeout(function() {
+            const alertBox = document.getElementById("alert-box");
+            if (alertBox) {
+                alertBox.style.display = "none";
+            }
+        }, 3000);
     </script>
 
 </body>

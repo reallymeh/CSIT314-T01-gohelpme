@@ -15,6 +15,7 @@
             <div class="login-container">
                 <h2>Welcome Back</h2>
                 <p class="subtitle">Please login to your account</p>
+                    <div id="message" class="message-box"></div>
                     <div class="input-group">
                         <label for="username">Email Address</label>
                         <input type="email" id="username" name="username" placeholder="Enter email" required>
@@ -32,7 +33,7 @@
             const email = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
-            fetch('/admin/login', {
+            fetch('/user/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -44,7 +45,9 @@
                if (data.success === true) {
                window.location.href = data.redirect_url;
                 } else {
-               alert(data.message);  
+               const messageBox = document.getElementById('message');
+               messageBox.style.color = "#A32D2D";
+               messageBox.innerText = data.message;
              }
             })
             .catch(error => console.error('Error:', error));

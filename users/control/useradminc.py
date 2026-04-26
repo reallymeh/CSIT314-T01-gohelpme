@@ -95,13 +95,3 @@ class SuspendUserAccountController:
     def suspendUserAccount(self, email_address: str) -> bool:
         return UserAccount.suspendAccount(email_address)
     
-class LoginController:
-    def login(self, email_address: str, password: str) -> bool:
-        if not email_address or not password:
-            return False
-        return UserAccount.login(email_address, password)
-
-    def getUserType(self, email_address: str) -> str | None:
-        if not email_address:
-            return None
-        return UserAccount.getUserType(email_address)

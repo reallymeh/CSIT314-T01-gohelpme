@@ -10,6 +10,9 @@
 </head>
 
 <body>
+{% if message %}
+<div id="alert-box">{{ message }}</div>
+{% endif %}
 
 <!-- TOP BAR -->
 <div class="topbar">
@@ -26,7 +29,7 @@
     <!-- SIDEBAR -->
     <div class="sidebar">
         <a href="/fundraiser/homepage" class="nav-item active">Dashboard</a>
-        <a href="/fundraiser/logout" class="nav-item logout">Log Out</a>
+        <a href="/user/logout" class="nav-item logout">Log Out</a>
     </div>
 
     <!-- MAIN -->
@@ -122,6 +125,12 @@ function suspendFRA(fraId) {
         alert("Suspend failed");
     });
 }
+setTimeout(function() {
+    const alertBox = document.getElementById("alert-box");
+    if (alertBox) {
+        alertBox.style.display = "none";
+    }
+}, 3000);
 
 function searchFRA() {
     const name = document.getElementById('searchInput').value;
