@@ -51,53 +51,38 @@
                 {# BACKEND: url_for points to show_create_category route in platform_managerb.py #}
                 <a href="/manager/create_category" class="btn-primary">+ Create Category</a>
             </div>
-
-            {# BACKEND: displayFRACategory() renders all category cards #}
-            {# BACKEND: Replace hardcoded cards below with Jinja2 loop #}
-            {# {% for category in categories %} #}
             {# <div class="profile-card" data-name="{{ category.name | lower }}"> #}
             {# {% endfor %} #}
             <div class="grid" id="category-grid">
-
-                <!-- hardcoded card 1: Equipment -->
-                <div class="profile-card" data-name="equipment">
-                    <div class="card-top">
-                        <div class="icon-circle icon-fr">EQ</div>
-                        <div>
-                            {# BACKEND: Replace with {{ category.name | title }} #}
-                            <div class="card-name">Equipment</div>
-                            {# BACKEND: Replace with {{ category.description }} #}
-                            <div class="card-desc">Donation of equipment</div>
+                {% for category in categories %}
+                    <div class="profile-card" data-name="{{ category.category_name | lower }}">
+                        <div class="card-top">
+                            {# Icon: first 2 letters + appropriate style class #}
+                            <div class="icon-circle
+                                {% if category.category_name.lower() == 'cash' %}icon-donee{% else %}icon-fr{% endif %}">
+                                {{ category.category_name[:2].upper() }}
+                            </div>
+                            <div>
+                                <div class="card-name">{{ category.category_name | title }}</div>
+                                <div class="card-desc">{{ category.description }}</div>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="act-btn view" 
+                                    onclick="window.location.href='/manager/viewcategory/{{ category.category_name | lower }}'">
+                                View
+                            </button>
+                            <button class="act-btn" 
+                                    onclick="window.location.href='/manager/updatecategory/{{ category.category_name | lower }}'">
+                                Update
+                            </button>
+                            <button class="act-btn danger" 
+                                    onclick="suspendCategory('{{ category.category_name | lower }}')">
+                                Suspend
+                            </button>
                         </div>
                     </div>
-                    <div class="card-actions">
-                        {# BACKEND: View button calls GET /manager/viewcategory/<name> → ViewFRACategory boundary #}
-                        <button class="act-btn view" onclick="window.location.href='/manager/viewcategory/equipment'">View</button>
-                        {# BACKEND: Update button calls GET /manager/updatecategory/<name> → UpdateFRACategory boundary #}
-                        <button class="act-btn" onclick="window.location.href='/manager/updatecategory/equipment'">Update</button>
-                        {# BACKEND: Suspend button calls POST /manager/suspend_category → SuspendFRACategory boundary #}
-                        <button class="act-btn danger" onclick="suspendCategory('equipment')">Suspend</button>
-                    </div>
-                </div>
-
-                <!-- hardcoded card 2: Cash -->
-                <div class="profile-card" data-name="cash">
-                    <div class="card-top">
-                        <div class="icon-circle icon-donee">CA</div>
-                        <div>
-                            {# BACKEND: Replace with {{ category.name | title }} #}
-                            <div class="card-name">Cash</div>
-                            {# BACKEND: Replace with {{ category.description }} #}
-                            <div class="card-desc">Cash donation</div>
-                        </div>
-                    </div>
-                    <div class="card-actions">
-                        <button class="act-btn view" onclick="window.location.href='/manager/viewcategory/cash'">View</button>
-                        <button class="act-btn" onclick="window.location.href='/manager/updatecategory/cash'">Update</button>
-                        <button class="act-btn danger" onclick="suspendCategory('cash')">Suspend</button>
-                    </div>
-                </div>
-
+                {% endfor %}
             </div>
 
         </div>
