@@ -208,7 +208,6 @@ class FRA:
             })
 
         return result
-<<<<<<< HEAD
 
     '''
     User Story # (Donee): Search all active FRAs by name. Only returns FRAs with status = 1 (active), unlike the fund raiser searchFRA.
@@ -235,7 +234,6 @@ class FRA:
             }
             for r in rows
         ]
-=======
     '''
     User Story #20: As a Fund Raiser, I want to view the number of views of a FRA so that I can analyze the view of a FRA and adjust my strategy to attract more donees.
     '''
@@ -331,5 +329,3 @@ class FRA:
             }
 
         return None
-    
->>>>>>> 2acc2e3859bce03fd26f507c17b304769ae660a2
