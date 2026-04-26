@@ -54,7 +54,7 @@
                             type="text"
                             id="category-name"
                             placeholder="Enter category name..."
-                            value="Equipment"
+                            value="{{ category.category_name }}"
                             style="width:100%;"
                         />
                     </div>
@@ -67,15 +67,15 @@
                             id="category-desc"
                             placeholder="Enter category description..."
                             style="width:100%; height:80px; resize:vertical;"
-                        >Donation of equipment</textarea>
+                        >{{ category.description }}</textarea>
                     </div>
 
                     <div class="field-row" style="flex-direction:column; align-items:flex-start; gap:6px; margin-top:12px;">
                         <label class="field-label" for="category-status">Status</label>
                         {# BACKEND: Replace selected option with {% if category.status == 1 %}selected{% endif %} on correct option #}
                         <select class="search-box" id="category-status" style="width:100%;">
-                            <option value="1" selected>Active</option>
-                            <option value="0">Inactive</option>
+                            <option value="1" {% if category.status == 1 %}selected{% endif %}>Active</option>
+                            <option value="0" {% if category.status == 0 %}selected{% endif %}>Inactive</option>
                         </select>
                     </div>
 
