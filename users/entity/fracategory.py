@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from database import connect_db
+from typing import List
 
 @dataclass
 class FRACategory:
@@ -50,6 +51,25 @@ class FRACategory:
         if row is None:
             return None
         return FRACategory(row[0], row[1], row[2])
+    
+    @staticmethod
+    def getAllCategory() -> List["FRACategory"]:
+        conn, cur = connect_db()
+        try:
+            result = cur.execute(
+                "SELECT * FROM fra_category"
+            )
+            rows = result.fetchall()
+            return [
+            FRACategory(name, description, status)
+            for name, description, status in rows
+            ]
+
+        except Exception as e:
+            print(e)
+        finally:
+            cur.close()
+            conn.close()
     
     # check for backend for this user story
     @staticmethod
