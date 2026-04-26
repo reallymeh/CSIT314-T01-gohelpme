@@ -114,26 +114,33 @@
 
 
         // =====================
-        // BCE BOUNDARY: SuspendFRACategory
-        // HARDCODED — backend needs to:
-        // uncomment fetch block, delete hardcoded alert line
-        // Flask route: POST /manager/suspend_category → SuspendFRACategoryController
+        // BCE BOUNDARY: SuspendFRACategoryBoundary
+        // suspendCategory() — called when Suspend button is pressed
+        // sends POST request to SuspendFRACategoryController via /manager/suspend_category
+        // calls displaySuspendSuccess() or displaySuspendFail() based on response
         // =====================
         function suspendCategory(categoryName) {
             if (confirm("Are you sure you want to suspend " + categoryName + "?")) {
-                // BACKEND: Hook to POST /manager/suspend_category → SuspendFRACategory boundary
-                // fetch('/manager/suspend_category', {
-                //     method: 'POST',
-                //     headers: { 'Content-Type': 'application/json' },
-                //     body: JSON.stringify({ category_name: categoryName })
-                // })
-                // .then(response => response.json())
-                // .then(data => {
-                //     // displaySuspendSuccess() or displaySuspendFail()
-                //     alert(data.message);
-                //     location.reload();
-                // });
-                alert("Suspend " + categoryName + " coming soon!");
+                // BCE BOUNDARY: SuspendFRACategory
+                fetch('/manager/suspend_category', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ category_name: categoryName })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // BCE BOUNDARY: displaySuspendSuccess()
+                        alert(data.message);
+                        loadCategories('');
+                    } else {
+                        // BCE BOUNDARY: displaySuspendFail()
+                        alert(data.message);
+                    }
+                })
+                .catch(() => {
+                    alert("Something went wrong!");
+                });
             }
         }
 

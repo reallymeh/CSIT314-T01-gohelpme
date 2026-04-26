@@ -1,5 +1,4 @@
 from users.entity.fracategory import FRACategory
-
 from typing import List
 
 class CreateFRACategoryController:
@@ -33,4 +32,8 @@ class SearchFRACategoryController:
                (hasattr(p, 'description') and query in getattr(p, 'description', '').lower())
         ]
         return results
+    
+class SuspendFRACategoryController:
+    def suspendFRACategory(self, category_name: str) -> bool:
+        return FRACategory.suspendCategory(category_name)
     
