@@ -64,8 +64,6 @@
                        <input type="number" id="startDay" class="small-input" placeholder="DD" min="1" max="31">
                        <!-- YEAR -->
                        <input type="number" id="startYear" class="year-input" placeholder="YYYY" min="2000" max="2100">
-                       <!-- CALENDAR ICON -->
-                       <span class="calendar-icon">[cal]</span>
                    </div>
                 </div>
 
@@ -74,7 +72,7 @@
                    <div class="date-row">
                        <!-- MONTH -->
                        <select id="endMonth" class="date-input">
-                           <option value="">Month</option>
+                            <option value="">Month</option>
                            <option value="01">January</option>
                            <option value="02">February</option>
                            <option value="03">March</option>
@@ -92,13 +90,14 @@
                        <input type="number" id="endDay" class="small-input" placeholder="DD" min="1" max="31">
                        <!-- YEAR -->
                        <input type="number" id="endYear" class="year-input" placeholder="YYYY" min="2000" max="2100">
-                       <!-- CALENDAR ICON -->
-                       <span class="calendar-icon">[cal]</span>
                    </div>
+                   
                 </div>
-
-                <label class="date-label">FRA Category</label>
-                <input type="text" id="searchInput" placeholder="FRA Category...">
+                <div class="filter-group">
+                   <label class="date-label">FRA Category</label>
+                   <input type="text" id="searchInput" placeholder="FRA Category...">
+                </div>
+               
             
                 <button onclick="searchCompletedFRA()" class="btn-primary">Search</button>
             </div>
@@ -132,13 +131,9 @@
                 <!-- ACTIONS -->
                 <div class="card-actions">
 
-                    <button class="act-btn view" onclick="window.location.href='/fundraiser/view/{{ fra.fraId }}'">
+                    <button class="act-btn view" onclick="window.location.href='/fundraiser/viewCompleted/{{ fra.fraId }}'">
                     View
                     </button>
-                    <button class="act-btn" onclick="window.location.href='/fundraiser/update/{{ fra.fraId }}'">
-                    Update
-                    </button>
-
                     <button class="act-btn" onclick="suspendFRA('{{ fra.fraId }}')"
                             style="color:red; border:1px solid red;">
                         Suspend
@@ -225,7 +220,7 @@
 
                         <div class="card-actions">
                             <button class="act-btn view"
-                                onclick="window.location.href='/fundraiser/view/${fra.fraId}'">
+                                onclick="window.location.href='/fundraiser/viewCompleted/${fra.fraId}'">
                                 View
                             </button>
                         </div>

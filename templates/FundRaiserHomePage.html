@@ -93,6 +93,14 @@
                         Suspend
                     </button>
 
+                    <button class="act-btn" onclick="viewFRAViewCount('{{ fra.fraId }}')">
+                        View Count
+                    </button>
+
+                    <button class="act-btn" onclick="viewFRAShortlistCount('{{ fra.fraId }}')">
+                        Shortlist Count
+                    </button>
+
                 </div>
 
             </div>
@@ -197,6 +205,38 @@ function searchFRA() {
     .catch(err => {
         console.error(err);
         alert("Search failed");
+    });
+}
+
+function viewFRAViewCount(fraId) {
+    fetch(`/fundraiser/viewCount/${fraId}`)
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert(`FRA "${data.title}" has been viewed ${data.view_count} times.`);
+        } else {
+            alert(data.message || "Failed to retrieve view count");
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Failed to retrieve view count");
+    });
+}
+
+function viewFRAShortlistCount(fraId) {
+    fetch(`/fundraiser/shortlistCount/${fraId}`)
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert(`FRA "${data.title}" has been shortlisted ${data.shortlist_count} times.`);
+        } else {
+            alert(data.message || "Failed to retrieve shortlist count");
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Failed to retrieve shortlist count");
     });
 }
 </script>
