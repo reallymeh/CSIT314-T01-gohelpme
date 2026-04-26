@@ -29,6 +29,7 @@
     <!-- SIDEBAR -->
     <div class="sidebar">
         <a href="/fundraiser/homepage" class="nav-item active">Dashboard</a>
+        <a href="/fundraiser/history" class="nav-item">History</a>
         <a href="/user/logout" class="nav-item logout">Log Out</a>
     </div>
 
@@ -44,7 +45,7 @@
             <!-- SEARCH -->
             <div class="search-group">
                 <input type="text" id="searchInput" placeholder="Search FRA title...">
-                <button onclick="searchFRA()">Search</button>
+                <button onclick="searchFRA()" class="btn-primary">Search</button>
             </div>
 
             <!-- CREATE BUTTON -->
@@ -90,6 +91,14 @@
                     <button class="act-btn" onclick="suspendFRA('{{ fra.fraId }}')"
                             style="color:red; border:1px solid red;">
                         Suspend
+                    </button>
+
+                    <button class="act-btn" onclick="viewFRAViewCount('{{ fra.fraId }}')">
+                        View Count
+                    </button>
+
+                    <button class="act-btn" onclick="viewFRAShortlistCount('{{ fra.fraId }}')">
+                        Shortlist Count
                     </button>
 
                 </div>
@@ -196,6 +205,38 @@ function searchFRA() {
     .catch(err => {
         console.error(err);
         alert("Search failed");
+    });
+}
+
+function viewFRAViewCount(fraId) {
+    fetch(`/fundraiser/viewCount/${fraId}`)
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert(`FRA "${data.title}" has been viewed ${data.view_count} times.`);
+        } else {
+            alert(data.message || "Failed to retrieve view count");
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Failed to retrieve view count");
+    });
+}
+
+function viewFRAShortlistCount(fraId) {
+    fetch(`/fundraiser/shortlistCount/${fraId}`)
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert(`FRA "${data.title}" has been shortlisted ${data.shortlist_count} times.`);
+        } else {
+            alert(data.message || "Failed to retrieve shortlist count");
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Failed to retrieve shortlist count");
     });
 }
 </script>
