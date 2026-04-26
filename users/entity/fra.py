@@ -208,6 +208,7 @@ class FRA:
             })
 
         return result
+<<<<<<< HEAD
 
     '''
     User Story # (Donee): Search all active FRAs by name. Only returns FRAs with status = 1 (active), unlike the fund raiser searchFRA.
@@ -234,3 +235,101 @@ class FRA:
             }
             for r in rows
         ]
+=======
+    '''
+    User Story #20: As a Fund Raiser, I want to view the number of views of a FRA so that I can analyze the view of a FRA and adjust my strategy to attract more donees.
+    '''
+    @staticmethod
+    def getFRAViewCount(fraId):
+        conn, cur = connect_db()
+
+        cur.execute("SELECT view_count FROM fra WHERE fraId = ?", (fraId,))
+        row = cur.fetchone()
+
+        conn.close()
+
+        if row:
+            return row[0]
+
+        return None
+    '''
+    User Story #21: As a Fund Raiser, I want to view the number of times a FRA is shortlisted so that I can know how many people are interested in this FRA.
+    '''
+    @staticmethod
+    def getFRAShortlistCount(fraId):
+        conn, cur = connect_db()
+        ''' Assuming there is a "shortlist" table that tracks which FRA has been shortlisted by users'''
+        cur.execute("SELECT COUNT(*) FROM shortlist WHERE fraId = ?", (fraId,))
+        row = cur.fetchone()
+
+        conn.close()
+
+        if row:
+            return row[0]
+
+        return None
+    ''' 
+    User Story #22: As a Fund Raiser, I want to search history of completed FRA by service category and date period so that I can search for the past FRA that is completed.
+    '''
+    @staticmethod 
+    def searchCompletedFRAHistory(category, start_date, end_date):
+        conn, cur = connect_db()
+
+        cur.execute("""
+            SELECT * FROM fra
+            WHERE LOWER(category) LIKE LOWER(?)
+              AND end_date BETWEEN ? AND ?
+              AND status = 0
+        """, ('%' + category.strip() + '%', start_date, end_date))
+
+        rows = cur.fetchall()
+        conn.close()
+
+        result = []
+
+        for row in rows:
+            result.append({
+                "fraId": row[1],
+                "title": row[2],
+                "description": row[3],
+                "category": row[4],
+                "target_amount": row[5],
+                "collected_amount": row[6],
+                "start_date": row[7],
+                "end_date": row[8],
+                "status": row[9],
+                "view_count": row[10],
+                "location": row[11]
+            })
+
+        return result
+    '''
+    User Story #23: As a Fund Raiser, I want to view the history of completed FRA by service category and date period so that I can review how the past FRA has progressed.
+    '''
+    @staticmethod
+    def viewCompletedFRA(fraId: str):
+        conn, cur = connect_db()
+
+        cur.execute("SELECT * FROM fra WHERE fraId = ? AND status = 0", (fraId,))
+        row = cur.fetchone()
+
+        conn.close()
+
+        if row:
+            return {
+                "fraId": row[1],
+                "title": row[2],
+                "description": row[3],
+                "category": row[4],
+                "target_amount": row[5],
+                "collected_amount": row[6],
+                "start_date": row[7],
+                "end_date": row[8],
+                "status": row[9],
+                "view_count": row[10],
+                "location": row[11],
+            }
+
+        return None
+    
+>>>>>>> 2acc2e3859bce03fd26f507c17b304769ae660a2

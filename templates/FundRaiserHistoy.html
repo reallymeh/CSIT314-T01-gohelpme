@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fundraiser Dashboard</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+    <span class="topbar-logo">Online Fundraising System — Fund Raiser Portal</span>
+
+    <div class="topbar-user">
+        <span>Fund Raiser</span>
+        <div class="avatar">FR</div>
+    </div>
+</div>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <a href="/fundraiser/homepage" class="nav-item">Dashboard</a>
+        <a href="/fundraiser/history" class="nav-item active">History</a>
+        <a href="/user/logout" class="nav-item logout">Log Out</a>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+
+        <div class="page-title">Completed FRA Campaigns</div>
+        <div class="page-sub">All your completed FRA campaigns</div>
+
+        <!-- TOOLBAR -->
+        <div class="toolbar" style="display:flex; justify-content:space-between; align-items:center;">
+
+            <!-- SEARCH -->
+            <div class="search-group">
+                <div class="filter-group">
+                   <label class="date-label">Start Date</label>
+                   <div class="date-row">
+                       <!-- MONTH -->
+                       <select id="startMonth" class="date-input">
+                           <option value="">Month</option>
+                           <option value="01">January</option>
+                           <option value="02">February</option>
+                           <option value="03">March</option>
+                           <option value="04">April</option>
+                           <option value="05">May</option>
+                           <option value="06">June</option>
+                           <option value="07">July</option>
+                           <option value="08">August</option>
+                           <option value="09">September</option>
+                           <option value="10">October</option>
+                           <option value="11">November</option>
+                           <option value="12">December</option>
+                       </select>
+                       <!-- DAY -->
+                       <input type="number" id="startDay" class="small-input" placeholder="DD" min="1" max="31">
+                       <!-- YEAR -->
+                       <input type="number" id="startYear" class="year-input" placeholder="YYYY" min="2000" max="2100">
+                   </div>
+                </div>
+
+                <div class="filter-group">
+                   <label class="date-label">End Date</label>
+                   <div class="date-row">
+                       <!-- MONTH -->
+                       <select id="endMonth" class="date-input">
+                            <option value="">Month</option>
+                           <option value="01">January</option>
+                           <option value="02">February</option>
+                           <option value="03">March</option>
+                           <option value="04">April</option>
+                           <option value="05">May</option>
+                           <option value="06">June</option>
+                           <option value="07">July</option>
+                           <option value="08">August</option>
+                           <option value="09">September</option>
+                           <option value="10">October</option>
+                           <option value="11">November</option>
+                           <option value="12">December</option>
+                       </select>
+                       <!-- DAY -->
+                       <input type="number" id="endDay" class="small-input" placeholder="DD" min="1" max="31">
+                       <!-- YEAR -->
+                       <input type="number" id="endYear" class="year-input" placeholder="YYYY" min="2000" max="2100">
+                   </div>
+                   
+                </div>
+                <div class="filter-group">
+                   <label class="date-label">FRA Category</label>
+                   <input type="text" id="searchInput" placeholder="FRA Category...">
+                </div>
+               
+            
+                <button onclick="searchCompletedFRA()" class="btn-primary">Search</button>
+            </div>
+
+
+        </div>
+
+        <!-- GRID -->
+        <div class="grid" id="fra-container">
+
+            {% for fra in fra_data %}
+
+            <div class="profile-card">
+
+                <!-- TOP -->
+                <div class="card-top">
+                    <div class="icon-circle icon-fr">
+                        {{ fra.title[:2] | upper }}
+                    </div>
+
+                    <div>
+                        <div class="card-name">{{ fra.title }}</div>
+
+                        <!-- GREY DESCRIPTION -->
+                        <div style="font-size:12px; color:grey; margin-top:2px;">
+                            {{ fra.description }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="card-actions">
+
+                    <button class="act-btn view" onclick="window.location.href='/fundraiser/viewCompleted/{{ fra.fraId }}'">
+                    View
+                    </button>
+                    <button class="act-btn" onclick="suspendFRA('{{ fra.fraId }}')"
+                            style="color:red; border:1px solid red;">
+                        Suspend
+                    </button>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+</div>
+
+</body>
+<script>
+
+    function getDateValue(prefix) {
+        const month = document.getElementById(`${prefix}Month`).value;
+        const day = document.getElementById(`${prefix}Day`).value;
+        const year = document.getElementById(`${prefix}Year`).value;
+
+        if (!month || !day || !year) {
+            return '';
+        }
+
+        return `${year}-${month}-${day.padStart(2, '0')}`;
+    }
+
+    function searchCompletedFRA() {
+        const category = document.getElementById('searchInput').value.trim();
+        const startDate = getDateValue('start');
+        const endDate = getDateValue('end');
+
+        if (!category || !startDate || !endDate) {
+            alert('Please enter category, start date, and end date.');
+            return;
+        }
+
+        fetch('/fundraiser/history/search', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                category: category,
+                start_date: startDate,
+                end_date: endDate
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+
+            const container = document.getElementById('fra-container');
+            container.innerHTML = '';
+
+            if (!data.success) {
+                alert(data.message || 'Search failed');
+                return;
+            }
+
+            if (data.data.length === 0) {
+                container.innerHTML = '<p>No completed FRA found</p>';
+                return;
+            }
+
+            data.data.forEach(fra => {
+                container.innerHTML += `
+                    <div class="profile-card">
+                        <div class="card-top">
+                            <div class="icon-circle icon-fr">
+                                ${fra.title.substring(0, 2).toUpperCase()}
+                            </div>
+                            <div>
+                                <div class="card-name">${fra.title}</div>
+                                <div style="font-size:12px; color:grey; margin-top:2px;">
+                                    ${fra.description}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-actions">
+                            <button class="act-btn view"
+                                onclick="window.location.href='/fundraiser/viewCompleted/${fra.fraId}'">
+                                View
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        })
+        .catch(error => {
+            console.error(error);
+            alert('Search failed');
+        });
+    }
+
+
+</script>
+</html>
+
+
+
+

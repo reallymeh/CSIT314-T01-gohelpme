@@ -1,6 +1,6 @@
 # FRA Boundary
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for
-from users.control.fundraiserc import CreateFRAController, FRAController, ViewFRAController, UpdateFRAController, SuspendFRAController, SearchFRAController
+from users.control.fundraiserc import CreateFRAController, FRAController, ViewFRAController, UpdateFRAController, SuspendFRAController, SearchFRAController, SearchCompletedFRAHistoryController, ViewCompletedFRAController, ViewFRAShortlistCountController, ViewFRAViewCountController
 
 fundraiser_bp = Blueprint('fundraiser', __name__, url_prefix='/fundraiser')
 
@@ -201,5 +201,98 @@ def search_fra():
         "data": results,
         "message": "" if results else page.displayNoResult()
     })
+
+'''
+User Story #20: As a Fund Raiser,I want to view the number of views of a FRA so that I can analyze the view of a FRA and adjust my strategy to attract more donees.
+'''
+
+class ViewFRAViewCountPage:
+    def __init__(self):
+        self.controller = ViewFRAViewCountController()
+
+    def getFRAViewCount(self, fraId):
+        return self.controller.getFRAViewCount(fraId)
+
+@fundraiser_bp.route('/viewCount/<fraId>', methods=['GET'])
+def view_fra_view_count(fraId):
+    page = ViewFRAViewCountPage()
+    view_count = page.getFRAViewCount(fraId)
+
+    return jsonify({
+        "success": True,
+        "view_count": view_count
+    })
+'''
+User Story #21: As a Fund Raiser, I want to view the number of times a FRA is shortlisted so that I can know how many people are interested in this FRA.
+'''
+class ViewFRAShortlistCountPage:
+    def __init__(self):
+        self.controller = ViewFRAShortlistCountController()
+
+    def getFRAShortlistCount(self, fraId):
+        return self.controller.getFRAShortlistCount(fraId)
+@fundraiser_bp.route('/shortlistCount/<fraId>', methods=['GET'])
+def view_fra_shortlist_count(fraId):
+    page = ViewFRAShortlistCountPage()
+    shortlist_count = page.getFRAShortlistCount(fraId)
+
+    return jsonify({
+        "success": True,
+        "shortlist_count": shortlist_count
+    })
+
+''' 
+User Story #22: As a Fund Raiser, I want to search history of completed FRA by service category and date period so that I can search for the past FRA that is completed.
+'''
+@fundraiser_bp.route('/history', methods=['GET'])
+def view_history():
+    return render_template('FundRaiserHistoy.html')
+class SearchCompletedFRAHistoryPage: 
+    def __init__(self): 
+        self.controller = SearchCompletedFRAHistoryController()
     
+    def searchCompletedFRAHistory(self, category, start_date, end_date):
+        return self.controller.searchCompletedFRAHistory(category, start_date, end_date)
+    def displaySearchFailed(self):
+        return "Search failed. Please try again."
+
+@fundraiser_bp.route('/history/search', methods=['POST'])
+def search_completed_fra_history():
+    data = request.get_json(silent=True) or {}
+    category = data.get('category', '')
+    start_date = data.get('start_date', '')
+    end_date = data.get('end_date', '')
+
+    page = SearchCompletedFRAHistoryPage()
+
+    if not category or not start_date or not end_date:
+        return jsonify({
+            "success": False,
+            "data": [],
+            "message": page.displaySearchFailed()
+        })
+    
+    results = page.searchCompletedFRAHistory(category, start_date, end_date)
+    return jsonify({
+        "success": True,
+        "data": results,
+        "message": "" if results else page.displaySearchFailed()
+    })
+  
+'''
+User Story #23: As a Fund Raiser, I want to view the history of completed FRA by service category and date period so that I can review how the past FRA has progressed.
+'''
+class ViewCompletedFRAPage:
+    def __init__(self):
+        self.controller = ViewCompletedFRAController()
+
+    def viewCompletedFRA(self, fraId):
+        return self.controller.viewCompletedFRA(fraId)
+
+@fundraiser_bp.route('/viewCompleted/<fraId>', methods=['GET'])
+def view_comopleted_fra(fraId):
+    page = ViewCompletedFRAPage()
+    fra = page.viewCompletedFRA(fraId)
+
+    return render_template('FundRaiserViewCompletedFRA.html', fra=fra)
 

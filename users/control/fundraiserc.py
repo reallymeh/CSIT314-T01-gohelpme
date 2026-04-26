@@ -93,3 +93,32 @@ class SearchFRAController:
 
     def searchFRA(self, name):
         return FRA.searchFRA(name)
+
+'''
+User Story #20: As a Fund Raiser, I want to view the number of views of a FRA so that I can analyze the view of a FRA and adjust my strategy to attract more donees.
+'''
+class ViewFRAViewCountController:
+    def getFRAViewCount(self, fraId):
+        return FRA.getFRAViewCount(fraId)   
+    
+'''
+User Story #21: As a Fund Raiser, I want to view the number of times a FRA is shortlisted so that I can know how many people are interested in this FRA.
+'''
+class ViewFRAShortlistCountController:
+    def getFRAShortlistCount(self, fraId):
+        return FRA.getFRAShortlistCount(fraId)
+
+'''
+User Story #22: As a Fund Raiser, I want to search history of completed FRA by service category and date period so that I can search for the past FRA that is completed.
+'''
+class SearchCompletedFRAHistoryController: 
+    def searchCompletedFRAHistory(self, category, start_date, end_date):
+        return FRA.searchCompletedFRAHistory(category, start_date, end_date)
+    
+'''
+User Story #23: As a Fund Raiser, I want to view the history of completed FRA by service category and date period so that I can review how the past FRA has progressed.
+'''
+class ViewCompletedFRAController:
+    def viewCompletedFRA(self, fraId):
+        return FRA.viewCompletedFRA(fraId)
+    
