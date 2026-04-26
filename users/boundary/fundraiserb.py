@@ -9,8 +9,9 @@ fundraiser_bp = Blueprint('fundraiser', __name__, url_prefix='/fundraiser')
 def homepage():
     controller = FRAController()
     fra_data = controller.get_all_fra()
+    message = request.args.get('message')
 
-    return render_template('FundRaiserHomePage.html', fra_data=fra_data)
+    return render_template('FundRaiserHomePage.html', fra_data=fra_data, message=message)
     
     
 '''
@@ -179,6 +180,8 @@ def suspend_fra(fraId):
 User Story #19: As a Fund Raiser, I want to search a FRA so that I can manage and update specific FRA efficiently.
 '''
 
+'''User Story #24: As a Fund Raiser, I want to log out my user account so that I can end a session.
+'''
 # Logout functionality for Fund Raiser
 class LogoutPage:
     def logout(self):

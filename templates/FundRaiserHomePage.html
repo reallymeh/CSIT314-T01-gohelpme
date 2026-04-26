@@ -10,6 +10,9 @@
 </head>
 
 <body>
+{% if message %}
+<div id="alert-box">{{ message }}</div>
+{% endif %}
 
 <!-- TOP BAR -->
 <div class="topbar">
@@ -122,4 +125,12 @@ function suspendFRA(fraId) {
         alert("Suspend failed");
     });
 }
+</script>
+<script>
+setTimeout(function() {
+    const alertBox = document.getElementById("alert-box");
+    if (alertBox) {
+        alertBox.style.display = "none";
+    }
+}, 3000);
 </script>
