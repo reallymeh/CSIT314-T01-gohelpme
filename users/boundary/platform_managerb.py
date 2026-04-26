@@ -1,6 +1,8 @@
-from users.control.platform_managerc import CreateFRACategoryController, ViewFRACategoryController, UpdateFRACategoryController, ViewAllFRACategoryController, SuspendFRACategoryController
+from users.control.platform_managerc import CreateFRACategoryController, ViewFRACategoryController, UpdateFRACategoryController, ViewAllFRACategoryController, SearchFRACategoryController
 from users.entity.fracategory import FRACategory
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for
+
+from typing import List
 
 platform_manager_bp = Blueprint('platform_manager', __name__, url_prefix='/manager')
 
@@ -123,31 +125,30 @@ class ViewAllFRACategoryBoundary:
 def view_all_category():
     boundary = ViewAllFRACategoryBoundary()
     categories = boundary.viewAllFRACategory()
-    print(categories)
+    
     return render_template('PlatformManagerCategories.html', categories=categories)
 
-# ========== BCE BOUNDARY: SuspendFRACategory ==========
-# User Story: #38 As a platform management, I want to suspend FRA categories
-class SuspendFRACategoryBoundary:
+class SearchFRACategory:
     def __init__(self):
-        self.controller = SuspendFRACategoryController()
+        self.controller = SearchFRACategoryController()
+    
+    def searchFRACategory(self, query:str) -> List["FRACategory"]:
+        return self.controller.searchFRACategory(query)
 
-    def displaySuspendSuccess(self) -> str:
-        return 'Category suspended successfully!'
-
-    def displaySuspendFail(self) -> str:
-        return 'Failed to suspend category. Category may already be suspended or does not exist.'
-
-    def suspendFRACategory(self, category_name: str) -> bool:
-        return self.controller.suspendFRACategory(category_name)
-
-@platform_manager_bp.route('/suspend_category', methods=['POST'])
-def suspend_category():
-    data = request.get_json()
-    category_name = data.get('category_name', '').strip()
-
-    boundary = SuspendFRACategoryBoundary()
-    if boundary.suspendFRACategory(category_name):
-        return jsonify({'success': True, 'message': boundary.displaySuspendSuccess()})
-    else:
-        return jsonify({'success': False, 'message': boundary.displaySuspendFail()})
+@platform_manager_bp.route('/search_categories', methods=['GET'])
+def search_categories():
+    query = request.args.get('q', '').strip().lower()
+    
+    boundary = SearchFRACategory()
+    results = boundary.searchFRACategory(query)
+    
+    data = [
+        {
+            "category_name": cat.category_name, 
+            "description": getattr(cat, 'description', ''),
+            "status": getattr(cat, 'status', 1)
+        }
+        for cat in results
+    ]
+    
+    return jsonify(data)
