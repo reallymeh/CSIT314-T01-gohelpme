@@ -12,3 +12,8 @@ class ViewFRACategoryController:
 class UpdateFRACategoryController:
     def updateFRACategory(self, old_name: str, new_name: str, description: str, status: int) -> bool:
         return FRACategory.updateFRACategory(old_name, new_name, description, status)
+    
+class ViewAllFRACategoryController:
+    def viewAllFRACategory(self):
+        return FRACategory.getAllCategory()
+    
