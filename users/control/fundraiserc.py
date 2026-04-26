@@ -36,12 +36,9 @@ class CreateFRAController:
     def createFRA(self, title: str, description: str, category: str, target_amount: int,  \
                     start_date: str, end_date: str, status: int, location: str) -> bool:
         
-        collected_amount = 0
-        view_count = 0
-        
         try:
-            FRA.createFRA(title, description, category, target_amount, collected_amount, \
-            start_date, end_date, status, view_count, location)
+            FRA.createFRA(title, description, category, target_amount, \
+            start_date, end_date, status, location)
             return True
 
         except Exception as e:
@@ -53,7 +50,7 @@ class CreateFRAController:
 User Story #16: As a Fund Raiser, I want to view a FRA so that I can know my fund raising progress.
 '''
 class ViewFRAController:
-    def viewFRA(self, fraId):
+    def viewFRA(self, fraId: str):
         fra = FRA.viewFRA(fraId)
 
         if fra:
@@ -87,3 +84,12 @@ class SuspendFRAController:
 
     def suspendFRA(self, fraId):
         return FRA.suspendFRA(fraId)
+    
+
+'''
+User Story #19: As a Fund Raiser, I want to search a FRA so that I can manage and update specific FRA efficiently.
+'''
+class SearchFRAController:
+
+    def searchFRA(self, name):
+        return FRA.searchFRA(name)

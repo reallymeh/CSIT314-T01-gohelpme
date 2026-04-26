@@ -46,9 +46,11 @@ class FRA:
     '''
     @staticmethod
     def createFRA(title: str, description: str, category: str,
-                target_amount: int, collected_amount: int,
-                start_date: str, end_date: str,
-                status: int, view_count: int, location: str):
+                target_amount: int, start_date: str, end_date: str,
+                status: int, location: str):
+
+        collected_amount = 0
+        view_count = 0
 
         conn, cur = connect_db()
 
@@ -88,7 +90,7 @@ class FRA:
     User Story #16: As a Fund Raiser, I want to view a FRA so that I can know my fund raising progress.
     '''
     @staticmethod
-    def viewFRA(fraId):
+    def viewFRA(fraId: str):
         conn, cur = connect_db()
 
         cur.execute("SELECT * FROM fra WHERE fraId = ?", (fraId,))
@@ -171,3 +173,38 @@ class FRA:
 
         finally:
             conn.close()
+            
+
+    '''
+    User Story #19: As a Fund Raiser, I want to search a FRA so that I can manage and update specific FRA efficiently.
+    '''
+    @staticmethod
+    def searchFRA(name):
+        conn, cur = connect_db()
+
+        cur.execute("""
+            SELECT * FROM fra
+            WHERE title LIKE ?
+        """, ('%' + name + '%',))
+
+        rows = cur.fetchall()
+        conn.close()
+
+        result = []
+
+        for row in rows:
+            result.append({
+                "fraId": row[1],
+                "title": row[2],
+                "description": row[3],
+                "category": row[4],
+                "target_amount": row[5],
+                "collected_amount": row[6],
+                "start_date": row[7],
+                "end_date": row[8],
+                "status": row[9],
+                "view_count": row[10],
+                "location": row[11]
+            })
+
+        return result

@@ -1,6 +1,6 @@
 # FRA Boundary
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for
-from users.control.fundraiserc import CreateFRAController, FRAController, ViewFRAController, UpdateFRAController, SuspendFRAController
+from users.control.fundraiserc import CreateFRAController, FRAController, ViewFRAController, UpdateFRAController, SuspendFRAController, SearchFRAController
 
 fundraiser_bp = Blueprint('fundraiser', __name__, url_prefix='/fundraiser')
 
@@ -73,7 +73,7 @@ class ViewFRAPage:
     def __init__(self):
         self.controller = ViewFRAController()
 
-    def displayFRA(self, fraId: int):
+    def displayFRA(self, fraId: str):
         fra = self.controller.viewFRA(fraId)
 
         if fra:
@@ -81,8 +81,6 @@ class ViewFRAPage:
         else:
             return None
 
-    def displayError(self):
-        return "FRA not found"
     
 # Link to View FRA page once clicked on "View" button for each FRA in the Fund Raiser Homepage
 @fundraiser_bp.route('/view/<fraId>', methods=['GET'])
@@ -179,3 +177,29 @@ def suspend_fra(fraId):
 '''
 User Story #19: As a Fund Raiser, I want to search a FRA so that I can manage and update specific FRA efficiently.
 '''
+class SearchFRAPage:
+
+    def __init__(self):
+        self.controller = SearchFRAController()
+
+    def searchFRA(self, name):
+        return self.controller.searchFRA(name)
+
+    def displayNoResult(self):
+        return "No FRA found"
+
+@fundraiser_bp.route('/search', methods=['POST'])
+def search_fra():
+    data = request.get_json()
+    name = data.get('name', '')
+
+    page = SearchFRAPage()
+    results = page.searchFRA(name)
+
+    return jsonify({
+        "success": True,
+        "data": results,
+        "message": "" if results else page.displayNoResult()
+    })
+    
+

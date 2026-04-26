@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Category — Online Fundraising System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+    {# BCE BOUNDARY: UpdateFRACategoryBoundary #}
+    {# User Story: #37 As a platform management, I want to update FRA categories so that I can ensure the information is latest #}
+    {# Sequence: Platform Manager clicks Update → UpdateFRACategoryBoundary(Boundary) → UpdateFRACategoryController(Controller) → FRACategory(Entity) #}
+    {# Flask route: GET /manager/updatecategory/<category_name> in platform_managerb.py #}
+    {# BACKEND: category object passed from UpdateFRACategoryController via render_template('PlatformManagerUpdateCategory.html', category=category) #}
+    {# BACKEND: category object has: category_name, description, status #}
+
+    <div class="topbar">
+        <span class="topbar-logo">Online Fundraising System — Platform Manager Portal</span>
+        <div class="topbar-user">
+            {# BACKEND: Replace "Platform Manager" with logged-in manager's username from session #}
+            <span id="manager-name">Platform Manager</span>
+            <div class="avatar">PM</div>
+        </div>
+    </div>
+
+    <div class="layout">
+
+        <div class="sidebar">
+            <a href="/manager/categories" class="nav-item active">FRA Categories</a>
+            {# BACKEND: /logout route should clear session #}
+            <a href="/logout" class="nav-item logout">Log Out</a>
+        </div>
+
+        {# BACKEND: displayUpdateResult() renders this form pre-filled with current category data #}
+        {# BACKEND: displayUpdateFail() shows error message if update fails #}
+        <div class="main" id="UpdateFRACategory">
+
+            <a href="/manager/categories" class="back-link">← Back to FRA Categories</a>
+
+            <div class="page-title">Update Category</div>
+            <div class="page-sub">Edit the details of the selected FRA category</div>
+
+            <div class="detail-card">
+                <div class="detail-body">
+
+                    <div id="message-box" style="display:none; padding:10px; border-radius:6px; margin-bottom:16px; font-size:13px;"></div>
+
+                    <div class="field-row" style="flex-direction:column; align-items:flex-start; gap:6px;">
+                        <label class="field-label" for="category-name">Category Name</label>
+                        {# BACKEND: Replace hardcoded value with value="{{ category.category_name }}" #}
+                        <input
+                            class="search-box"
+                            type="text"
+                            id="category-name"
+                            placeholder="Enter category name..."
+                            value="{{ category.category_name }}"
+                            style="width:100%;"
+                        />
+                    </div>
+
+                    <div class="field-row" style="flex-direction:column; align-items:flex-start; gap:6px; margin-top:12px;">
+                        <label class="field-label" for="category-desc">Description</label>
+                        {# BACKEND: Replace hardcoded value with {{ category.description }} inside textarea #}
+                        <textarea
+                            class="search-box"
+                            id="category-desc"
+                            placeholder="Enter category description..."
+                            style="width:100%; height:80px; resize:vertical;"
+                        >{{ category.description }}</textarea>
+                    </div>
+
+                    <div class="field-row" style="flex-direction:column; align-items:flex-start; gap:6px; margin-top:12px;">
+                        <label class="field-label" for="category-status">Status</label>
+                        {# BACKEND: Replace selected option with {% if category.status == 1 %}selected{% endif %} on correct option #}
+                        <select class="search-box" id="category-status" style="width:100%;">
+                            <option value="1" {% if category.status == 1 %}selected{% endif %}>Active</option>
+                            <option value="0" {% if category.status == 0 %}selected{% endif %}>Inactive</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="detail-actions">
+                    {# BACKEND: Submit button calls POST /manager/updatecategory/<category_name> → UpdateFRACategoryBoundary #}
+                    <button class="btn-primary" onclick="updateCategory()">Confirm Update</button>
+                    <button class="act-btn" onclick="window.location.href='/manager/categories'">Cancel</button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        // =====================
+        // BCE BOUNDARY: UpdateFRACategoryBoundary
+        // updateCategory() — called when Confirm Update button is pressed
+        // sends POST request to UpdateFRACategoryController via /manager/updatecategory/<category_name>
+        // calls displayUpdateSuccess() or displayUpdateFail() based on response
+        // HARDCODED — backend needs to:
+        // 1. Add GET /manager/updatecategory/<category_name> route to pre-fill form with real data
+        // 2. Add POST /manager/updatecategory/<category_name> route to process update
+        // 3. Replace hardcoded input values with Jinja2 variables
+        // =====================
+
+        // BCE BOUNDARY: updateCategory()
+        // gets the current category name from the URL to identify which category to update
+        function updateCategory() {
+            const newName = document.getElementById('category-name').value.trim();
+            const description = document.getElementById('category-desc').value.trim();
+            const status = parseInt(document.getElementById('category-status').value);
+
+            if (newName === '') {
+                showMessage('Category name cannot be empty.', false);
+                return;
+            }
+
+            // get current category name from URL
+            // e.g. /manager/updatecategory/equipment → oldName = 'equipment'
+            const oldName = window.location.pathname.split('/').pop();
+
+            // BACKEND: Hook to POST /manager/updatecategory/<category_name> → UpdateFRACategoryBoundary
+            fetch('/manager/updatecategory/' + oldName, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    new_name: newName,
+                    description: description,
+                    status: status
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // BCE BOUNDARY: displayUpdateSuccess()
+                    showMessage(data.message, true);
+                } else {
+                    // BCE BOUNDARY: displayUpdateFail()
+                    showMessage(data.message, false);
+                }
+            })
+            .catch(() => {
+                showMessage('Something went wrong!', false);
+            });
+        }
+
+        // BCE BOUNDARY: displayUpdateSuccess() — shows green success message
+        // BCE BOUNDARY: displayUpdateFail() — shows red error message
+        function showMessage(message, success) {
+            const box = document.getElementById('message-box');
+            box.style.display = 'block';
+            box.style.backgroundColor = success ? '#EAF3DE' : '#FCEBEB';
+            box.style.color = success ? '#3B6D11' : '#A32D2D';
+            box.style.border = success ? '1px solid #C0DD97' : '1px solid #F7C1C1';
+            box.textContent = message;
+        }
+
+        window.onload = function() {
+            document.getElementById('message-box').style.display = 'none';
+        };
+    </script>
+
+</body>
+</html>

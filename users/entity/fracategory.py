@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from database import connect_db
+from typing import List
 
 @dataclass
 class FRACategory:
@@ -50,3 +51,74 @@ class FRACategory:
         if row is None:
             return None
         return FRACategory(row[0], row[1], row[2])
+    
+    @staticmethod
+    def getAllCategory() -> List["FRACategory"]:
+        conn, cur = connect_db()
+        try:
+            result = cur.execute(
+                "SELECT * FROM fra_category"
+            )
+            rows = result.fetchall()
+            return [
+            FRACategory(name, description, status)
+            for name, description, status in rows
+            ]
+
+        except Exception as e:
+            print(e)
+        finally:
+            cur.close()
+            conn.close()
+    
+    # check for backend for this user story
+    @staticmethod
+    def updateFRACategory(old_name: str, new_name: str, description: str, status: int) -> bool:
+        conn, cur = connect_db()
+        try:
+            cur.execute(
+                "UPDATE fra_category SET name = ?, description = ?, status = ? WHERE name = ?",
+                (new_name, description, status, old_name)
+            )
+            conn.commit()
+            if cur.rowcount == 0:
+                return False
+            return True
+        except Exception as e:
+            print(e)
+            conn.rollback()
+            return False
+        finally:
+            cur.close()
+            conn.close()
+
+    @staticmethod
+    def suspendCategory(category_name: str) -> bool:
+        conn, cur = connect_db()
+        try:
+            # check if already suspended
+            result = cur.execute(
+                "SELECT status FROM fra_category WHERE name = ?", (category_name,)
+            )
+            row = result.fetchone()
+
+            if row is None:
+                return False  # category does not exist
+
+            if row[0] == 0:
+                return False  # already suspended
+
+            cur.execute(
+                "UPDATE fra_category SET status = 0 WHERE name = ?", (category_name,)
+            )
+            conn.commit()
+            if cur.rowcount == 0:
+                return False
+            return True
+        except Exception as e:
+            print(e)
+            conn.rollback()
+            return False
+        finally:
+            cur.close()
+            conn.close()
