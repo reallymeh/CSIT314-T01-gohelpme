@@ -91,3 +91,34 @@ class FRACategory:
         finally:
             cur.close()
             conn.close()
+
+    @staticmethod
+    def suspendCategory(category_name: str) -> bool:
+        conn, cur = connect_db()
+        try:
+            # check if already suspended
+            result = cur.execute(
+                "SELECT status FROM fra_category WHERE name = ?", (category_name,)
+            )
+            row = result.fetchone()
+
+            if row is None:
+                return False  # category does not exist
+
+            if row[0] == 0:
+                return False  # already suspended
+
+            cur.execute(
+                "UPDATE fra_category SET status = 0 WHERE name = ?", (category_name,)
+            )
+            conn.commit()
+            if cur.rowcount == 0:
+                return False
+            return True
+        except Exception as e:
+            print(e)
+            conn.rollback()
+            return False
+        finally:
+            cur.close()
+            conn.close()

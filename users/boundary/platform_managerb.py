@@ -1,4 +1,4 @@
-from users.control.platform_managerc import CreateFRACategoryController, ViewFRACategoryController, UpdateFRACategoryController, ViewAllFRACategoryController
+from users.control.platform_managerc import CreateFRACategoryController, ViewFRACategoryController, UpdateFRACategoryController, ViewAllFRACategoryController, SuspendFRACategoryController
 from users.entity.fracategory import FRACategory
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for
 
@@ -126,3 +126,28 @@ def view_all_category():
     print(categories)
     return render_template('PlatformManagerCategories.html', categories=categories)
 
+# ========== BCE BOUNDARY: SuspendFRACategory ==========
+# User Story: #38 As a platform management, I want to suspend FRA categories
+class SuspendFRACategoryBoundary:
+    def __init__(self):
+        self.controller = SuspendFRACategoryController()
+
+    def displaySuspendSuccess(self) -> str:
+        return 'Category suspended successfully!'
+
+    def displaySuspendFail(self) -> str:
+        return 'Failed to suspend category. Category may already be suspended or does not exist.'
+
+    def suspendFRACategory(self, category_name: str) -> bool:
+        return self.controller.suspendFRACategory(category_name)
+
+@platform_manager_bp.route('/suspend_category', methods=['POST'])
+def suspend_category():
+    data = request.get_json()
+    category_name = data.get('category_name', '').strip()
+
+    boundary = SuspendFRACategoryBoundary()
+    if boundary.suspendFRACategory(category_name):
+        return jsonify({'success': True, 'message': boundary.displaySuspendSuccess()})
+    else:
+        return jsonify({'success': False, 'message': boundary.displaySuspendFail()})

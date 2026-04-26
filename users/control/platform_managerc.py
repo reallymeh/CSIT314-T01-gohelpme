@@ -17,3 +17,6 @@ class ViewAllFRACategoryController:
     def viewAllFRACategory(self):
         return FRACategory.getAllCategory()
     
+class SuspendFRACategoryController:
+    def suspendFRACategory(self, category_name: str) -> bool:
+        return FRACategory.suspendCategory(category_name)
