@@ -21,9 +21,11 @@ class FRA:
     view_count: int
     location: str
 
-    '''Dashboard: Fund Raiser Home Page'''
+    '''
+    User Story #344: As a Fund Raiser, I want to view all FRAs so that I can view many FRAs at the same time .
+    '''
     @staticmethod
-    def get_all_fra():
+    def displayFRA() -> List[FRA]:
         conn, cur = connect_db()
 
         cur.execute("""
@@ -87,7 +89,7 @@ class FRA:
     User Story #16: As a Fund Raiser, I want to view a FRA so that I can know my fund raising progress.
     '''
     @staticmethod
-    def viewFRA(fraId: str) -> list:
+    def viewFRA(fraId: str) -> FRA:
         conn, cur = connect_db()
 
         cur.execute("SELECT * FROM fra WHERE fraId = ?", (fraId,))

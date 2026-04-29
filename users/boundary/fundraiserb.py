@@ -1,19 +1,30 @@
 # FRA Boundary
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session
-from users.control.fundraiserc import CreateFRAController, FRAController, ViewFRAController, UpdateFRAController, SuspendFRAController, SearchFRAController, SearchCompletedFRAHistoryController, ViewCompletedFRAController, ViewFRAShortlistCountController, ViewFRAViewCountController
+from typing import List
+from users.control.fundraiserc import CreateFRAController, DisplayFRAController, ViewFRAController, UpdateFRAController, SuspendFRAController, SearchFRAController, SearchCompletedFRAHistoryController, ViewCompletedFRAController, ViewFRAShortlistCountController, ViewFRAViewCountController
 from users.entity.fracategory import FRACategory
 
 fundraiser_bp = Blueprint('fundraiser', __name__, url_prefix='/fundraiser')
 
+'''
+User Story #344: As a Fund Raiser, I want to view all FRAs so that I can view many FRAs at the same time .
+'''
 # Link to Fund Raiser Homepage
 @fundraiser_bp.route('/homepage', methods=['GET'])
 def homepage():
-    controller = FRAController()
-    fra_data = controller.get_all_fra()
+    boundary = DisplayFRAPage()
+    fra_data = boundary.displayFRA()
     message = request.args.get('message')
 
     return render_template('FundRaiserHomePage.html', fra_data=fra_data, message=message)
-    
+
+class DisplayFRAPage:
+    def __init__(self):
+        self.controller = DisplayFRAController()
+
+    def displayFRA(self):
+        return self.controller.displayFRA()
+
     
 '''
 User Story #15: As a Fund Raiser, I want to create a FRA so that I can share my story and start receiving donations.
@@ -76,7 +87,7 @@ class ViewFRAPage:
     def __init__(self):
         self.controller = ViewFRAController()
 
-    def displayFRA(self, fraId: str) -> list:    
+    def displayFRA(self, fraId: str):    
         fra = self.controller.viewFRA(fraId)
 
         if fra:

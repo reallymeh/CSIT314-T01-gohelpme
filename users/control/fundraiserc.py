@@ -1,13 +1,15 @@
 # controller
 import time
 from users.entity.fra import FRA
+from typing import List
+
 
 '''
-Dashboard: Fund Raiser Home Page
+User Story #344: As a Fund Raiser, I want to view all FRAs so that I can view many FRAs at the same time .
 '''
-class FRAController:
-    def get_all_fra(self):
-        rows = FRA.get_all_fra()
+class DisplayFRAController:
+    def displayFRA(self) -> List[FRA]:
+        rows = FRA.displayFRA()
 
         return [
     {
@@ -48,7 +50,7 @@ class CreateFRAController:
 User Story #16: As a Fund Raiser, I want to view a FRA so that I can know my fund raising progress.
 '''
 class ViewFRAController:
-    def viewFRA(self, fraId: str) -> list:
+    def viewFRA(self, fraId: str)-> FRA:
         fra = FRA.viewFRA(fraId)
 
         if fra:
