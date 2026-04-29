@@ -50,7 +50,16 @@
 
                 <div class="input-group">
                     <label>Category</label>
-                    <input type="text" name="category" placeholder="e.g. Education / Medical / Charity" required>
+                    <select name="category" required>
+                        <option value="">Select category</option>
+                        {% if categories %}
+                            {% for category in categories %}
+                                <option value="{{ category }}">{{ category }}</option>
+                            {% endfor %}
+                        {% else %}
+                            <option value="" disabled>No categories available</option>
+                        {% endif %}
+                    </select>
                 </div>
 
                 <div class="input-group">
@@ -100,7 +109,7 @@ function createFRA() {
 
     const title = document.querySelector('input[name="title"]').value;
     const description = document.querySelector('textarea[name="description"]').value;
-    const category = document.querySelector('input[name="category"]').value;
+    const category = document.querySelector('select[name="category"]').value;
     const target_amount = document.querySelector('input[name="target_amount"]').value;
     const start_date = document.querySelector('input[name="start_date"]').value;
     const end_date  = document.querySelector('input[name="end_date"]').value;

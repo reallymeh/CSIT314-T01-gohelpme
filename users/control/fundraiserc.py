@@ -30,15 +30,13 @@ class FRAController:
 '''
 User Story #15: As a Fund Raiser, I want to create a FRA so that I can share my story and start receiving donations.
 '''
-class CreateFRAController:
-    '''Controller class for the Create FRA page. (With parameter same as diagram)'''
-    
+class CreateFRAController:    
     def createFRA(self, title: str, description: str, category: str, target_amount: int,  \
-                    start_date: str, end_date: str, status: int, location: str) -> bool:
+                    start_date: str, end_date: str, status: int, location: str, created_by: str) -> bool:
         
         try:
             FRA.createFRA(title, description, category, target_amount, \
-            start_date, end_date, status, location)
+            start_date, end_date, status, location, created_by)
             return True
 
         except Exception as e:
@@ -50,7 +48,7 @@ class CreateFRAController:
 User Story #16: As a Fund Raiser, I want to view a FRA so that I can know my fund raising progress.
 '''
 class ViewFRAController:
-    def viewFRA(self, fraId: str):
+    def viewFRA(self, fraId: str) -> list:
         fra = FRA.viewFRA(fraId)
 
         if fra:
@@ -62,8 +60,8 @@ User Story #17: As a Fund Raiser, I want to update a FRA so that I can show my c
 '''
 class UpdateFRAController:
 
-    def updateFRA(self, fraId, title, description, category,
-                  target_amount, start_date, end_date, location):
+    def updateFRA(self, fraId: str, title: str, description: str, category: str,
+                  target_amount: int, start_date: str, end_date: str, location: str) -> bool:
 
         if not fraId or not title:
             return False
@@ -82,7 +80,7 @@ User Story #18: As a Fund Raiser, I want to suspend a FRA so that I can stop the
 '''
 class SuspendFRAController:
 
-    def suspendFRA(self, fraId):
+    def suspendFRA(self, fraId: str) -> bool:
         return FRA.suspendFRA(fraId)
     
 
@@ -91,14 +89,14 @@ User Story #19: As a Fund Raiser, I want to search a FRA so that I can manage an
 '''
 class SearchFRAController:
 
-    def searchFRA(self, name):
+    def searchFRA(self, name: str) -> list:
         return FRA.searchFRA(name)
 
 '''
 User Story #20: As a Fund Raiser, I want to view the number of views of a FRA so that I can analyze the view of a FRA and adjust my strategy to attract more donees.
 '''
 class ViewFRAViewCountController:
-    def getFRAViewCount(self, fraId):
+    def getFRAViewCount(self, fraId: str) -> int:
         return FRA.getFRAViewCount(fraId)   
     
 '''

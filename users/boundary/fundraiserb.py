@@ -1,6 +1,7 @@
 # FRA Boundary
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session
 from users.control.fundraiserc import CreateFRAController, FRAController, ViewFRAController, UpdateFRAController, SuspendFRAController, SearchFRAController, SearchCompletedFRAHistoryController, ViewCompletedFRAController, ViewFRAShortlistCountController, ViewFRAViewCountController
+from users.entity.fracategory import FRACategory
 
 fundraiser_bp = Blueprint('fundraiser', __name__, url_prefix='/fundraiser')
 
@@ -20,33 +21,35 @@ User Story #15: As a Fund Raiser, I want to create a FRA so that I can share my 
 # Link to Create FRA page once clicked on "Create FRA" button
 @fundraiser_bp.route('/create', methods=['GET'])
 def show_create_fra():
-    return render_template('FundRaiserCreateFRA.html')
+    categories = [c.category_name for c in FRACategory.getAllCategory() if c.status == 1]
+    return render_template('FundRaiserCreateFRA.html', categories=categories)
 
 class CreateFRAPage:
-    '''Boundary class for the Create FRA page. (With parameter same as diagram)'''
     def __init__(self):
         self.controller = CreateFRAController()
 
     def createFRA(self, title: str, description: str, category: str,
-                  target_amount: int, start_date: str, end_date: str,
-                  status: int, location: str):
-
+                target_amount: int, start_date: str, end_date: str,
+                status: int, location: str) -> bool:
+        
+        created_by = session.get("email_address") 
+        
         return self.controller.createFRA(title, description, category, target_amount, 
-                                         start_date, end_date, status, location)
+                                        start_date, end_date, status, location, created_by)
 
-    def displaySuccess(self): 
+    def displaySuccess(self) -> str: 
         return "Success: FRA created successfully."
 
-    def displayError(self):
+    def displayError(self) -> str:
         return "Something went wrong."
 
-# Link to Create FRA page once clicked on "Create FRA" button
+# Link to Create FRA function once clicked on "Create FRA" button
 @fundraiser_bp.route('/create', methods=['POST'])
 def create_fra():
     data = request.get_json()
 
     boundary = CreateFRAPage()
-    success = boundary.controller.createFRA(
+    success = boundary.createFRA(
         data['title'],
         data['description'],
         data['category'],
@@ -73,7 +76,7 @@ class ViewFRAPage:
     def __init__(self):
         self.controller = ViewFRAController()
 
-    def displayFRA(self, fraId: str):
+    def displayFRA(self, fraId: str) -> list:    
         fra = self.controller.viewFRA(fraId)
 
         if fra:
@@ -101,24 +104,25 @@ User Story #17: As a Fund Raiser, I want to update a FRA so that I can show my c
 def show_update_page(fraId):
     page = ViewFRAPage()
     fra = page.displayFRA(fraId)
+    categories = [c.category_name for c in FRACategory.getAllCategory() if c.status == 1]
     
-    return render_template('FundRaiserUpdateFRA.html', fra=fra)
+    return render_template('FundRaiserUpdateFRA.html', fra=fra, categories=categories)
     
 class UpdateFRAPage:
     def __init__(self):
         self.controller = UpdateFRAController()
     
     def updateFRA(self, fraId: str, title: str, description: str, category: str,
-                  target_amount: int, start_date: str, end_date: str, location: str):
+                  target_amount: int, start_date: str, end_date: str, location: str) -> bool:
 
         return self.controller.updateFRA(
             fraId, title, description, category,
             target_amount, start_date, end_date, location)
         
-    def displaySuccess(self):
+    def displaySuccess(self) -> str:
         return "Success: FRA updated successfully."
 
-    def displayError(self):
+    def displayError(self) -> str:
         return "Update failed."
 
 @fundraiser_bp.route('/update', methods=['POST'])
@@ -156,10 +160,10 @@ class SuspendFRAPage:
     def suspendFRA(self, fraId: str) -> bool:
         return self.controller.suspendFRA(fraId)
 
-    def displaySuccess(self):
+    def displaySuccess(self) -> str:
         return "FRA suspended successfully!"
 
-    def displayError(self):
+    def displayError(self) -> str:
         return "Failed to suspend FRA"
     
 @fundraiser_bp.route('/suspend/<fraId>', methods=['POST'])
@@ -182,10 +186,10 @@ class SearchFRAPage:
     def __init__(self):
         self.controller = SearchFRAController()
 
-    def searchFRA(self, name):
+    def searchFRA(self, name: str) -> list:
         return self.controller.searchFRA(name)
 
-    def displayNoResult(self):
+    def displayNoResult(self) -> str:
         return "No FRA found"
 
 @fundraiser_bp.route('/search', methods=['POST'])
@@ -210,7 +214,7 @@ class ViewFRAViewCountPage:
     def __init__(self):
         self.controller = ViewFRAViewCountController()
 
-    def getFRAViewCount(self, fraId):
+    def getFRAViewCount(self, fraId: str) -> int:
         return self.controller.getFRAViewCount(fraId)
 
 @fundraiser_bp.route('/viewCount/<fraId>', methods=['GET'])
@@ -222,6 +226,8 @@ def view_fra_view_count(fraId):
         "success": True,
         "view_count": view_count
     })
+    
+    
 '''
 User Story #21: As a Fund Raiser, I want to view the number of times a FRA is shortlisted so that I can know how many people are interested in this FRA.
 '''
@@ -231,6 +237,7 @@ class ViewFRAShortlistCountPage:
 
     def getFRAShortlistCount(self, fraId):
         return self.controller.getFRAShortlistCount(fraId)
+    
 @fundraiser_bp.route('/shortlistCount/<fraId>', methods=['GET'])
 def view_fra_shortlist_count(fraId):
     page = ViewFRAShortlistCountPage()
@@ -241,12 +248,14 @@ def view_fra_shortlist_count(fraId):
         "shortlist_count": shortlist_count
     })
 
+
 ''' 
 User Story #22: As a Fund Raiser, I want to search history of completed FRA by service category and date period so that I can search for the past FRA that is completed.
 '''
 @fundraiser_bp.route('/history', methods=['GET'])
 def view_history():
     return render_template('FundRaiserHistoy.html')
+
 class SearchCompletedFRAHistoryPage: 
     def __init__(self): 
         self.controller = SearchCompletedFRAHistoryController()
@@ -278,6 +287,7 @@ def search_completed_fra_history():
         "data": results,
         "message": "" if results else page.displaySearchFailed()
     })
+  
   
 '''
 User Story #23: As a Fund Raiser, I want to view the history of completed FRA by service category and date period so that I can review how the past FRA has progressed.

@@ -15,12 +15,6 @@ from flask import Blueprint, render_template, request, jsonify, redirect, url_fo
 from typing import List
 
 
-class DisplayUserProfile:
-    def __init__(self):
-        self.controller = DisplayUserProfileController()
-
-    def displayUserProfile(self) -> List[UserProfile]:
-        return self.controller.displayUserProfile()
 
 
 class UpdateUserProfile:
@@ -61,6 +55,13 @@ class GetUserAccount:
 admin_profiles_bp = Blueprint('admin_view_profile', __name__, url_prefix='/admin')
 
 update_user_account = UpdateUserAccount()
+
+class DisplayUserProfile:
+    def __init__(self):
+        self.controller = DisplayUserProfileController()
+
+    def displayUserProfile(self) -> List[UserProfile]:
+        return self.controller.displayUserProfile()
 
 
 @admin_profiles_bp.route('/userprofile')

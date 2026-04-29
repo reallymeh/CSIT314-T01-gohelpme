@@ -136,6 +136,7 @@ body {
     border: none;
     border-radius: 6px;
     cursor: pointer;
+    white-space: nowrap;
 }
 
 .btn-primary:hover {
@@ -363,10 +364,18 @@ a{
 .login-container {
     background: white;
     padding: 40px;
-    width: 380px;
+    width: 440px;
     border-radius: 16px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
     text-align: center;
+}
+
+.login-hint {
+    margin-top: 18px;
+    color: #6b7280;
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: left;
 }
 
 .login-container h2 {

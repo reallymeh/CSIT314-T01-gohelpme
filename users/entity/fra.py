@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from datetime import datetime
 from database import connect_db
 from typing import List
-from flask import session
 
 @dataclass
 class FRA:
@@ -47,14 +46,12 @@ class FRA:
     @staticmethod
     def createFRA(title: str, description: str, category: str,
                 target_amount: int, start_date: str, end_date: str,
-                status: int, location: str):
+                status: int, location: str, created_by: str) -> bool:
 
         collected_amount = 0
         view_count = 0
 
         conn, cur = connect_db()
-
-        created_by = session.get("email_address")
 
         cur.execute("""
             INSERT INTO fra (
@@ -90,7 +87,7 @@ class FRA:
     User Story #16: As a Fund Raiser, I want to view a FRA so that I can know my fund raising progress.
     '''
     @staticmethod
-    def viewFRA(fraId: str):
+    def viewFRA(fraId: str) -> list:
         conn, cur = connect_db()
 
         cur.execute("SELECT * FROM fra WHERE fraId = ?", (fraId,))
@@ -100,28 +97,27 @@ class FRA:
 
         if row:
             return {
-                "fraId": row[1],
-                "title": row[2],
-                "description": row[3],
-                "category": row[4],
-                "target_amount": row[5],
-                "collected_amount": row[6],
-                "start_date": row[7],
-                "end_date": row[8],
-                "status": row[9],
-                "view_count": row[10],
-                "location": row[11],
-            }
+            "fraId": row[1],
+            "title": row[2],
+            "description": row[3],
+            "category": row[4],
+            "target_amount": row[5],
+            "collected_amount": row[6],
+            "start_date": row[7],
+            "end_date": row[8],
+            "status": row[9],
+            "view_count": row[10],
+            "location": row[11]
+        }
 
-        return None
-    
+        return None    
     
     '''
     User Story #17: As a Fund Raiser, I want to update a FRA so that I can show my current status and need.
     '''
     @staticmethod
-    def updateFRA(fraId, title, description, category,
-                target_amount, start_date, end_date, location):
+    def updateFRA(fraId: str, title: str, description: str, category: str,
+                target_amount: int, start_date: str, end_date: str, location: str) -> bool:
 
         conn, cur = connect_db()
 
@@ -153,7 +149,7 @@ class FRA:
     User Story #18: As a Fund Raiser, I want to suspend a FRA so that I can stop the fund raising activity.
     '''
     @staticmethod
-    def suspendFRA(fraId):
+    def suspendFRA(fraId: str) -> bool:
         conn, cur = connect_db()
 
         try:
@@ -179,7 +175,7 @@ class FRA:
     User Story #19: As a Fund Raiser, I want to search a FRA so that I can manage and update specific FRA efficiently.
     '''
     @staticmethod
-    def searchFRA(name):
+    def searchFRA(name: str) -> list:
         conn, cur = connect_db()
 
         cur.execute("""
@@ -208,6 +204,7 @@ class FRA:
             })
 
         return result
+    
 
     '''
     User Story # (Donee): Search all active FRAs by name. Only returns FRAs with status = 1 (active), unlike the fund raiser searchFRA.
@@ -234,6 +231,8 @@ class FRA:
             }
             for r in rows
         ]
+        
+        
     '''
     User Story #20: As a Fund Raiser, I want to view the number of views of a FRA so that I can analyze the view of a FRA and adjust my strategy to attract more donees.
     '''
@@ -250,6 +249,8 @@ class FRA:
             return row[0]
 
         return None
+    
+    
     '''
     User Story #21: As a Fund Raiser, I want to view the number of times a FRA is shortlisted so that I can know how many people are interested in this FRA.
     '''
@@ -266,6 +267,8 @@ class FRA:
             return row[0]
 
         return None
+    
+    
     ''' 
     User Story #22: As a Fund Raiser, I want to search history of completed FRA by service category and date period so that I can search for the past FRA that is completed.
     '''
@@ -301,6 +304,8 @@ class FRA:
             })
 
         return result
+    
+    
     '''
     User Story #23: As a Fund Raiser, I want to view the history of completed FRA by service category and date period so that I can review how the past FRA has progressed.
     '''
