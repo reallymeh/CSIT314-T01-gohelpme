@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports — Online Fundraising System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+    {# BCE BOUNDARY: GenerateReportBoundary #}
+    {# User Stories: #40 Daily Report, #41 Weekly Report, #42 Monthly Report #}
+    {# Flask route: GET /manager/reports in platform_managerb.py #}
+
+    <div class="topbar">
+        <span class="topbar-logo">Online Fundraising System — Platform Manager Portal</span>
+        <div class="topbar-user">
+            {# BACKEND: Replace "Platform Manager" with logged-in manager's username from session #}
+            <span id="manager-name">Platform Manager</span>
+            <div class="avatar">PM</div>
+        </div>
+    </div>
+
+    <div class="layout">
+
+        <div class="sidebar">
+            <a href="/manager/categories" class="nav-item">FRA Categories</a>
+            <a href="/manager/reports" class="nav-item active">Reports</a>
+            <a href="/user/logout" class="nav-item logout">Log Out</a>
+        </div>
+
+        <div class="main" id="GenerateReport">
+            <div class="page-title">Reports</div>
+            <div class="page-sub">Select a report type to generate and analyze FRA views</div>
+
+            <div class="grid">
+
+                <!-- Daily Report Card -->
+                <div class="profile-card">
+                    <div class="card-top">
+                        <div class="icon-circle icon-fr">DR</div>
+                        <div>
+                            <div class="card-name">Daily Report</div>
+                            <div class="card-desc">Analyze the number of views of each FRA and FRA category for today</div>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        {# BACKEND: calls GET /manager/reports/daily → GenerateDailyReportBoundary #}
+                        <button class="act-btn view" onclick="window.location.href='/manager/reports/daily'">Generate</button>
+                    </div>
+                </div>
+
+                <!-- Weekly Report Card -->
+                <div class="profile-card">
+                    <div class="card-top">
+                        <div class="icon-circle icon-donee">WR</div>
+                        <div>
+                            <div class="card-name">Weekly Report</div>
+                            <div class="card-desc">Analyze the number of views of each FRA and FRA category for this week</div>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        {# BACKEND: calls GET /manager/reports/weekly → GenerateWeeklyReportBoundary #}
+                        <button class="act-btn view" onclick="window.location.href='/manager/reports/weekly'">Generate</button>
+                    </div>
+                </div>
+
+                <!-- Monthly Report Card -->
+                <div class="profile-card">
+                    <div class="card-top">
+                        <div class="icon-circle icon-pm">MR</div>
+                        <div>
+                            <div class="card-name">Monthly Report</div>
+                            <div class="card-desc">Analyze the number of views of each FRA and FRA category for this month</div>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        {# BACKEND: calls GET /manager/reports/monthly → GenerateMonthlyReportBoundary #}
+                        <button class="act-btn view" onclick="window.location.href='/manager/reports/monthly'">Generate</button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

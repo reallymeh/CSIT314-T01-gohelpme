@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Report — Online Fundraising System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+    {# BCE BOUNDARY: GenerateWeeklyReportBoundary #}
+    {# User Story: #41 As a platform manager, I want to generate weekly report #}
+    {# Sequence: Platform Manager clicks Weekly → GenerateWeeklyReportBoundary(Boundary) → GenerateWeeklyReportController(Controller) → FRA/FRACategory(Entity) #}
+    {# Flask route: GET /manager/reports/weekly in platform_managerb.py #}
+    {# BACKEND: report data passed from GenerateWeeklyReportController via render_template('PlatformManagerWeeklyReport.html', fra_data=fra_data, category_data=category_data, week=week) #}
+    {# BACKEND: fra_data list has: title, view_count #}
+    {# BACKEND: category_data list has: category_name, total_views #}
+
+    <div class="topbar">
+        <span class="topbar-logo">Online Fundraising System — Platform Manager Portal</span>
+        <div class="topbar-user">
+            {# BACKEND: Replace "Platform Manager" with logged-in manager's username from session #}
+            <span id="manager-name">Platform Manager</span>
+            <div class="avatar">PM</div>
+        </div>
+    </div>
+
+    <div class="layout">
+
+        <div class="sidebar">
+            <a href="/manager/categories" class="nav-item">FRA Categories</a>
+            <a href="/manager/reports" class="nav-item active">Reports</a>
+            <a href="/user/logout" class="nav-item logout">Log Out</a>
+        </div>
+
+        {# BACKEND: displayWeeklyReport() renders this page when report data is returned #}
+        <div class="main" id="GenerateWeeklyReport">
+
+            <a href="/manager/reports" class="back-link">← Back to Reports</a>
+
+            <div class="page-title">Weekly Report</div>
+            {# BACKEND: Replace hardcoded week with {{ week }} #}
+            <div class="page-sub">FRA and category views for this week — 24 April 2026 to 30 April 2026</div>
+
+            <!-- FRA Views Section -->
+            <div class="section-title" style="font-size:15px; font-weight:bold; margin-bottom:10px; margin-top:20px;">
+                FRA Views
+            </div>
+
+            <div class="profile-card" style="margin-bottom:20px;">
+                <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                    <thead>
+                        <tr style="background:var(--color-background-secondary);">
+                            <th style="padding:10px 16px; text-align:left; border-bottom:1px solid #e0e0e0;">FRA Title</th>
+                            <th style="padding:10px 16px; text-align:left; border-bottom:1px solid #e0e0e0;">Views This Week</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- BACKEND: Replace with {% for fra in fra_data %} -->
+                        <tr>
+                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">Education Fund 2026</td>
+                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">540</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">Medical Aid Fund</td>
+                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">420</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:10px 16px;">Charity Relief Fund</td>
+                            <td style="padding:10px 16px;">890</td>
+                        </tr>
+                        <!-- BACKEND: {% endfor %} -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- FRA Category Views Section -->
+            <div class="section-title" style="font-size:15px; font-weight:bold; margin-bottom:10px;">
+                FRA Category Views
+            </div>
+
+            <div class="profile-card">
+                <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                    <thead>
+                        <tr style="background:var(--color-background-secondary);">
+                            <th style="padding:10px 16px; text-align:left; border-bottom:1px solid #e0e0e0;">Category Name</th>
+                            <th style="padding:10px 16px; text-align:left; border-bottom:1px solid #e0e0e0;">Total Views This Week</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- BACKEND: Replace with {% for category in category_data %} -->
+                        <tr>
+                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">Equipment</td>
+                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">540</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:10px 16px;">Cash</td>
+                            <td style="padding:10px 16px;">1310</td>
+                        </tr>
+                        <!-- BACKEND: {% endfor %} -->
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

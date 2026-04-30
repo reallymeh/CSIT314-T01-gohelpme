@@ -178,3 +178,40 @@ def suspend_category():
         return jsonify({'success': True, 'message': boundary.displaySuspendSuccess()})
     else:
         return jsonify({'success': False, 'message': boundary.displaySuspendFail()})
+    
+# ========== BCE BOUNDARY: GenerateReport ==========
+# User Stories: #40 Daily, #41 Weekly, #42 Monthly
+
+@platform_manager_bp.route('/reports', methods=['GET'])
+def show_reports():
+    return render_template('PlatformManagerReports.html')
+
+# ========== BCE BOUNDARY: GenerateDailyReport ==========
+# User Story: #40 As a platform manager, I want to generate daily report
+# HARDCODED — backend needs to:
+# 1. Create GenerateDailyReportController in platform_managerc.py
+# 2. Query FRA and FRACategory views for today from database
+# 3. Pass fra_data, category_data, date to render_template
+@platform_manager_bp.route('/reports/daily', methods=['GET'])
+def daily_report():
+    return render_template('PlatformManagerDailyReport.html')
+
+# ========== BCE BOUNDARY: GenerateWeeklyReport ==========
+# User Story: #41 As a platform manager, I want to generate weekly report
+# HARDCODED — backend needs to:
+# 1. Create GenerateWeeklyReportController in platform_managerc.py
+# 2. Query FRA and FRACategory views for this week from database
+# 3. Pass fra_data, category_data, week to render_template
+@platform_manager_bp.route('/reports/weekly', methods=['GET'])
+def weekly_report():
+    return render_template('PlatformManagerWeeklyReport.html')
+
+# ========== BCE BOUNDARY: GenerateMonthlyReport ==========
+# User Story: #42 As a platform manager, I want to generate monthly report
+# HARDCODED — backend needs to:
+# 1. Create GenerateMonthlyReportController in platform_managerc.py
+# 2. Query FRA and FRACategory views for this month from database
+# 3. Pass fra_data, category_data, month to render_template
+@platform_manager_bp.route('/reports/monthly', methods=['GET'])
+def monthly_report():
+    return render_template('PlatformManagerMonthlyReport.html')

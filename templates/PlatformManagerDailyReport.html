@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Report — Online Fundraising System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+    {# BCE BOUNDARY: GenerateDailyReportBoundary #}
+    {# User Story: #40 As a platform manager, I want to generate daily report #}
+    {# Sequence: Platform Manager clicks Daily → GenerateDailyReportBoundary(Boundary) → GenerateDailyReportController(Controller) → FRA/FRACategory(Entity) #}
+    {# Flask route: GET /manager/reports/daily in platform_managerb.py #}
+    {# BACKEND: report data passed from GenerateDailyReportController via render_template('PlatformManagerDailyReport.html', fra_data=fra_data, category_data=category_data, date=date) #}
+    {# BACKEND: fra_data list has: title, view_count #}
+    {# BACKEND: category_data list has: category_name, total_views #}
+
+    <div class="topbar">
+        <span class="topbar-logo">Online Fundraising System — Platform Manager Portal</span>
+        <div class="topbar-user">
+            {# BACKEND: Replace "Platform Manager" with logged-in manager's username from session #}
+            <span id="manager-name">Platform Manager</span>
+            <div class="avatar">PM</div>
+        </div>
+    </div>
+
+    <div class="layout">
+
+        <div class="sidebar">
+            <a href="/manager/categories" class="nav-item">FRA Categories</a>
+            <a href="/manager/reports" class="nav-item active">Reports</a>
+            <a href="/user/logout" class="nav-item logout">Log Out</a>
+        </div>
+
+        {# BACKEND: displayDailyReport() renders this page when report data is returned #}
+        <div class="main" id="GenerateDailyReport">
+
+            <a href="/manager/reports" class="back-link">← Back to Reports</a>
+
+            <div class="page-title">Daily Report</div>
+            {# BACKEND: Replace hardcoded date with {{ date }} #}
+            <div class="page-sub">FRA and category views for today — 30 April 2026</div>
+
+            <!-- FRA Views Section -->
+            <div class="section-title" style="font-size:15px; font-weight:bold; margin-bottom:10px; margin-top:20px;">
+                FRA Views
+            </div>
+
+            {# BACKEND: Replace hardcoded table rows with {% for fra in fra_data %} loop #}
+            {# BACKEND: Each fra object has: title, view_count #}
+            <div class="profile-card" style="margin-bottom:20px;">
+                <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                    <thead>
+                        <tr style="background:var(--color-background-secondary);">
+                            <th style="padding:10px 16px; text-align:left; border-bottom:1px solid #e0e0e0;">FRA Title</th>
+                            <th style="padding:10px 16px; text-align:left; border-bottom:1px solid #e0e0e0;">Views Today</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- BACKEND: Replace with {% for fra in fra_data %} -->
+                        <tr>
+                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">Education Fund 2026</td>
+                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">120</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">Medical Aid Fund</td>
+                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">98</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:10px 16px;">Charity Relief Fund</td>
+                            <td style="padding:10px 16px;">210</td>
+                        </tr>
+                        <!-- BACKEND: {% endfor %} -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- FRA Category Views Section -->
+            <div class="section-title" style="font-size:15px; font-weight:bold; margin-bottom:10px;">
+                FRA Category Views
+            </div>
+
+            {# BACKEND: Replace hardcoded table rows with {% for category in category_data %} loop #}
+            {# BACKEND: Each category object has: category_name, total_views #}
+            <div class="profile-card">
+                <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                    <thead>
+                        <tr style="background:var(--color-background-secondary);">
+                            <th style="padding:10px 16px; text-align:left; border-bottom:1px solid #e0e0e0;">Category Name</th>
+                            <th style="padding:10px 16px; text-align:left; border-bottom:1px solid #e0e0e0;">Total Views Today</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- BACKEND: Replace with {% for category in category_data %} -->
+                        <tr>
+                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">Equipment</td>
+                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">120</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:10px 16px;">Cash</td>
+                            <td style="padding:10px 16px;">308</td>
+                        </tr>
+                        <!-- BACKEND: {% endfor %} -->
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
