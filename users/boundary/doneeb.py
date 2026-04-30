@@ -9,9 +9,7 @@ from users.control.doneec import (
     SearchDonationHistoryController,
     ViewDonationHistoryController,
 )
-from users.control.fundraiserc import ViewFRAViewStatsController
 from users.entity.fra_view import FRAView
-
 donee_bp = Blueprint('donee', __name__, url_prefix='/donee')
 
 
@@ -124,6 +122,9 @@ def view_fra(fraId):
 
     if not fra:
         return redirect(url_for('donee.homepage'))
+    # RECORD VIEW HERE
+    owner_email = fra["created_by"]
+    FRAView.recordView(fraId, donee_email, owner_email)
 
     is_fav = page.fav_controller.isFavourited(donee_email, fraId)
     return render_template('DoneeViewFRA.html', fra=fra, is_favourited=is_fav)
@@ -332,3 +333,4 @@ def api_search_history():
             else page.displayEmpty()
         )
     })
+

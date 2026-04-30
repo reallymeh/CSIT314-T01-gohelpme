@@ -9,20 +9,52 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <style>
         .table {
-         width: 100%;
-         border-collapse: collapse;
-         margin-top: 20px;
-    }
-
-        .table th, .table td {
-         border: 1px solid #ddd;
-         padding: 10px;
-         text-align: center;
-        }
-
-        .table th {
-          background-color: #f4f4f4;
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    overflow: hidden;
+    border-radius: 10px;
 }
+
+/* HEADER */
+.table thead th {
+    background-color: #1a3a5c;
+    color: white;
+    padding: 12px;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* BODY */
+.table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+/* ROW COLORS */
+.table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* HOVER EFFECT */
+.table tbody tr:hover {
+    background-color: #e6f0ff;
+    transition: 0.2s;
+}
+
+/* FIRST ROW HIGHLIGHT (optional) */
+.table tbody tr:first-child {
+    background-color: #dbe9ff;
+    font-weight: 500;
+}
+
+/* EMPTY STATE */
+.table td[colspan] {
+    text-align: center;
+    padding: 20px;
+    color: #888;
+}
+
     </style>>
 </head>
 
@@ -56,8 +88,8 @@
             <h3>View Statistics</h3>
 
             <table class="table">
-            <thead>
-             <tr>
+            <thead style="background-color: #1a3a5c;">
+             <tr style=" color: white;">
                 <th>User Email</th>
                 <th>Date</th>
                 <th>Views</th>
