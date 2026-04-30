@@ -22,11 +22,13 @@ class Favourite:
     collected_amount: int = 0
     start_date: str = ""
     end_date: str = ""
+    view_count: int = 0
     status: int = 1
     location: str = ""
-
+    created_by: str = ""
+    
     '''
-    User Story #3 (Donee): Save a FRA to the favourite list.
+    User Story #28 (Donee): Save a FRA to the favourite list.
     '''
     @staticmethod
     def saveFavourite(donee_email: str, fraId: str) -> bool:
@@ -56,8 +58,8 @@ class Favourite:
         return row is not None
 
     '''
-    User Story #4 (Donee): Search FRA in favourite list by name.
-    User Story #5 (Donee): View all FRA in favourite list (empty name returns all).
+    User Story #29 (Donee): Search FRA in favourite list by name.
+    User Story #30 (Donee): View all FRA in favourite list (empty name returns all).
     '''
     @staticmethod
     def searchFavourites(donee_email: str, name: str) -> List[dict]:

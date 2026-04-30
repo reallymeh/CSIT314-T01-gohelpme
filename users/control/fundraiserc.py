@@ -12,7 +12,7 @@ class DisplayFRAController:
         rows = FRA.displayFRA()
 
         return [
-    {
+        {
         "fraId": r[0],
         "title": r[1],
         "description": r[2],

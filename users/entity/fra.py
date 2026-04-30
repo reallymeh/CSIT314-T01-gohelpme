@@ -20,6 +20,7 @@ class FRA:
     status: int  # e.g., 1 for Active, 0 for Suspended/Closed
     view_count: int
     location: str
+    created_by: str  # email of the fund raiser who created this FRA
 
     '''
     User Story #344: As a Fund Raiser, I want to view all FRAs so that I can view many FRAs at the same time .

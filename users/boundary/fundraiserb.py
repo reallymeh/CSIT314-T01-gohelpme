@@ -7,7 +7,7 @@ from users.entity.fracategory import FRACategory
 fundraiser_bp = Blueprint('fundraiser', __name__, url_prefix='/fundraiser')
 
 '''
-User Story #344: As a Fund Raiser, I want to view all FRAs so that I can view many FRAs at the same time .
+User Story #344: As a Fund Raiser, I want to view all FRAs so that I can view many FRAs at the same time.
 '''
 # Link to Fund Raiser Homepage
 @fundraiser_bp.route('/homepage', methods=['GET'])
