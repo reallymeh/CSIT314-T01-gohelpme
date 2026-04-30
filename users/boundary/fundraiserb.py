@@ -222,17 +222,38 @@ def search_fra():
 '''
 User Story #20: As a Fund Raiser,I want to view the number of views of a FRA so that I can analyze the view of a FRA and adjust my strategy to attract more donees.
 '''
+class ViewFRAViewCountPage:
+    def __init__(self):
+        self.fra_controller = ViewFRAController()
+        self.stats_controller = ViewFRAViewStatsController()
+
+    def getStats(self, fraId):
+        fra = self.fra_controller.viewFRA(fraId)
+        stats = self.stats_controller.getStats(fraId)
+
+        total_views = sum(stat['count'] for stat in stats) if stats else 0
+
+        return {
+            "fra": fra,
+            "stats": stats,
+            "total_views": total_views
+        }
+    
 @fundraiser_bp.route('/viewCount/<fraId>', methods=['GET'])
 def view_fra_view_count(fraId):
-    fra = ViewFRAController().viewFRA(fraId)
-    stats = ViewFRAViewStatsController().getStats(fraId)
+
+    page = ViewFRAViewCountPage()
+    data = page.getStats(fraId)
+
+    if not data["fra"]:
+        return redirect(url_for('fundraiser.homepage'))
 
     return render_template(
         "FundRaiserViewFRAViewCount.html",
-        fra=fra,
-        stats=stats
+        fra=data["fra"],
+        stats=data["stats"],
+        total_views=data["total_views"]
     )
-    
 '''
 User Story #21: As a Fund Raiser, I want to view the number of times a FRA is shortlisted so that I can know how many people are interested in this FRA.
 '''

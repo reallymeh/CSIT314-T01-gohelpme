@@ -16,14 +16,13 @@ class FRAView:
         print("❌ Missing data")
         return False
 
-    # 🚫 Optional: still block fundraiser self-view
+
       if viewer_email == owner_email:
         return False
 
       try:
         conn, cur = connect_db()
 
-        # ✅ ALWAYS INSERT (no duplicate check)
         cur.execute("""
             INSERT INTO fra_view (fraId, user_email)
             VALUES (?, ?)
