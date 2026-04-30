@@ -50,7 +50,7 @@ def login():
 
     role_redirects = {
         "admin": url_for('admin_view_profile.user_profile_list', message=message),
-        "platform_manager": url_for('fundraiser.homepage', message=message),
+        "platform manager": url_for('platform_manager.view_all_category', message=message),
         "fund raiser": url_for('fundraiser.homepage', message=message),
         "donee": url_for('donee.homepage', message=message), 
     }
