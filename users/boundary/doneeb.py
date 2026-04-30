@@ -9,6 +9,8 @@ from users.control.doneec import (
     SearchDonationHistoryController,
     ViewDonationHistoryController,
 )
+from users.control.fundraiserc import ViewFRAViewStatsController
+from users.entity.fra_view import FRAView
 
 donee_bp = Blueprint('donee', __name__, url_prefix='/donee')
 
