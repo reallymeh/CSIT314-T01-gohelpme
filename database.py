@@ -53,10 +53,25 @@ def init_db():
         view_count INTEGER DEFAULT 0, \
         location TEXT NOT NULL, \
         created_by TEXT, \
-        FOREIGN KEY (created_by) REFERENCES user_account(email_address)\
+        FOREIGN KEY (created_by) REFERENCES user_account(email_address), \
+        FOREIGN KEY (category) REFERENCES fra_category(name) \
     )"
     )
-    
+    #Create table for fra_view
+    cur.execute(
+        "CREATE TABLE IF NOT EXISTS fra_view (\
+         id INTEGER PRIMARY KEY AUTOINCREMENT,\
+         fraId TEXT NOT NULL, \
+         user_email TEXT NOT NULL,\
+         view_date DATETIME DEFAULT CURRENT_TIMESTAMP, \
+         fra_name TEXT NOT NULL,  \
+         fra_category TEXT NOT NULL,  \
+         FOREIGN KEY (fraId) REFERENCES fra(fraId),\
+         FOREIGN KEY (user_email) REFERENCES user_account(email_address), \
+         FOREIGN KEY (fra_name) REFERENCES fra(title),\
+         FOREIGN KEY (fra_category) REFERENCES fra(category) \
+        )"
+    )
     # sample test data
     user_account_data = [
         ('John Doe', 'admin@email.com', '+65 9123 4567', '123 Example Street', 'admin', 1, 'password123'),
@@ -76,6 +91,7 @@ def init_db():
     ]
     cur.executemany("INSERT OR IGNORE INTO user_profile VALUES(?, ?, ?, ?)", user_profile_data)
     conn.commit()
+    
 
     fra_category_data = [
         ('equipment', 'donation of equipment', 1),
@@ -85,12 +101,14 @@ def init_db():
     conn.commit()
     
     fra_data = [
-    ("FRA001", "Education Fund 2026", "Support students with tuition fees", "Cash", 10000, 4500,
+    ("FRA001", "Education Fund 2026", "Support students with tuition fees", "cash", 10000, 4500,
         "2026-01-01", "2026-12-31", 1, 120, "Admiralty Link Singapore","fundraiser1@email.com"),
-    ("FRA002", "Medical Aid Fund", "Help patients with hospital bills", "Cash", 20000, 12300,
+    ("FRA002", "Medical Aid Fund", "Help patients with hospital bills", "cash", 20000, 12300,
         "2026-02-01", "2026-10-30", 1, 98, "Steven Road Singapore", "fundraiser1@email.com"),
-    ("FRA003", "Charity Relief Fund", "Community support for families", "Cash", 5000, 5000,
-        "2025-05-01","2025-12-31", 0, 210, "Bedok North Singapore", "fundraiser1@email.com")
+    ("FRA003", "Charity Relief Fund", "Community support for families", "cash", 5000, 5000,
+        "2025-05-01","2025-12-31", 0, 210, "Bedok North Singapore", "fundraiser1@email.com"),
+    ("FRA004", "Disaster Relief Fund", "Support for communities affected by disasters", "cash", 15000, 8000,
+        "2025-05-01", "2025-12-31", 0, 150, "Choa Chu Kang Singapore", "fundraiser1@email.com")
     ]
     cur.executemany("""INSERT OR IGNORE INTO fra (fraId, title, description, category, target_amount, collected_amount,
     start_date, end_date, status, view_count, location, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)

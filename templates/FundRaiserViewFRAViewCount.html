@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fundraiser Dashboard</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        .table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+/* HEADER */
+.table thead th {
+    background-color: #1a3a5c;
+    color: white;
+    padding: 12px;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* BODY */
+.table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+/* ROW COLORS */
+.table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* HOVER EFFECT */
+.table tbody tr:hover {
+    background-color: #e6f0ff;
+    transition: 0.2s;
+}
+
+/* FIRST ROW HIGHLIGHT (optional) */
+.table tbody tr:first-child {
+    background-color: #dbe9ff;
+    font-weight: 500;
+}
+
+/* EMPTY STATE */
+.table td[colspan] {
+    text-align: center;
+    padding: 20px;
+    color: #888;
+}
+
+    </style>
+</head>
+
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+    <span class="topbar-logo">Online Fundraising System — Fund Raiser Portal</span>
+
+    <div class="topbar-user">
+        <span>Fund Raiser</span>
+        <div class="avatar">FR</div>
+    </div>
+</div>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <a href="/fundraiser/homepage" class="nav-item active">Dashboard</a>
+        <a href="/fundraiser/history" class="nav-item ">History</a>
+        <a href="/user/logout" class="nav-item logout">Log Out</a>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+
+        <div class="page-title">FRA View Count of {{ fra.title }}</div>
+        <div class="page-sub">View the number of times each FRA has been viewed</div>
+        <div class="card">
+            <h3>View Statistics</h3>
+
+            <table class="table">
+            <thead style="background-color: #1a3a5c;">
+             <tr style=" color: white;">
+                <th>User Email</th>
+                <th>Date</th>
+                <th>Views</th>
+             </tr>
+            </thead>
+              <tbody>
+            {% if stats %}
+            {% for row in stats %}
+            <tr>
+                <td>{{ row.user_email }}</td>
+                <td>{{ row.view_date }}</td>
+                <td>{{ row.count }}</td>
+            </tr>
+            {% endfor %}
+            {% else %}
+        
+               <td colspan="3">No view data available</td>
+
+            {% endif %}
+        </tbody>
+    </table>
+</div>    
+    </div>        
+</body>
+<script>
+    
+
+</script>
+</html>
+
+
+
+

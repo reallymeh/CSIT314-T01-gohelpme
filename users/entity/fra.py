@@ -26,7 +26,7 @@ class FRA:
     User Story #344: As a Fund Raiser, I want to view all FRAs so that I can view many FRAs at the same time .
     '''
     @staticmethod
-    def displayFRA() -> List[FRA]:
+    def displayFRA() -> List["FRA"]:
         conn, cur = connect_db()
 
         cur.execute("""
@@ -90,7 +90,7 @@ class FRA:
     User Story #16: As a Fund Raiser, I want to view a FRA so that I can know my fund raising progress.
     '''
     @staticmethod
-    def viewFRA(fraId: str) -> FRA:
+    def viewFRA(fraId: str) -> "FRA":
         conn, cur = connect_db()
 
         cur.execute("SELECT * FROM fra WHERE fraId = ?", (fraId,))
@@ -110,7 +110,8 @@ class FRA:
             "end_date": row[8],
             "status": row[9],
             "view_count": row[10],
-            "location": row[11]
+            "location": row[11],
+            "created_by": row[12]
         }
 
         return None    
@@ -236,23 +237,8 @@ class FRA:
         ]
         
         
-    '''
-    User Story #20: As a Fund Raiser, I want to view the number of views of a FRA so that I can analyze the view of a FRA and adjust my strategy to attract more donees.
-    '''
-    @staticmethod
-    def getFRAViewCount(fraId):
-        conn, cur = connect_db()
-
-        cur.execute("SELECT view_count FROM fra WHERE fraId = ?", (fraId,))
-        row = cur.fetchone()
-
-        conn.close()
-
-        if row:
-            return row[0]
-
-        return None
-    
+  
+  
     
     '''
     User Story #21: As a Fund Raiser, I want to view the number of times a FRA is shortlisted so that I can know how many people are interested in this FRA.
@@ -260,8 +246,8 @@ class FRA:
     @staticmethod
     def getFRAShortlistCount(fraId):
         conn, cur = connect_db()
-        ''' Assuming there is a "shortlist" table that tracks which FRA has been shortlisted by users'''
-        cur.execute("SELECT COUNT(*) FROM shortlist WHERE fraId = ?", (fraId,))
+        ''' Assuming there is a "favorite" table that tracks which FRA has been favorited by users'''
+        cur.execute("SELECT COUNT(*) FROM donee_favourite WHERE fraId = ?", (fraId,))
         row = cur.fetchone()
 
         conn.close()
@@ -275,16 +261,22 @@ class FRA:
     ''' 
     User Story #22: As a Fund Raiser, I want to search history of completed FRA by service category and date period so that I can search for the past FRA that is completed.
     '''
+
     @staticmethod 
-    def searchCompletedFRAHistory(category, start_date, end_date):
+    def searchCompletedFRAHistory(category, start_date, end_date)->list:
         conn, cur = connect_db()
 
         cur.execute("""
-            SELECT * FROM fra
-            WHERE LOWER(category) LIKE LOWER(?)
-              AND end_date BETWEEN ? AND ?
-              AND status = 0
-        """, ('%' + category.strip() + '%', start_date, end_date))
+           SELECT * FROM fra
+           WHERE status = 0
+           AND (? = '' OR category = ?)
+           AND (? = '' OR start_date >= ?)
+           AND (? = '' OR end_date <= ?)
+        """, (
+               category, category,
+               start_date, start_date,
+               end_date, end_date
+             ))
 
         rows = cur.fetchall()
         conn.close()

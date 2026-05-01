@@ -1,6 +1,7 @@
 # controller
 import time
 from users.entity.fra import FRA
+from users.entity.fra_view import FRAView
 from typing import List
 
 
@@ -97,10 +98,9 @@ class SearchFRAController:
 '''
 User Story #20: As a Fund Raiser, I want to view the number of views of a FRA so that I can analyze the view of a FRA and adjust my strategy to attract more donees.
 '''
-class ViewFRAViewCountController:
-    def getFRAViewCount(self, fraId: str) -> int:
-        return FRA.getFRAViewCount(fraId)   
-    
+class ViewFRAViewStatsController:
+    def getStats(self, fraId):
+        return FRAView.getViewStatsByDateAndUser(fraId)
 '''
 User Story #21: As a Fund Raiser, I want to view the number of times a FRA is shortlisted so that I can know how many people are interested in this FRA.
 '''
@@ -114,7 +114,7 @@ User Story #22: As a Fund Raiser, I want to search history of completed FRA by s
 class SearchCompletedFRAHistoryController: 
     def searchCompletedFRAHistory(self, category, start_date, end_date):
         return FRA.searchCompletedFRAHistory(category, start_date, end_date)
-    
+
 '''
 User Story #23: As a Fund Raiser, I want to view the history of completed FRA by service category and date period so that I can review how the past FRA has progressed.
 '''
