@@ -63,9 +63,13 @@ def init_db():
          id INTEGER PRIMARY KEY AUTOINCREMENT,\
          fraId TEXT NOT NULL, \
          user_email TEXT NOT NULL,\
-         view_date DATETIME DEFAULT CURRENT_TIMESTAMP,\
+         view_date DATETIME DEFAULT CURRENT_TIMESTAMP, \
+         fra_name TEXT NOT NULL,  \
+         fra_category TEXT NOT NULL,  \
          FOREIGN KEY (fraId) REFERENCES fra(fraId),\
-         FOREIGN KEY (user_email) REFERENCES user_account(email_address)\
+         FOREIGN KEY (user_email) REFERENCES user_account(email_address), \
+         FOREIGN KEY (fra_name) REFERENCES fra(title),\
+         FOREIGN KEY (fra_category) REFERENCES fra(category) \
         )"
     )
     # sample test data

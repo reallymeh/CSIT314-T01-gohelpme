@@ -124,7 +124,7 @@ def view_fra(fraId):
         return redirect(url_for('donee.homepage'))
     # RECORD VIEW HERE
     owner_email = fra["created_by"]
-    FRAView.recordView(fraId, donee_email, owner_email)
+    FRAView.recordView(fraId, donee_email, owner_email  , fra["title"], fra["category"])
 
     is_fav = page.fav_controller.isFavourited(donee_email, fraId)
     return render_template('DoneeViewFRA.html', fra=fra, is_favourited=is_fav)
