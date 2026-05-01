@@ -1,8 +1,9 @@
-from users.control.platform_managerc import CreateFRACategoryController, ViewFRACategoryController, UpdateFRACategoryController, ViewAllFRACategoryController, SearchFRACategoryController, SuspendFRACategoryController
+from users.control.platform_managerc import CreateFRACategoryController, ViewFRACategoryController, UpdateFRACategoryController, ViewAllFRACategoryController, SearchFRACategoryController, SuspendFRACategoryController, DailyReportController
 from users.entity.fracategory import FRACategory
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for
 
-from typing import List
+
+from typing import List, Dict, Any
 
 platform_manager_bp = Blueprint('platform_manager', __name__, url_prefix='/manager')
 
@@ -192,9 +193,18 @@ def show_reports():
 # 1. Create GenerateDailyReportController in platform_managerc.py
 # 2. Query FRA and FRACategory views for today from database
 # 3. Pass fra_data, category_data, date to render_template
+class DailyReportBoundary:
+    def __init__(self):
+        self.controller = DailyReportController()
+    
+    def getReport(self) -> Dict[str, int]:
+        return self.controller.generateDailyReport()
+
 @platform_manager_bp.route('/reports/daily', methods=['GET'])
 def daily_report():
-    return render_template('PlatformManagerDailyReport.html')
+    boundary = DailyReportBoundary()
+    daily = boundary.getReport()
+    return render_template('PlatformManagerDailyReport.html', daily=daily)
 
 # ========== BCE BOUNDARY: GenerateWeeklyReport ==========
 # User Story: #41 As a platform manager, I want to generate weekly report
