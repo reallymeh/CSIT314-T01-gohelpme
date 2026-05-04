@@ -5,10 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Favourites — Donee Portal</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <style>
-        .progress-bar-bg  { background:#e0e0e0; border-radius:4px; height:8px; margin-top:4px; }
-        .progress-bar-fill{ background:#1D9E75; height:8px; border-radius:4px; }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/donee.css') }}">
 </head>
 <body>
 
@@ -34,7 +31,7 @@
 
     <!-- SIDEBAR -->
     <div class="sidebar">
-        <a href="/donee/homepage"         class="nav-item">Search FRAs</a>
+        <a href="/donee/homepage"         class="nav-item">Dashboard</a>
         <a href="/donee/favourites"        class="nav-item active">My Favourites</a>
         <a href="/donee/donation_history"  class="nav-item">Donation History</a>
         <a href="/user/logout"             class="nav-item logout">Log Out</a>
@@ -119,9 +116,6 @@ function renderFavCards(favs) {
         const pct = f.target_amount > 0
             ? Math.min(100, Math.round(f.collected_amount / f.target_amount * 100))
             : 0;
-        const statusLabel = f.status === 1 ? 'Active' : 'Inactive';
-        const statusClass = f.status === 1 ? 'status-active' : 'status-suspended';
-
         container.innerHTML += `
         <div class="profile-card">
             <div class="card-top">
@@ -134,40 +128,9 @@ function renderFavCards(favs) {
                 </div>
             </div>
 
-            <div class="card-body">
-                <div class="field-row">
-                    <span class="field-label">Description</span>
-                    <span class="field-val" style="max-width:60%;text-align:right;">
-                        ${esc(f.description.length > 60 ? f.description.substring(0,60) + '…' : f.description)}
-                    </span>
-                </div>
-                <div class="field-row">
-                    <span class="field-label">Target</span>
-                    <span class="field-val">S$ ${f.target_amount.toLocaleString()}</span>
-                </div>
-                <div class="field-row">
-                    <span class="field-label">Collected</span>
-                    <span class="field-val">S$ ${f.collected_amount.toLocaleString()}</span>
-                </div>
-                <div style="padding:4px 0 8px;">
-                    <div class="progress-bar-bg">
-                        <div class="progress-bar-fill" style="width:${pct}%;"></div>
-                    </div>
-                    <div style="font-size:11px;color:#888;margin-top:3px;">${pct}% funded</div>
-                </div>
-                <div class="field-row">
-                    <span class="field-label">Period</span>
-                    <span class="field-val">${esc(f.start_date)} → ${esc(f.end_date)}</span>
-                </div>
-                <div class="field-row">
-                    <span class="field-label">Status</span>
-                    <span class="field-val ${statusClass}">${statusLabel}</span>
-                </div>
-            </div>
-
             <div class="card-actions">
                 <!-- US2 entry point from favourites: view full detail -->
-                <button class="act-btn"
+                <button class="act-btn view"
                         onclick="window.location.href='/donee/view/${esc(f.fraId)}'">
                     View Details
                 </button>

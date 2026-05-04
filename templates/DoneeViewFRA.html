@@ -5,22 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View FRA — Donee Portal</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <style>
-        .detail-card  { background:#fff; border:1px solid #e0e0e0; border-radius:10px; overflow:hidden; max-width:760px; }
-        .detail-top   { padding:20px 24px; border-bottom:1px solid #e0e0e0; display:flex; justify-content:space-between; align-items:flex-start; gap:16px; }
-        .detail-title { font-size:18px; font-weight:bold; color:#1a1a1a; }
-        .detail-desc  { font-size:13px; color:#666; margin-top:4px; line-height:1.6; }
-        .detail-body  { padding:4px 0; }
-        .progress-bar-bg  { background:#e0e0e0; border-radius:4px; height:10px; margin-top:6px; }
-        .progress-bar-fill{ background:#1D9E75; height:10px; border-radius:4px; }
-        .fav-btn-saved { padding:8px 18px; font-size:13px; background-color:#1D9E75;
-                         color:#fff; border:none; border-radius:6px; cursor:default; }
-        .fav-btn-save  { padding:8px 18px; font-size:13px; background-color:#1a3a5c;
-                         color:#fff; border:none; border-radius:6px; cursor:pointer; }
-        .fav-btn-save:hover { background-color:#142e4a; }
-        #toast { display:none; position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
-                 padding:10px 24px; border-radius:8px; font-size:14px; color:#fff; z-index:999; }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/donee.css') }}">
 </head>
 <body>
 
@@ -51,7 +36,7 @@
 
     <!-- SIDEBAR -->
     <div class="sidebar">
-        <a href="/donee/homepage"         class="nav-item active">Search FRAs</a>
+        <a href="/donee/homepage"         class="nav-item active">Dashboard</a>
         <a href="/donee/favourites"        class="nav-item">My Favourites</a>
         <a href="/donee/donation_history"  class="nav-item">Donation History</a>
         <a href="/user/logout"             class="nav-item logout">Log Out</a>
