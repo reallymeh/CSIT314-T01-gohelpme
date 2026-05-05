@@ -36,6 +36,7 @@ class FRAView:
          ]
       except Exception as e:
          print(e)
+         return []
       finally:
          cur.close()
          conn.close()
@@ -131,3 +132,126 @@ class FRAView:
          if conn:
             conn.close()
 
+   @staticmethod
+   def getWeeklyCategoryViews() -> List[dict]:
+      conn, cur = connect_db()
+
+      # get current year, month, date
+      today = date.today()
+      # extract week number
+      week_num = today.isocalendar().week
+      year_num = str(today.year)
+
+      try:
+         cur.execute('''
+            SELECT fra_category, COUNT(*) AS total_view 
+            FROM fra_view
+            WHERE strftime('%Y', view_date) = ?
+            AND CAST(strftime('%W', view_date) AS INTEGER) + 1 = ?
+            GROUP BY fra_category
+            ''', (year_num, week_num,))
+         rows = cur.fetchall()
+         return [
+            {  
+                  "fra_category": r[0],
+                  "count": r[1],
+            }
+            for r in rows
+         ]
+      except Exception as e:
+         print(e)
+         return []
+      finally:
+         cur.close()
+         conn.close()
+
+   @staticmethod
+   def getWeeklyFRAViews() -> int:
+      conn, cur = connect_db()
+
+      today = date.today()
+      # extract week number
+      week_num = today.isocalendar().week
+      year_num = str(today.year)
+
+      try:
+         cur.execute('''
+            SELECT COUNT(*) 
+            FROM fra_view
+            WHERE strftime('%Y', view_date) = ?
+            AND CAST(strftime('%W', view_date) AS INTEGER) + 1 = ?
+        ''', (year_num, week_num))
+         row = cur.fetchone()
+         return row[0] if row else 0
+
+      except Exception as e:
+         print(e)
+      
+      finally:
+         cur.close()
+         conn.close()
+   
+   @staticmethod
+   def getMonthlyCategoryViews() -> List[dict]:
+      conn, cur = connect_db()
+
+      # get current year, month, date
+      today = date.today()
+      year_num = str(today.year)
+      month_num = today.month
+      if month_num < 10:
+         month_num = "0" + (str(month_num))
+      else:
+         month_num = str(month_num)
+      try:
+         cur.execute('''
+            SELECT fra_category, COUNT(*) AS total_view 
+            FROM fra_view
+            WHERE strftime('%Y', view_date) = ?
+            AND strftime('%m', view_date) = ?
+            GROUP BY fra_category
+            ''', (year_num, month_num,))
+         rows = cur.fetchall()
+         print(rows)
+         return [
+            {  
+                  "fra_category": r[0],
+                  "count": r[1],
+            }
+            for r in rows
+         ]
+      except Exception as e:
+         print(e)
+         return []
+      finally:
+         cur.close()
+         conn.close()
+
+   @staticmethod
+   def getMonthlyFRAViews() -> int:
+      conn, cur = connect_db()
+
+      today = date.today()
+      # extract week number
+      year_num = str(today.year)
+      month_num = today.month
+      if month_num < 10:
+         month_num = "0" + (str(month_num))
+      else:
+         month_num = str(month_num)
+
+      try:
+         cur.execute('''
+            SELECT COUNT(*) 
+            FROM fra_view
+            WHERE strftime('%Y', view_date) = ?
+            AND strftime('%m', view_date) = ?
+        ''', (year_num, month_num))
+         row = cur.fetchone()
+         return row[0] if row else 0
+
+      except Exception as e:
+         print(e)
+      finally:
+         cur.close()
+         conn.close()
