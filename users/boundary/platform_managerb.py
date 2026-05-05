@@ -1,4 +1,4 @@
-from users.control.platform_managerc import CreateFRACategoryController, ViewFRACategoryController, UpdateFRACategoryController, ViewAllFRACategoryController, SearchFRACategoryController, SuspendFRACategoryController, DailyReportController
+from users.control.platform_managerc import CreateFRACategoryController, ViewFRACategoryController, UpdateFRACategoryController, ViewAllFRACategoryController, SearchFRACategoryController, SuspendFRACategoryController, DailyReportController, WeeklyReportController, MonthlyReportController
 from users.entity.fracategory import FRACategory
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for
 
@@ -197,7 +197,7 @@ class DailyReportBoundary:
     def __init__(self):
         self.controller = DailyReportController()
     
-    def getReport(self) -> Dict[str, int]:
+    def getReport(self) -> Dict[str, Any]:
         return self.controller.generateDailyReport()
 
 @platform_manager_bp.route('/reports/daily', methods=['GET'])
@@ -212,9 +212,18 @@ def daily_report():
 # 1. Create GenerateWeeklyReportController in platform_managerc.py
 # 2. Query FRA and FRACategory views for this week from database
 # 3. Pass fra_data, category_data, week to render_template
+class WeeklyReportBoundary:
+    def __init__(self):
+        self.controller = WeeklyReportController()
+    
+    def getReport(self) -> Dict[str, Any]:
+        return self.controller.getReport()
+    
 @platform_manager_bp.route('/reports/weekly', methods=['GET'])
 def weekly_report():
-    return render_template('PlatformManagerWeeklyReport.html')
+    boundary = WeeklyReportBoundary()
+    weekly = boundary.getReport()
+    return render_template('PlatformManagerWeeklyReport.html', weekly=weekly)
 
 # ========== BCE BOUNDARY: GenerateMonthlyReport ==========
 # User Story: #42 As a platform manager, I want to generate monthly report
@@ -222,6 +231,17 @@ def weekly_report():
 # 1. Create GenerateMonthlyReportController in platform_managerc.py
 # 2. Query FRA and FRACategory views for this month from database
 # 3. Pass fra_data, category_data, month to render_template
+class MonthlyReportBoundary:
+    def __init__(self):
+        self.controller = MonthlyReportController()
+    
+    def getReport(self) -> Dict[str, Any]:
+        return self.controller.getReport()
+    
+
 @platform_manager_bp.route('/reports/monthly', methods=['GET'])
 def monthly_report():
-    return render_template('PlatformManagerMonthlyReport.html')
+    boundary = MonthlyReportBoundary()
+    monthly = boundary.getReport()
+    print(monthly)
+    return render_template('PlatformManagerMonthlyReport.html', monthly=monthly)
