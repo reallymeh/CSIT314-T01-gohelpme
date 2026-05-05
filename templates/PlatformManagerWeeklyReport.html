@@ -40,12 +40,15 @@
 
             <div class="page-title">Weekly Report</div>
             {# BACKEND: Replace hardcoded week with {{ week }} #}
-            <div class="page-sub">FRA and category views for this week — 24 April 2026 to 30 April 2026</div>
+            <div class="page-sub">FRA and category views for this week</div>
 
             <!-- FRA Views Section -->
             <div class="section-title" style="font-size:15px; font-weight:bold; margin-bottom:10px; margin-top:20px;">
                 FRA Views
             </div>
+
+            <!-- Total Views -->
+            <h2>Total Views: {{ weekly.total_views or 0 }}</h2>
 
             <div class="profile-card" style="margin-bottom:20px;">
                 <table style="width:100%; border-collapse:collapse; font-size:13px;">
@@ -56,48 +59,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- BACKEND: Replace with {% for fra in fra_data %} -->
-                        <tr>
-                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">Education Fund 2026</td>
-                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">540</td>
+                        {% for category, count in weekly.category.items() %}
+                          <tr>
+                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">
+                                {{ category }}
+                            </td>
+                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">
+                                {{ count }}
+                            </td>
                         </tr>
-                        <tr>
-                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">Medical Aid Fund</td>
-                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">420</td>
-                        </tr>
-                        <tr>
-                            <td style="padding:10px 16px;">Charity Relief Fund</td>
-                            <td style="padding:10px 16px;">890</td>
-                        </tr>
-                        <!-- BACKEND: {% endfor %} -->
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- FRA Category Views Section -->
-            <div class="section-title" style="font-size:15px; font-weight:bold; margin-bottom:10px;">
-                FRA Category Views
-            </div>
-
-            <div class="profile-card">
-                <table style="width:100%; border-collapse:collapse; font-size:13px;">
-                    <thead>
-                        <tr style="background:var(--color-background-secondary);">
-                            <th style="padding:10px 16px; text-align:left; border-bottom:1px solid #e0e0e0;">Category Name</th>
-                            <th style="padding:10px 16px; text-align:left; border-bottom:1px solid #e0e0e0;">Total Views This Week</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- BACKEND: Replace with {% for category in category_data %} -->
-                        <tr>
-                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">Equipment</td>
-                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">540</td>
-                        </tr>
-                        <tr>
-                            <td style="padding:10px 16px;">Cash</td>
-                            <td style="padding:10px 16px;">1310</td>
-                        </tr>
-                        <!-- BACKEND: {% endfor %} -->
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
