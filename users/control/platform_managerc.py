@@ -1,5 +1,7 @@
 from users.entity.fracategory import FRACategory
-from typing import List
+from typing import List, Dict, Any
+
+from users.entity.fra_view import FRAView
 
 class CreateFRACategoryController:
     def createFRACategory(self, cat_name: str, description: str, status: int) -> bool:
@@ -37,3 +39,41 @@ class SuspendFRACategoryController:
     def suspendFRACategory(self, category_name: str) -> bool:
         return FRACategory.suspendCategory(category_name)
     
+class DailyReportController:
+    def generateDailyReport(self) -> Dict[str, Any]:
+        total_views = FRAView.getDailyFRAView()
+        category_views = FRAView.getDailyCategoryView()
+
+        return {
+            "total_views": total_views,
+            "category": {
+                row["fra_category"]: row["count"]
+                for row in category_views
+                }
+            }
+    
+class WeeklyReportController:
+    def getReport(self) -> Dict[str, Any]:
+        total_views = FRAView.getWeeklyFRAViews()
+        category_views = FRAView.getWeeklyCategoryViews()
+
+        return {
+            "total_views": total_views,
+            "category": {
+                row["fra_category"]: row["count"]
+                for row in category_views
+                }
+            }
+
+class MonthlyReportController:
+    def getReport(self) -> Dict[str, Any]:
+        total_views = FRAView.getMonthlyFRAViews()
+        category_views = FRAView.getMonthlyCategoryViews()
+        print(category_views)
+        return {
+            "total_views": total_views,
+            "category": {
+                row["fra_category"]: row["count"]
+                for row in category_views
+                }
+            }
