@@ -1,20 +1,23 @@
 # Donee Boundary
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session
 from users.control.doneec import (
+    ViewAllFRAController,
     SearchFRAController,
     ViewFRAController,
     SaveFavouriteController,
-    SearchFavouriteController,
+    RemoveFavouriteController,
     ViewFavouriteListController,
-    SearchDonationHistoryController,
+    SearchFavouriteController,
     ViewDonationHistoryController,
+    SearchDonationHistoryController,
 )
 from users.entity.fra_view import FRAView
+
 donee_bp = Blueprint('donee', __name__, url_prefix='/donee')
 
 
 def get_donee_email():
-    """Helper — returns the logged-in donee's email from session, or None."""
+    """Returns the logged-in donee's email from session, or None."""
     return session.get('email_address')
 
 
@@ -26,17 +29,66 @@ def require_donee_login():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  US1 — Search all FRA by name
+#  US1 — View all active FRAs (Donee Dashboard)
+# ─────────────────────────────────────────────────────────────────────────────
+
+class ViewAllFRAPage:
+    """
+    Boundary: ViewAllFRAPage
+    User Story #1 (Donee): As a Donee, I want to view all active FRAs on the
+    dashboard so that I can browse all available fundraising activities.
+    Sequence: Donee → ViewAllFRAPage → ViewAllFRAController → FRA
+    """
+    def __init__(self):
+        self.controller = ViewAllFRAController()
+
+    def displayAllFRA(self) -> list:
+        return self.controller.viewAllFRA()
+
+    def displayNoResult(self) -> str:
+        return "There are currently no active fundraising activities."
+
+
+@donee_bp.route('/dashboard', methods=['GET'])
+def dashboard():
+    """Render the Donee dashboard (US1 entry point)."""
+    guard = require_donee_login()
+    if guard:
+        return guard
+    return render_template('donee/DoneeHomePage.html')
+
+
+@donee_bp.route('/api/view_all_fra', methods=['GET'])
+def api_view_all_fra():
+    """
+    API: GET /donee/api/view_all_fra
+    US1 — ViewAllFRAPage → ViewAllFRAController → FRA.viewAllActiveFRA()
+    """
+    guard = require_donee_login()
+    if guard:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
+
+    page = ViewAllFRAPage()
+    results = page.displayAllFRA()
+
+    return jsonify({
+        "success": True,
+        "data": results,
+        "message": "" if results else page.displayNoResult()
+    })
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  US1 — Search all active FRAs by name
 # ─────────────────────────────────────────────────────────────────────────────
 
 class SearchFRAPage:
-    '''
+    """
     Boundary: SearchFRAPage
-    User Story #1: As a Donee, I want to search all FRA by name
+    User Story #1 (Donee): As a Donee, I want to search all FRA by name
     so that I can find a specific FRA that I am interested in.
-    Sequence: Donee searches → SearchFRAPage(Boundary)
-              → SearchFRAController(Controller) → FRA(Entity)
-    '''
+    Sequence: Donee → SearchFRAPage → SearchFRAController → FRA
+    """
     def __init__(self):
         self.controller = SearchFRAController()
 
@@ -47,21 +99,10 @@ class SearchFRAPage:
         return "No active fundraising activities found."
 
 
-@donee_bp.route('/homepage', methods=['GET'])
-def homepage():
-    """Render the Donee homepage (search all FRAs — US1 entry point)."""
-    guard = require_donee_login()
-    if guard:
-        return guard
-    return render_template('DoneeHomePage.html')
-
-
 @donee_bp.route('/api/search_fra', methods=['POST'])
 def api_search_fra():
     """
-    API: POST /donee/api/search_fra
-    Body: { "name": "<search term>" }
-    Returns JSON list of active FRAs matching the name.
+    API: POST /donee/api/search_fra   Body: { "name": "<search term>" }
     US1 — SearchFRAPage → SearchFRAController → FRA.searchActiveFRA()
     """
     guard = require_donee_login()
@@ -82,24 +123,22 @@ def api_search_fra():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  US2 — View a FRA
+#  US2 — View a single FRA
 # ─────────────────────────────────────────────────────────────────────────────
 
 class ViewFRAPage:
-    '''
+    """
     Boundary: ViewFRAPage
-    User Story #2: As a Donee, I want to view a FRA
+    User Story #2 (Donee): As a Donee, I want to view a FRA
     so that I can view existing FRA information that needs donation.
-    Sequence: Donee clicks View → ViewFRAPage(Boundary)
-              → ViewFRAController(Controller) → FRA(Entity)
-    '''
+    Sequence: Donee → ViewFRAPage → ViewFRAController → FRA
+    """
     def __init__(self):
         self.controller = ViewFRAController()
         self.fav_controller = SaveFavouriteController()
 
     def displayFRA(self, fraId: str) -> dict | None:
-        fra = self.controller.viewFRA(fraId)
-        return fra
+        return self.controller.viewFRA(fraId)
 
     def displayError(self) -> str:
         return "FRA not found."
@@ -108,8 +147,8 @@ class ViewFRAPage:
 @donee_bp.route('/view/<fraId>', methods=['GET'])
 def view_fra(fraId):
     """
-    Render the View FRA detail page.
-    Also passes is_favourited flag so the Save button shows correct state (US3).
+    Render the FRA detail page.
+    Passes is_favourited flag so the Save button shows the correct state (US3).
     US2 — ViewFRAPage → ViewFRAController → FRA.viewFRA()
     """
     guard = require_donee_login()
@@ -121,13 +160,12 @@ def view_fra(fraId):
     fra = page.displayFRA(fraId)
 
     if not fra:
-        return redirect(url_for('donee.homepage'))
-    # RECORD VIEW HERE
-    owner_email = fra["created_by"]
-    FRAView.recordView(fraId, donee_email, owner_email  , fra["title"], fra["category"])
+        return redirect(url_for('donee.dashboard'))
+
+    FRAView.recordView(fraId, donee_email, fra["created_by"], fra["title"], fra["category"])
 
     is_fav = page.fav_controller.isFavourited(donee_email, fraId)
-    return render_template('DoneeViewFRA.html', fra=fra, is_favourited=is_fav)
+    return render_template('donee/DoneeViewFRA.html', fra=fra, is_favourited=is_fav)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -135,13 +173,12 @@ def view_fra(fraId):
 # ─────────────────────────────────────────────────────────────────────────────
 
 class SaveFavouritePage:
-    '''
+    """
     Boundary: SaveFavouritePage
-    User Story #3: As a Donee, I want to save a FRA to favourite list
+    User Story #3 (Donee): As a Donee, I want to save a FRA to favourite list
     so that I can decide a donation later.
-    Sequence: Donee clicks Save → SaveFavouritePage(Boundary)
-              → SaveFavouriteController(Controller) → Favourite(Entity)
-    '''
+    Sequence: Donee → SaveFavouritePage → SaveFavouriteController → Favourite
+    """
     def __init__(self):
         self.controller = SaveFavouriteController()
 
@@ -161,8 +198,7 @@ class SaveFavouritePage:
 @donee_bp.route('/save_favourite', methods=['POST'])
 def save_favourite():
     """
-    API: POST /donee/save_favourite
-    Body: { "fraId": "<FRA001>" }
+    API: POST /donee/save_favourite   Body: { "fraId": "<FRA001>" }
     US3 — SaveFavouritePage → SaveFavouriteController → Favourite.saveFavourite()
     """
     guard = require_donee_login()
@@ -178,62 +214,84 @@ def save_favourite():
 
     page = SaveFavouritePage()
 
-    # Check duplicate before attempting save
     if page.controller.isFavourited(donee_email, fraId):
         return jsonify({"success": False, "message": page.displayAlreadySaved()})
 
     saved = page.saveFavourite(donee_email, fraId)
-    message = page.displaySuccess() if saved else page.displayError()
+    return jsonify({"success": saved, "message": page.displaySuccess() if saved else page.displayError()})
 
-    return jsonify({"success": saved, "message": message})
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  US3b — Remove a FRA from favourite list
+# ─────────────────────────────────────────────────────────────────────────────
+
+class RemoveFavouritePage:
+    """
+    Boundary: RemoveFavouritePage
+    User Story #3b (Donee): As a Donee, I want to remove a FRA from my favourite list.
+    Sequence: Donee → RemoveFavouritePage → RemoveFavouriteController → Favourite
+    """
+    def __init__(self):
+        self.controller = RemoveFavouriteController()
+
+    def removeFavourite(self, donee_email: str, fraId: str) -> bool:
+        return self.controller.removeFavourite(donee_email, fraId)
+
+    def displaySuccess(self) -> str:
+        return "FRA removed from your favourites."
+
+    def displayError(self) -> str:
+        return "Failed to remove FRA from favourites. Please try again."
+
+
+@donee_bp.route('/remove_favourite', methods=['POST'])
+def remove_favourite():
+    """
+    API: POST /donee/remove_favourite   Body: { "fraId": "<FRA001>" }
+    US3b — RemoveFavouritePage → RemoveFavouriteController → Favourite.removeFavourite()
+    """
+    guard = require_donee_login()
+    if guard:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
+
+    donee_email = get_donee_email()
+    data = request.get_json()
+    fraId = data.get('fraId', '').strip()
+
+    if not fraId:
+        return jsonify({"success": False, "message": "fraId is required"}), 400
+
+    page = RemoveFavouritePage()
+    removed = page.removeFavourite(donee_email, fraId)
+    return jsonify({"success": removed, "message": page.displaySuccess() if removed else page.displayError()})
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  US4 — Search FRA in favourite list by name
-#  US5 — View all FRA in favourite list
 # ─────────────────────────────────────────────────────────────────────────────
 
 class SearchFavouritePage:
-    '''
+    """
     Boundary: SearchFavouritePage
-    User Story #4: As a Donee, I want to search FRA in favourite list by name.
-    User Story #5: As a Donee, I want to view FRA in favourite list.
-    Sequence: Donee searches/views → SearchFavouritePage(Boundary)
-              → SearchFavouriteController / ViewFavouriteListController
-              → Favourite(Entity)
-    '''
+    User Story #4 (Donee): As a Donee, I want to search FRA in favourite list by name
+    so that I can find a specific FRA within the favourite list.
+    Sequence: Donee → SearchFavouritePage → SearchFavouriteController → Favourite
+    """
     def __init__(self):
-        self.search_controller  = SearchFavouriteController()
-        self.view_controller    = ViewFavouriteListController()
+        self.controller = SearchFavouriteController()
 
     def searchFavourites(self, donee_email: str, name: str) -> list:
-        return self.search_controller.searchFavourites(donee_email, name)
-
-    def viewFavourites(self, donee_email: str) -> list:
-        return self.view_controller.viewFavourites(donee_email)
+        return self.controller.searchFavourites(donee_email, name)
 
     def displayNoResult(self) -> str:
         return "No favourites found matching your search."
-
-    def displayEmpty(self) -> str:
-        return "You have not saved any FRAs to your favourites yet."
-
-
-@donee_bp.route('/favourites', methods=['GET'])
-def favourites():
-    """Render the Favourites page (US4 + US5 entry point)."""
-    guard = require_donee_login()
-    if guard:
-        return guard
-    return render_template('DoneeFavourites.html')
 
 
 @donee_bp.route('/api/search_favourites', methods=['POST'])
 def api_search_favourites():
     """
-    API: POST /donee/api/search_favourites
-    Body: { "name": "<search term>" }   — empty name returns all (US5 view)
-    US4/US5 — SearchFavouritePage → SearchFavouriteController → Favourite.searchFavourites()
+    API: POST /donee/api/search_favourites   Body: { "name": "<search term>" }
+    US4 — SearchFavouritePage → SearchFavouriteController → Favourite.searchFavourites()
     """
     guard = require_donee_login()
     if guard:
@@ -249,58 +307,84 @@ def api_search_favourites():
     return jsonify({
         "success": True,
         "data": results,
-        "message": "" if results else (
-            page.displayNoResult() if name else page.displayEmpty()
-        )
+        "message": "" if results else page.displayNoResult()
     })
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  US6 — Search history of donation by FRA category and date period
-#  US7 — View history of donation
+#  US5 — View all FRAs in favourite list
 # ─────────────────────────────────────────────────────────────────────────────
 
-class SearchDonationHistoryPage:
-    '''
-    Boundary: SearchDonationHistoryPage
-    User Story #6: As a Donee, I want to search history of donation by FRA category and date period.
-    User Story #7: As a Donee, I want to view history of donation.
-    Sequence: Donee filters/views → SearchDonationHistoryPage(Boundary)
-              → SearchDonationHistoryController / ViewDonationHistoryController
-              → DonationHistory(Entity)
-    '''
+class ViewFavouritePage:
+    """
+    Boundary: ViewFavouritePage
+    User Story #5 (Donee): As a Donee, I want to view FRA in favourite list
+    so that I can view all FRA within the favourite list.
+    Sequence: Donee → ViewFavouritePage → ViewFavouriteListController → Favourite
+    """
     def __init__(self):
-        self.search_controller = SearchDonationHistoryController()
-        self.view_controller   = ViewDonationHistoryController()
+        self.controller = ViewFavouriteListController()
 
-    def searchHistory(self, donee_email: str, category: str,
-                      date_from: str, date_to: str) -> list:
-        return self.search_controller.searchHistory(donee_email, category, date_from, date_to)
-
-    def viewHistory(self, donee_email: str) -> list:
-        return self.view_controller.viewHistory(donee_email)
-
-    def getCategories(self, donee_email: str) -> list:
-        return self.search_controller.getCategories(donee_email)
-
-    def displayNoResult(self) -> str:
-        return "No donation records found for the selected filters."
+    def viewFavourites(self, donee_email: str) -> list:
+        return self.controller.viewFavourites(donee_email)
 
     def displayEmpty(self) -> str:
-        return "You have no donation history yet."
+        return "You have not saved any FRAs to your favourites yet."
 
 
-@donee_bp.route('/donation_history', methods=['GET'])
-def donation_history():
-    """Render the Donation History page (US6 + US7 entry point)."""
+@donee_bp.route('/favourites', methods=['GET'])
+def favourites():
+    """Render the Favourites page (US4 + US5 entry point)."""
     guard = require_donee_login()
     if guard:
         return guard
+    return render_template('donee/DoneeFavourites.html')
+
+
+@donee_bp.route('/api/view_favourites', methods=['GET'])
+def api_view_favourites():
+    """
+    API: GET /donee/api/view_favourites
+    US5 — ViewFavouritePage → ViewFavouriteListController → Favourite.searchFavourites("")
+    """
+    guard = require_donee_login()
+    if guard:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
 
     donee_email = get_donee_email()
-    page = SearchDonationHistoryPage()
-    categories = page.getCategories(donee_email)
-    return render_template('DoneeDonationHistory.html', categories=categories)
+    page = ViewFavouritePage()
+    results = page.viewFavourites(donee_email)
+
+    return jsonify({
+        "success": True,
+        "data": results,
+        "message": "" if results else page.displayEmpty()
+    })
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  US6 — Search donation history by FRA category and date period
+# ─────────────────────────────────────────────────────────────────────────────
+
+class SearchDonationHistoryPage:
+    """
+    Boundary: SearchDonationHistoryPage
+    User Story #6 (Donee): As a Donee, I want to search history of donation by
+    FRA category and date period so that I can find a specific FRA I had donated.
+    Sequence: Donee → SearchDonationHistoryPage → SearchDonationHistoryController → DonationHistory
+    """
+    def __init__(self):
+        self.controller = SearchDonationHistoryController()
+
+    def searchHistory(self, donee_email: str, category: str,
+                      date_from: str, date_to: str) -> list:
+        return self.controller.searchHistory(donee_email, category, date_from, date_to)
+
+    def getCategories(self, donee_email: str) -> list:
+        return self.controller.getCategories(donee_email)
+
+    def displayNoResult(self) -> str:
+        return "No donation records found for the selected filters."
 
 
 @donee_bp.route('/api/search_history', methods=['POST'])
@@ -308,9 +392,7 @@ def api_search_history():
     """
     API: POST /donee/api/search_history
     Body: { "category": "", "date_from": "YYYY-MM-DD", "date_to": "YYYY-MM-DD" }
-    All fields optional — omitting all is equivalent to US7 (view all).
-    US6/US7 — SearchDonationHistoryPage → SearchDonationHistoryController
-              → DonationHistory.searchHistory()
+    US6 — SearchDonationHistoryPage → SearchDonationHistoryController → DonationHistory.searchHistory()
     """
     guard = require_donee_login()
     if guard:
@@ -328,9 +410,60 @@ def api_search_history():
     return jsonify({
         "success": True,
         "data": results,
-        "message": "" if results else (
-            page.displayNoResult() if (category or date_from or date_to)
-            else page.displayEmpty()
-        )
+        "message": "" if results else page.displayNoResult()
     })
 
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  US7 — View all donation history
+# ─────────────────────────────────────────────────────────────────────────────
+
+class ViewDonationHistoryPage:
+    """
+    Boundary: ViewDonationHistoryPage
+    User Story #7 (Donee): As a Donee, I want to view history of donation
+    so that I can evaluate the impact of my donation and consider another donation.
+    Sequence: Donee → ViewDonationHistoryPage → ViewDonationHistoryController → DonationHistory
+    """
+    def __init__(self):
+        self.controller = ViewDonationHistoryController()
+
+    def viewHistory(self, donee_email: str) -> list:
+        return self.controller.viewHistory(donee_email)
+
+    def displayEmpty(self) -> str:
+        return "You have no donation history yet."
+
+
+@donee_bp.route('/donation_history', methods=['GET'])
+def donation_history():
+    """Render the Donation History page (US6 + US7 entry point)."""
+    guard = require_donee_login()
+    if guard:
+        return guard
+
+    donee_email = get_donee_email()
+    page = SearchDonationHistoryPage()
+    categories = page.getCategories(donee_email)
+    return render_template('donee/DoneeDonationHistory.html', categories=categories)
+
+
+@donee_bp.route('/api/view_history', methods=['GET'])
+def api_view_history():
+    """
+    API: GET /donee/api/view_history
+    US7 — ViewDonationHistoryPage → ViewDonationHistoryController → DonationHistory.searchHistory()
+    """
+    guard = require_donee_login()
+    if guard:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
+
+    donee_email = get_donee_email()
+    page = ViewDonationHistoryPage()
+    results = page.viewHistory(donee_email)
+
+    return jsonify({
+        "success": True,
+        "data": results,
+        "message": "" if results else page.displayEmpty()
+    })

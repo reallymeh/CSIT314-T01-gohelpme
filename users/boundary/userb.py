@@ -8,7 +8,7 @@ user_bp = Blueprint('user', __name__, url_prefix='/user')
 @user_bp.route('/homepage')
 def homepage():
     message = request.args.get('message')
-    return render_template('HomePage.html', message=message)
+    return render_template('user/HomePage.html', message=message)
 
 class LoginPage:
     def clickLogin(self, email, password):
@@ -27,7 +27,7 @@ class LoginPage:
 
 @user_bp.route('/login', methods=['GET'])
 def show_login():
-    return render_template('UserAdminlogin.html')
+    return render_template('user/UserLogin.html')
 
 
 @user_bp.route('/login', methods=['POST'])
@@ -52,7 +52,7 @@ def login():
         "admin": url_for('admin_view_profile.user_profile_list', message=message),
         "platform manager": url_for('platform_manager.view_all_category', message=message),
         "fund raiser": url_for('fundraiser.homepage', message=message),
-        "donee": url_for('donee.homepage', message=message), 
+        "donee": url_for('donee.dashboard', message=message),
     }
     redirect_url = role_redirects.get(normalized_user_type, url_for('user.homepage', message=message))
     return jsonify({

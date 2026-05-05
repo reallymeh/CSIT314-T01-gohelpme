@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Donee Dashboard</title>
+    <title>Donee — Home</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
 
-{# BCE BOUNDARY: SearchFRAPage #}
+{# BCE BOUNDARY: ViewAllFRAPage + SearchFRAPage #}
+{# User Story #0 (Donee): As a Donee, I want to view all active FRAs on the dashboard #}
+{#   so that I can browse all available fundraising activities. #}
 {# User Story #1 (Donee): As a Donee, I want to search all FRA by name #}
 {#   so that I can find a specific FRA that I am interested in. #}
+{# Sequence: Donee opens Dashboard → ViewAllFRAPage(Boundary) #}
+{#           → ViewAllFRAController(Controller) → FRA(Entity) #}
 {# Sequence: Donee searches → SearchFRAPage(Boundary) #}
 {#           → SearchFRAController(Controller) → FRA(Entity) #}
-{# Flask route: POST /donee/api/search_fra in doneeb.py #}
-
-{% if message %}
-<div id="alert-box">{{ message }}</div>
-{% endif %}
+{# Flask routes: GET /donee/api/view_all_fra  POST /donee/api/search_fra  in doneeb.py #}
 
 <!-- TOP BAR -->
 <div class="topbar">
@@ -32,7 +32,7 @@
 
     <!-- SIDEBAR -->
     <div class="sidebar">
-        <a href="/donee/homepage"         class="nav-item active">Dashboard</a>
+        <a href="/donee/dashboard"        class="nav-item active">Dashboard</a>
         <a href="/donee/favourites"        class="nav-item">My Favourites</a>
         <a href="/donee/donation_history"  class="nav-item">Donation History</a>
         <a href="/user/logout"             class="nav-item logout">Log Out</a>
@@ -41,8 +41,8 @@
     <!-- MAIN -->
     <div class="main">
 
-        <div class="page-title">My Fund Raising Activities</div>
-        <div class="page-sub">Find an active fundraising activity by name</div>
+        <div class="page-title">Active Fundraising Activities</div>
+        <div class="page-sub">Browse all currently active fundraising activities</div>
 
         <!-- SEARCH TOOLBAR (US1) -->
         <div class="toolbar" style="justify-content: flex-start;">
@@ -50,19 +50,20 @@
                 <input type="text" id="searchInput"
                        class="search-box"
                        placeholder="Search FRA by name..."
-                       style="width:280px;">
+                       style="width:280px;"
+                       onkeydown="if(event.key==='Enter') searchFRA()">
                 <button class="btn-primary" onclick="searchFRA()">Search</button>
             </div>
         </div>
 
-        <!-- EMPTY STATE (initial load prompt) -->
-        <div id="empty-state" class="empty-state">
-            <div class="empty-text">Enter a name above and click Search to find fundraising activities.</div>
+        <!-- LOADING STATE -->
+        <div id="loading-state" class="empty-state">
+            <div class="empty-text">Loading fundraising activities...</div>
         </div>
 
         <!-- NO RESULTS STATE -->
         <div id="no-result-state" class="empty-state" style="display:none;">
-            <div class="empty-text" id="no-result-msg">No active fundraising activities found.</div>
+            <div class="empty-text" id="no-result-msg">There are currently no active fundraising activities.</div>
         </div>
 
         <!-- RESULTS GRID -->
@@ -72,12 +73,16 @@
 </div>
 
 <script>
-/* ── US1: Search all active FRAs by name ───────────────────────────────────
+/* ── US1: Search active FRAs by name (empty name = view all) ────────────────
    BCE BOUNDARY: SearchFRAPage
    Calls POST /donee/api/search_fra → SearchFRAController → FRA.searchActiveFRA()
    ─────────────────────────────────────────────────────────────────────────── */
 function searchFRA() {
     const name = document.getElementById('searchInput').value.trim();
+
+    document.getElementById('loading-state').style.display   = 'flex';
+    document.getElementById('no-result-state').style.display = 'none';
+    document.getElementById('fra-container').style.display   = 'none';
 
     fetch('/donee/api/search_fra', {
         method: 'POST',
@@ -86,9 +91,7 @@ function searchFRA() {
     })
     .then(res => res.json())
     .then(data => {
-        document.getElementById('empty-state').style.display    = 'none';
-        document.getElementById('no-result-state').style.display = 'none';
-        document.getElementById('fra-container').style.display   = 'none';
+        document.getElementById('loading-state').style.display = 'none';
 
         if (!data.data || data.data.length === 0) {
             document.getElementById('no-result-msg').textContent = data.message;
@@ -98,10 +101,15 @@ function searchFRA() {
 
         renderFRACards(data.data);
     })
-    .catch(err => { console.error(err); alert('Search failed. Please try again.'); });
+    .catch(err => {
+        console.error(err);
+        document.getElementById('loading-state').style.display = 'none';
+        document.getElementById('no-result-msg').textContent = 'Failed to load fundraising activities. Please try again.';
+        document.getElementById('no-result-state').style.display = 'flex';
+    });
 }
 
-/* ── US2 entry point: clicking View navigates to /donee/view/<fraId> ───────
+/* ── US2 entry point: clicking View navigates to /donee/view/<fraId> ────────
    BCE BOUNDARY: ViewFRAPage (rendered in DoneeViewFRA.html)
    ─────────────────────────────────────────────────────────────────────────── */
 function renderFRACards(fras) {
@@ -109,15 +117,11 @@ function renderFRACards(fras) {
     container.innerHTML = '';
 
     fras.forEach(fra => {
-        const pct = fra.target_amount > 0
-            ? Math.min(100, Math.round(fra.collected_amount / fra.target_amount * 100))
-            : 0;
-
         container.innerHTML += `
         <div class="profile-card">
             <div class="card-top">
                 <div class="icon-circle icon-donee">
-                    ${fra.title.substring(0, 2).toUpperCase()}
+                    ${esc(fra.title.substring(0, 2).toUpperCase())}
                 </div>
                 <div>
                     <div class="card-name">${esc(fra.title)}</div>
@@ -144,7 +148,7 @@ function esc(str) {
     return d.innerHTML;
 }
 
-// Also load all active FRAs on page open (empty search = all)
+// Load all active FRAs on page open (empty search = all)
 window.onload = () => searchFRA();
 </script>
 

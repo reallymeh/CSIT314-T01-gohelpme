@@ -26,12 +26,12 @@ class Favourite:
     status: int = 1
     location: str = ""
     created_by: str = ""
-    
-    '''
-    User Story #28 (Donee): Save a FRA to the favourite list.
-    '''
+
     @staticmethod
     def saveFavourite(donee_email: str, fraId: str) -> bool:
+        """
+        User Story #3 (Donee): Save a FRA to the favourite list.
+        """
         try:
             conn, cur = connect_db()
             cur.execute(
@@ -57,12 +57,31 @@ class Favourite:
         conn.close()
         return row is not None
 
-    '''
-    User Story #29 (Donee): Search FRA in favourite list by name.
-    User Story #30 (Donee): View all FRA in favourite list (empty name returns all).
-    '''
+    @staticmethod
+    def removeFavourite(donee_email: str, fraId: str) -> bool:
+        """
+        User Story #3b (Donee): Remove a FRA from the favourite list.
+        """
+        try:
+            conn, cur = connect_db()
+            cur.execute(
+                "DELETE FROM donee_favourite WHERE donee_email = ? AND fraId = ?",
+                (donee_email, fraId)
+            )
+            conn.commit()
+            removed = cur.rowcount > 0
+            conn.close()
+            return removed
+        except Exception as e:
+            print(f"DB error removing favourite: {e}")
+            return False
+
     @staticmethod
     def searchFavourites(donee_email: str, name: str) -> List[dict]:
+        """
+        User Story #4 (Donee): Search FRA in favourite list by name.
+        User Story #5 (Donee): View all FRA in favourite list (empty name returns all).
+        """
         conn, cur = connect_db()
         cur.execute("""
             SELECT df.id, df.donee_email, df.fraId, df.saved_date,

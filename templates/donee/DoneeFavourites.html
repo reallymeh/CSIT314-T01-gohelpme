@@ -9,13 +9,16 @@
 </head>
 <body>
 
-{# BCE BOUNDARY: SearchFavouritePage #}
-{# User Story #4 (Donee): As a Donee, I want to search FRA in favourite list by name #}
-{#   so that I can find a specific FRA within the favourite list. #}
+{# BCE BOUNDARY: ViewFavouritePage (US5) / SearchFavouritePage (US4) #}
 {# User Story #5 (Donee): As a Donee, I want to view FRA in favourite list #}
 {#   so that I can view all FRA within the favourite list. #}
-{# Sequence: Donee searches/views → SearchFavouritePage(Boundary) #}
-{#           → SearchFavouriteController / ViewFavouriteListController → Favourite(Entity) #}
+{# Sequence: Donee views → ViewFavouritePage(Boundary) #}
+{#           → ViewFavouriteListController → Favourite(Entity) #}
+{# Flask route: GET /donee/api/view_favourites in doneeb.py #}
+{# User Story #4 (Donee): As a Donee, I want to search FRA in favourite list by name #}
+{#   so that I can find a specific FRA within the favourite list. #}
+{# Sequence: Donee searches → SearchFavouritePage(Boundary) #}
+{#           → SearchFavouriteController → Favourite(Entity) #}
 {# Flask route: POST /donee/api/search_favourites in doneeb.py #}
 
 <!-- TOP BAR -->
@@ -31,7 +34,7 @@
 
     <!-- SIDEBAR -->
     <div class="sidebar">
-        <a href="/donee/homepage"         class="nav-item">Dashboard</a>
+        <a href="/donee/dashboard"         class="nav-item">Dashboard</a>
         <a href="/donee/favourites"        class="nav-item active">My Favourites</a>
         <a href="/donee/donation_history"  class="nav-item">Donation History</a>
         <a href="/user/logout"             class="nav-item logout">Log Out</a>
@@ -72,15 +75,36 @@
 
 <script>
 /* ── US5: View all favourites on page load ──────────────────────────────────
-   Calls with empty name so the boundary returns all favourites.
+   BCE BOUNDARY: ViewFavouritePage
+   Calls GET /donee/api/view_favourites
+         → ViewFavouriteListController → Favourite.searchFavourites("")
    ─────────────────────────────────────────────────────────────────────────── */
-window.onload = () => searchFavourites();
+window.onload = () => viewFavourites();
 
-/* ── US4/US5: Search or view favourites ────────────────────────────────────
+function viewFavourites() {
+    hideAll();
+    document.getElementById('loading-state').style.display = 'flex';
+
+    fetch('/donee/api/view_favourites')
+    .then(res => res.json())
+    .then(data => {
+        hideAll();
+
+        if (!data.data || data.data.length === 0) {
+            document.getElementById('no-result-msg').textContent = data.message;
+            document.getElementById('no-result-state').style.display = 'flex';
+            return;
+        }
+
+        renderFavCards(data.data);
+    })
+    .catch(err => { console.error(err); alert('Failed to load favourites. Please try again.'); });
+}
+
+/* ── US4: Search favourites by name ────────────────────────────────────────
    BCE BOUNDARY: SearchFavouritePage
    Calls POST /donee/api/search_favourites
          → SearchFavouriteController → Favourite.searchFavourites()
-   Empty name → ViewFavouriteListController → Favourite.searchFavourites("") = all
    ─────────────────────────────────────────────────────────────────────────── */
 function searchFavourites() {
     const name = document.getElementById('searchInput').value.trim();
@@ -113,32 +137,64 @@ function renderFavCards(favs) {
     container.innerHTML = '';
 
     favs.forEach(f => {
-        const pct = f.target_amount > 0
-            ? Math.min(100, Math.round(f.collected_amount / f.target_amount * 100))
-            : 0;
-        container.innerHTML += `
-        <div class="profile-card">
+        const card = document.createElement('div');
+        card.className = 'profile-card';
+        card.dataset.fraId = f.fraId;
+        card.innerHTML = `
             <div class="card-top">
                 <div class="icon-circle icon-donee">
-                    ${f.title.substring(0, 2).toUpperCase()}
+                    ${esc(f.title.substring(0, 2).toUpperCase())}
                 </div>
                 <div>
                     <div class="card-name">${esc(f.title)}</div>
                     <div class="card-desc">${esc(f.category)} &nbsp;|&nbsp; Saved: ${esc(f.saved_date)}</div>
                 </div>
             </div>
-
             <div class="card-actions">
-                <!-- US2 entry point from favourites: view full detail -->
                 <button class="act-btn view"
                         onclick="window.location.href='/donee/view/${esc(f.fraId)}'">
                     View Details
                 </button>
-            </div>
-        </div>`;
+                <button class="act-btn delete"
+                        style="background:#dc2626;color:#fff;border-color:#dc2626;"
+                        onclick="removeFavourite('${esc(f.fraId)}', this)">
+                    Remove From Favourites
+                </button>
+            </div>`;
+        container.appendChild(card);
     });
 
     container.style.display = 'grid';
+}
+
+/* ── Remove a favourite ─────────────────────────────────────────────────────
+   BCE BOUNDARY: RemoveFavouritePage
+   Calls POST /donee/remove_favourite → RemoveFavouriteController → Favourite.removeFavourite()
+   ─────────────────────────────────────────────────────────────────────────── */
+function removeFavourite(fraId, btn) {
+    btn.disabled = true;
+    fetch('/donee/remove_favourite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fraId })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            const card = document.querySelector(`.profile-card[data-fra-id="${fraId}"]`);
+            if (card) card.remove();
+            // If grid is now empty, show the no-result message
+            if (document.getElementById('fav-container').children.length === 0) {
+                document.getElementById('fav-container').style.display = 'none';
+                document.getElementById('no-result-msg').textContent = 'You have not saved any FRAs to your favourites yet.';
+                document.getElementById('no-result-state').style.display = 'flex';
+            }
+        } else {
+            btn.disabled = false;
+            alert(data.message);
+        }
+    })
+    .catch(err => { console.error(err); btn.disabled = false; alert('Failed to remove. Please try again.'); });
 }
 
 function hideAll() {

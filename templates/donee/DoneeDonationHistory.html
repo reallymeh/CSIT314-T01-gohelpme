@@ -9,13 +9,16 @@
 </head>
 <body>
 
-{# BCE BOUNDARY: SearchDonationHistoryPage #}
-{# User Story # (Donee): As a Donee, I want to search history of donation by FRA category and date period #}
-{#   so that I can find a specific FRA that I had donated. #}
-{# User Story # (Donee): As a Donee, I want to view history of donation #}
+{# BCE BOUNDARY: ViewDonationHistoryPage (US7) / SearchDonationHistoryPage (US6) #}
+{# User Story #7 (Donee): As a Donee, I want to view history of donation #}
 {#   so that I can evaluate the impact of my donation and consider another donation. #}
-{# Sequence: Donee filters/views → SearchDonationHistoryPage(Boundary) #}
-{#           → SearchDonationHistoryController / ViewDonationHistoryController → DonationHistory(Entity) #}
+{# Sequence: Donee views → ViewDonationHistoryPage(Boundary) #}
+{#           → ViewDonationHistoryController → DonationHistory(Entity) #}
+{# Flask route: GET /donee/api/view_history in doneeb.py #}
+{# User Story #6 (Donee): As a Donee, I want to search history of donation by FRA category and date period #}
+{#   so that I can find a specific FRA that I had donated. #}
+{# Sequence: Donee filters → SearchDonationHistoryPage(Boundary) #}
+{#           → SearchDonationHistoryController → DonationHistory(Entity) #}
 {# Flask route: POST /donee/api/search_history in doneeb.py #}
 
 <!-- TOP BAR -->
@@ -31,7 +34,7 @@
 
     <!-- SIDEBAR -->
     <div class="sidebar">
-        <a href="/donee/homepage"         class="nav-item">Dashboard</a>
+        <a href="/donee/dashboard"         class="nav-item">Dashboard</a>
         <a href="/donee/favourites"        class="nav-item">My Favourites</a>
         <a href="/donee/donation_history"  class="nav-item active">Donation History</a>
         <a href="/user/logout"             class="nav-item logout">Log Out</a>
@@ -118,16 +121,35 @@
 
 <script>
 /* ── US7: Load all history on page open ─────────────────────────────────────
-   No filters = ViewDonationHistoryController → DonationHistory.searchHistory()
-   with empty params, returning all records.
+   BCE BOUNDARY: ViewDonationHistoryPage
+   Calls GET /donee/api/view_history
+         → ViewDonationHistoryController → DonationHistory.searchHistory()
    ─────────────────────────────────────────────────────────────────────────── */
-window.onload = () => searchHistory();
+window.onload = () => viewHistory();
 
-/* ── US6/US7: Search / view donation history ────────────────────────────────
+function viewHistory() {
+    hideAll();
+
+    fetch('/donee/api/view_history')
+    .then(res => res.json())
+    .then(data => {
+        hideAll();
+
+        if (!data.data || data.data.length === 0) {
+            document.getElementById('no-result-msg').textContent = data.message;
+            document.getElementById('no-result-state').style.display = 'flex';
+            return;
+        }
+
+        renderTable(data.data);
+    })
+    .catch(err => { console.error(err); alert('Failed to load history. Please try again.'); });
+}
+
+/* ── US6: Search donation history by filters ────────────────────────────────
    BCE BOUNDARY: SearchDonationHistoryPage
    Calls POST /donee/api/search_history
          → SearchDonationHistoryController → DonationHistory.searchHistory()
-   All filters optional — blank category + blank dates = US7 (view all).
    ─────────────────────────────────────────────────────────────────────────── */
 function searchHistory() {
     const category  = document.getElementById('filterCategory').value;
@@ -193,7 +215,7 @@ function clearFilters() {
     document.getElementById('filterCategory').value  = '';
     document.getElementById('filterDateFrom').value  = '';
     document.getElementById('filterDateTo').value    = '';
-    searchHistory();   // re-run with no filters = US7 (view all)
+    viewHistory();   // US7 — view all
 }
 
 function hideAll() {

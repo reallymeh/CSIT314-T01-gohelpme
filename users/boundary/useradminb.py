@@ -69,7 +69,7 @@ def user_profile_list():
     display_profile = DisplayUserProfile()
     profiles = display_profile.displayUserProfile()
     message = request.args.get('message')
-    return render_template('UserAdminProfiles.html', profiles=profiles, message=message)
+    return render_template('user_admin/UserAdminProfiles.html', profiles=profiles, message=message)
 
 
 # Create user profile
@@ -95,7 +95,7 @@ create_profile = CreateUserProfile()
 
 @admin_profiles_bp.route('/create_profile', methods=['GET'])
 def show_create_profile():
-    return render_template('UserAdminCreateUserProfile.html')
+    return render_template('user_admin/UserAdminCreateUserProfile.html')
 
 
 @admin_profiles_bp.route('/create_profile', methods=['POST'])
@@ -114,14 +114,14 @@ def create_user_profile():
 # Update profile
 @admin_profiles_bp.route('/updateprofile/<user_profile_name>', methods=['GET'])
 def render_update_page(user_profile_name):
-    return render_template('UserAdminUpdateProfile.html', user_profile_name=user_profile_name)
+    return render_template('user_admin/UserAdminUpdateProfile.html', user_profile_name=user_profile_name)
 
 
 # BCE BOUNDARY: UpdateUserAccount — render update form
 # Passes user_id (email address) to the template so it can pre-fill and submit correctly.
 @admin_profiles_bp.route('/updateaccount/<user_id>', methods=['GET'])
 def render_update_account_page(user_id):
-    return render_template('UserAdminUpdateAccount.html', user_id=user_id)
+    return render_template('user_admin/UserAdminUpdateAccount.html', user_id=user_id)
 
 
 # BCE BOUNDARY: UpdateUserAccount — PUT /admin/api/users/<email>
@@ -264,7 +264,7 @@ class ViewUserProfile:
 def user_profile(user_profile_name):
     display_profile = ViewUserProfile()
     profile = display_profile.viewUserProfile(user_profile_name)
-    return render_template('UserAdminViewProfile.html', profile=profile)
+    return render_template('user_admin/UserAdminViewProfile.html', profile=profile)
 
 
 class SearchUserProfile:
@@ -287,7 +287,7 @@ def search_user_profiles():
 # BCE BOUNDARY: SearchUserAccount — renders accounts page
 @admin_profiles_bp.route('/useraccount', methods=['GET'])
 def user_account_list():
-    return render_template('UserAdminAccounts.html')
+    return render_template('user_admin/UserAdminAccounts.html')
 
 
 # BCE BOUNDARY: ViewUserAccount
@@ -310,7 +310,7 @@ def view_account(account_name):
     account = ViewUserAccount().viewUserAccount(account_name)
     if account is None:
         return redirect(url_for('admin_view_profile.user_account_list'))
-    return render_template('UserAdminViewAccount.html', account=account)
+    return render_template('user_admin/UserAdminViewAccount.html', account=account)
 
 
 class CreateUserAccount:
@@ -348,7 +348,7 @@ class SuspendUserAccount:
         
 @admin_profiles_bp.route('/create_account', methods=['GET'])
 def show_create_account():
-    return render_template('UserAdminCreateUserAccount.html')
+    return render_template('user_admin/UserAdminCreateUserAccount.html')
 
 
 @admin_profiles_bp.route('/create_account', methods=['POST'])

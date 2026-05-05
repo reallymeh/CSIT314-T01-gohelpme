@@ -24,7 +24,7 @@ class CreateFRACategoryBoundary:
 
 @platform_manager_bp.route('/create_category', methods=['GET'])
 def show_create_category():
-    return render_template('PlatformManagerCreateCategory.html')
+    return render_template('platform_manager/PlatformManagerCreateCategory.html')
 
 @platform_manager_bp.route('/create_category', methods=['POST'])
 def create_category():
@@ -53,7 +53,7 @@ class ViewFRACategoryBoundary:
 def view_category(category_name):
     category = ViewFRACategoryBoundary().viewFRACategory(category_name)
     # BCE BOUNDARY: displayViewResult() — Flask renders category details via Jinja2
-    return render_template('PlatformManagerViewCategory.html', category=category)
+    return render_template('platform_manager/PlatformManagerViewCategory.html', category=category)
 
 # ========== BCE BOUNDARY: UpdateFRACategory ==========
 # User Story: #37 As a platform management, I want to update FRA categories
@@ -92,7 +92,7 @@ def update_category(category_name):
     
     # Pass the category object to the template
     return render_template(
-        'PlatformManagerUpdateCategory.html',
+        'platform_manager/PlatformManagerUpdateCategory.html',
         category=category
     )
 
@@ -127,7 +127,7 @@ def view_all_category():
     boundary = ViewAllFRACategoryBoundary()
     categories = boundary.viewAllFRACategory()
     
-    return render_template('PlatformManagerCategories.html', categories=categories)
+    return render_template('platform_manager/PlatformManagerCategories.html', categories=categories)
 
 class SearchFRACategory:
     def __init__(self):
@@ -185,7 +185,7 @@ def suspend_category():
 
 @platform_manager_bp.route('/reports', methods=['GET'])
 def show_reports():
-    return render_template('PlatformManagerReports.html')
+    return render_template('platform_manager/PlatformManagerReports.html')
 
 # ========== BCE BOUNDARY: GenerateDailyReport ==========
 # User Story: #40 As a platform manager, I want to generate daily report
@@ -204,7 +204,7 @@ class DailyReportBoundary:
 def daily_report():
     boundary = DailyReportBoundary()
     daily = boundary.getReport()
-    return render_template('PlatformManagerDailyReport.html', daily=daily)
+    return render_template('platform_manager/PlatformManagerDailyReport.html', daily=daily)
 
 # ========== BCE BOUNDARY: GenerateWeeklyReport ==========
 # User Story: #41 As a platform manager, I want to generate weekly report
@@ -223,7 +223,7 @@ class WeeklyReportBoundary:
 def weekly_report():
     boundary = WeeklyReportBoundary()
     weekly = boundary.getReport()
-    return render_template('PlatformManagerWeeklyReport.html', weekly=weekly)
+    return render_template('platform_manager/PlatformManagerWeeklyReport.html', weekly=weekly)
 
 # ========== BCE BOUNDARY: GenerateMonthlyReport ==========
 # User Story: #42 As a platform manager, I want to generate monthly report
@@ -244,4 +244,4 @@ def monthly_report():
     boundary = MonthlyReportBoundary()
     monthly = boundary.getReport()
     print(monthly)
-    return render_template('PlatformManagerMonthlyReport.html', monthly=monthly)
+    return render_template('platform_manager/PlatformManagerMonthlyReport.html', monthly=monthly)

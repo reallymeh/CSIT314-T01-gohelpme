@@ -211,6 +211,32 @@ class FRA:
     
 
     '''
+    User Story #1 (Donee): View all active FRAs. Returns all FRAs with status = 1, no filter.
+    '''
+    @staticmethod
+    def viewAllActiveFRA() -> list:
+        conn, cur = connect_db()
+        cur.execute("""
+            SELECT fraId, title, description, category,
+                   target_amount, collected_amount,
+                   start_date, end_date, status,
+                   view_count, location
+            FROM fra
+            WHERE status = 1
+        """)
+        rows = cur.fetchall()
+        conn.close()
+        return [
+            {
+                "fraId": r[0], "title": r[1], "description": r[2],
+                "category": r[3], "target_amount": r[4], "collected_amount": r[5],
+                "start_date": r[6], "end_date": r[7], "status": r[8],
+                "view_count": r[9], "location": r[10]
+            }
+            for r in rows
+        ]
+
+    '''
     User Story # (Donee): Search all active FRAs by name. Only returns FRAs with status = 1 (active), unlike the fund raiser searchFRA.
     '''
     @staticmethod

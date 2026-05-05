@@ -18,7 +18,7 @@ def homepage():
     fra_data = boundary.displayFRA()
     message = request.args.get('message')
 
-    return render_template('FundRaiserHomePage.html', fra_data=fra_data, message=message)
+    return render_template('fundraiser/FundRaiserHomePage.html', fra_data=fra_data, message=message)
 
 class DisplayFRAPage:
     def __init__(self):
@@ -35,7 +35,7 @@ User Story #15: As a Fund Raiser, I want to create a FRA so that I can share my 
 @fundraiser_bp.route('/create', methods=['GET'])
 def show_create_fra():
     categories = [c.category_name for c in FRACategory.getAllCategory() if c.status == 1]
-    return render_template('FundRaiserCreateFRA.html', categories=categories)
+    return render_template('fundraiser/FundRaiserCreateFRA.html', categories=categories)
 
 class CreateFRAPage:
     def __init__(self):
@@ -106,7 +106,7 @@ def view_fra(fraId):
     page = ViewFRAPage()
     fra = page.displayFRA(fraId)
     
-    return render_template('FundRaiserViewFRA.html', fra=fra)
+    return render_template('fundraiser/FundRaiserViewFRA.html', fra=fra)
 
     
 '''
@@ -119,7 +119,7 @@ def show_update_page(fraId):
     fra = page.displayFRA(fraId)
     categories = [c.category_name for c in FRACategory.getAllCategory() if c.status == 1]
     
-    return render_template('FundRaiserUpdateFRA.html', fra=fra, categories=categories)
+    return render_template('fundraiser/FundRaiserUpdateFRA.html', fra=fra, categories=categories)
     
 class UpdateFRAPage:
     def __init__(self):
@@ -249,7 +249,7 @@ def view_fra_view_count(fraId):
         return redirect(url_for('fundraiser.homepage'))
 
     return render_template(
-        "FundRaiserViewFRAViewCount.html",
+        "fundraiser/FundRaiserViewFRAViewCount.html",
         fra=data["fra"],
         stats=data["stats"],
         total_views=data["total_views"]
@@ -281,7 +281,7 @@ User Story #22: As a Fund Raiser, I want to search history of completed FRA by s
 @fundraiser_bp.route('/history', methods=['GET'])
 def view_history():
     categories = [c.category_name for c in FRACategory.getAllCategory() if c.status == 1]
-    return render_template('FundRaiserHistoy.html',categories=categories)
+    return render_template('fundraiser/FundRaiserHistory.html',categories=categories)
 
 class SearchCompletedFRAHistoryPage: 
     def __init__(self): 
@@ -329,5 +329,5 @@ def view_comopleted_fra(fraId):
     page = ViewCompletedFRAPage()
     fra = page.viewCompletedFRA(fraId)
 
-    return render_template('FundRaiserViewCompletedFRA.html', fra=fra)
+    return render_template('fundraiser/FundRaiserViewCompletedFRA.html', fra=fra)
 
