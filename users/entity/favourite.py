@@ -77,10 +77,38 @@ class Favourite:
             return False
 
     @staticmethod
+    def viewFavourites(donee_email: str) -> List[dict]:
+        """
+        User Story #5 (Donee): View all FRA in favourite list.
+        """
+        conn, cur = connect_db()
+        cur.execute("""
+            SELECT df.id, df.donee_email, df.fraId, df.saved_date,
+                   f.title, f.description, f.category,
+                   f.target_amount, f.collected_amount,
+                   f.start_date, f.end_date, f.status, f.location
+            FROM donee_favourite df
+            JOIN fra f ON df.fraId = f.fraId
+            WHERE df.donee_email = ?
+            ORDER BY df.saved_date DESC
+        """, (donee_email,))
+        rows = cur.fetchall()
+        conn.close()
+        return [
+            {
+                "id": r[0], "donee_email": r[1], "fraId": r[2],
+                "saved_date": r[3], "title": r[4], "description": r[5],
+                "category": r[6], "target_amount": r[7], "collected_amount": r[8],
+                "start_date": r[9], "end_date": r[10],
+                "status": r[11], "location": r[12]
+            }
+            for r in rows
+        ]
+
+    @staticmethod
     def searchFavourites(donee_email: str, name: str) -> List[dict]:
         """
         User Story #4 (Donee): Search FRA in favourite list by name.
-        User Story #5 (Donee): View all FRA in favourite list (empty name returns all).
         """
         conn, cur = connect_db()
         cur.execute("""

@@ -6,7 +6,7 @@ from users.control.doneec import (
     ViewFRAController,
     SaveFavouriteController,
     RemoveFavouriteController,
-    ViewFavouriteListController,
+    ViewFavouriteController,
     SearchFavouriteController,
     ViewDonationHistoryController,
     SearchDonationHistoryController,
@@ -323,7 +323,7 @@ class ViewFavouritePage:
     Sequence: Donee → ViewFavouritePage → ViewFavouriteListController → Favourite
     """
     def __init__(self):
-        self.controller = ViewFavouriteListController()
+        self.controller = ViewFavouriteController()
 
     def viewFavourites(self, donee_email: str) -> list:
         return self.controller.viewFavourites(donee_email)

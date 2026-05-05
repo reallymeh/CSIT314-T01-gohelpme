@@ -62,13 +62,13 @@ class SearchFavouriteController:
         return Favourite.searchFavourites(donee_email, name)
 
 
-class ViewFavouriteListController:
+class ViewFavouriteController:
     """
     User Story #5 (Donee): As a Donee, I want to view FRA in favourite list
     so that I can view all FRA within the favourite list.
     """
     def viewFavourites(self, donee_email: str) -> list:
-        return Favourite.searchFavourites(donee_email, "")  # empty name = all
+        return Favourite.viewFavourites(donee_email)
 
 
 class SearchDonationHistoryController:
@@ -81,7 +81,7 @@ class SearchDonationHistoryController:
         return DonationHistory.searchHistory(donee_email, category, date_from, date_to)
 
     def getCategories(self, donee_email: str) -> list:
-        return DonationHistory.getDistinctCategories(donee_email)
+        return DonationHistory.getCategories(donee_email)
 
 
 class ViewDonationHistoryController:
@@ -90,4 +90,4 @@ class ViewDonationHistoryController:
     so that I can evaluate the impact of my donation and consider another donation.
     """
     def viewHistory(self, donee_email: str) -> list:
-        return DonationHistory.searchHistory(donee_email, "", "", "")  # no filters = all
+        return DonationHistory.viewHistory(donee_email) 

@@ -67,7 +67,34 @@ class DonationHistory:
         ]
 
     @staticmethod
-    def getDistinctCategories(donee_email: str) -> List[str]:
+    def viewHistory(donee_email: str) -> List[dict]:
+        """
+        Returns all donation records for the given donee with no filters applied.
+        User Story #7 (Donee): View all history of donation.
+        """
+        conn, cur = connect_db()
+        cur.execute(
+            """
+            SELECT id, donee_email, fraId, fra_title, fra_category, amount, donation_date
+            FROM donation_history
+            WHERE donee_email = ?
+            ORDER BY donation_date DESC
+            """,
+            (donee_email,)
+        )
+        rows = cur.fetchall()
+        conn.close()
+        return [
+            {
+                "id": r[0], "donee_email": r[1], "fraId": r[2],
+                "fra_title": r[3], "fra_category": r[4],
+                "amount": r[5], "donation_date": r[6]
+            }
+            for r in rows
+        ]
+
+    @staticmethod
+    def getCategories(donee_email: str) -> List[str]:
         """Return the distinct FRA categories that appear in this donee's history."""
         conn, cur = connect_db()
         rows = cur.execute(
