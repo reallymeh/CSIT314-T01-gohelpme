@@ -67,7 +67,7 @@ class UpdateFRACategoryBoundary:
     def __init__(self):
         self.controller = UpdateFRACategoryController()
     
-    def displayUpdateSucess(self):
+    def displayUpdateSuccess(self):
         message = "Update Successful!"
         return {"success": True, "message": message}
 
@@ -77,7 +77,7 @@ class UpdateFRACategoryBoundary:
     
     def updateFRACategory(self, old_name:str, new_name:str, description: str, status:int) -> FRACategory:
         if self.controller.updateFRACategory(old_name, new_name, description, status):
-            return self.displayUpdateSucess()
+            return self.displayUpdateSuccess()
         
         else:
             return self.displayUpdateFail()
