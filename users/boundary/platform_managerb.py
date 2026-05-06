@@ -46,7 +46,7 @@ class ViewFRACategoryBoundary:
         self.controller = ViewFRACategoryController()
 
     # viewFRACategory(): FRACategory — receives category_name and returns FRACategory from controller
-    def viewFRACategory(self, category_name: str) -> FRACategory:
+    def viewFRACategory(self, category_name: str) -> FRACategory | None:
         return self.controller.viewFRACategory(category_name)
 
 @platform_manager_bp.route('/viewcategory/<category_name>', methods=['GET'])
