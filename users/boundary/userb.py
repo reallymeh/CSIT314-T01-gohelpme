@@ -10,6 +10,13 @@ def homepage():
     message = request.args.get('message')
     return render_template('user/HomePage.html', message=message)
 
+'''
+User Story #13: As a user admin, I want to log in my user account so that I can access the platform.
+'''
+@user_bp.route('/login', methods=['GET'])
+def show_login():
+    return render_template('user/UserLogin.html')
+
 class LoginPage:
     def clickLogin(self, email, password):
         login_controller = LoginController()
@@ -23,12 +30,6 @@ class LoginPage:
 
     def displaySuccess(self):
         return 'Login successful! Welcome back.'
-
-
-@user_bp.route('/login', methods=['GET'])
-def show_login():
-    return render_template('user/UserLogin.html')
-
 
 @user_bp.route('/login', methods=['POST'])
 def login():
@@ -62,11 +63,12 @@ def login():
         "user_type": user_type if success else None
     })
 
-
+'''
+User Story #13: As a user admin, I want to log in my user account so that I can access the platform.
+'''
 class LogoutPage:
     def logout(self):
         return 'You have logged out successfully!'
-
 
 @user_bp.route('/logout')
 def logout():

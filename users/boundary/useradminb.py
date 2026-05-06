@@ -14,71 +14,25 @@ from users.control.useradminc import (
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for
 from typing import List
 
-
-
-
-class UpdateUserProfile:
-    def __init__(self):
-        self.controller = UpdateUserProfileController()
-
-    def updateUserProfile(self, user_profile_name: str, new_name: str, new_access_level: int, new_description: str) -> bool:
-        return self.controller.updateUserProfile(user_profile_name, new_name, new_access_level, new_description)
-
-
-# BCE BOUNDARY: UpdateUserAccount
-class UpdateUserAccount:
-    def __init__(self):
-        self.controller = UpdateUserAccountController()
-
-    def updateUserAccount(self, email_address: str, data: dict) -> bool:
-        return self.controller.updateUserAccount(email_address, data)
-
-
-# BCE BOUNDARY: SearchUserAccount
-class SearchUserAccount:
-    def __init__(self):
-        self.controller = SearchUserAccountController()
-
-    def searchUserAccounts(self, query: str) -> List[UserAccount]:
-        return self.controller.searchUserAccounts(query)
-
-
-# BCE BOUNDARY: GetUserAccount (for pre-filling the update form)
-class GetUserAccount:
-    def __init__(self):
-        self.controller = GetUserAccountController()
-
-    def getUserAccount(self, email_address: str) -> UserAccount | None:
-        return self.controller.getUserAccount(email_address)
-
 # flask integration
 admin_profiles_bp = Blueprint('admin_view_profile', __name__, url_prefix='/admin')
 
-update_user_account = UpdateUserAccount()
 
-class DisplayUserProfile:
-    def __init__(self):
-        self.controller = DisplayUserProfileController()
-
-    def displayUserProfile(self) -> List[UserProfile]:
-        return self.controller.displayUserProfile()
-
-
-@admin_profiles_bp.route('/userprofile')
-def user_profile_list():
-    display_profile = DisplayUserProfile()
-    profiles = display_profile.displayUserProfile()
-    message = request.args.get('message')
-    return render_template('user_admin/UserAdminProfiles.html', profiles=profiles, message=message)
-
+'''
+User Story #3: As a user admin, I want to create user profile so that I can handle different types of user.
+'''
+# BCE BOUNDARY: ShowCreateUserProfilePage
+@admin_profiles_bp.route('/create_profile', methods=['GET'])
+def show_create_profile():
+    return render_template('user_admin/UserAdminCreateUserProfile.html')
 
 # Create user profile
 class CreateUserProfile:
     def __init__(self):
         self.controller = CreateUserProfileController()
 
-    def clickCreate(self, name, access_levels, statuses, descriptions):
-        if self.controller.createUserProfile(name, access_levels, statuses, descriptions):
+    def clickCreate(self, name: str, access_level: int, status: int, description: str) -> bool:
+        if self.controller.createUserProfile(name, access_level, status, description):
             return self.displaySuccess()
         else:
             return self.displayError()
@@ -89,15 +43,9 @@ class CreateUserProfile:
     def displaySuccess(self):
         return 'Profile created successfully!'
 
-
 create_profile = CreateUserProfile()
 
-
-@admin_profiles_bp.route('/create_profile', methods=['GET'])
-def show_create_profile():
-    return render_template('user_admin/UserAdminCreateUserProfile.html')
-
-
+# BCE BOUNDARY: CreateUserProfile — POST /admin/create_profile
 @admin_profiles_bp.route('/create_profile', methods=['POST'])
 def create_user_profile():
     data = request.get_json()
@@ -111,72 +59,21 @@ def create_user_profile():
     return jsonify({'message': message})
 
 
-# Update profile
-@admin_profiles_bp.route('/updateprofile/<user_profile_name>', methods=['GET'])
-def render_update_page(user_profile_name):
-    return render_template('user_admin/UserAdminUpdateProfile.html', user_profile_name=user_profile_name)
+'''
+User Story #4: As a user admin, I want to view user profile so that I can view the different types of user profiles.
+'''
+class ViewUserProfile:
+    def __init__(self):
+        self.controller = ViewUserProfileController()
 
+    def viewUserProfile(self, profile_name: str) -> UserProfile:
+        return self.controller.viewUserProfile(profile_name)
 
-# BCE BOUNDARY: UpdateUserAccount — render update form
-# Passes user_id (email address) to the template so it can pre-fill and submit correctly.
-@admin_profiles_bp.route('/updateaccount/<user_id>', methods=['GET'])
-def render_update_account_page(user_id):
-    return render_template('user_admin/UserAdminUpdateAccount.html', user_id=user_id)
-
-
-# BCE BOUNDARY: UpdateUserAccount — PUT /admin/api/users/<email>
-@admin_profiles_bp.route('/api/users/<path:user_id>', methods=['PUT'])
-def update_user_account_api(user_id):
-    data = request.get_json()
-
-    if not data:
-        return jsonify({"success": False, "message": "No data provided"}), 400
-
-    success = update_user_account.updateUserAccount(user_id, data)
-
-    if success:
-        return jsonify({"success": True, "message": f"Account {user_id} updated successfully"}), 200
-    else:
-        return jsonify({"success": False, "message": "Failed to update account in database"}), 500
-
-
-# BCE BOUNDARY: GetUserAccount — GET /admin/api/users/<email>
-# Used by the update form to pre-fill current account data.
-@admin_profiles_bp.route('/api/users/<path:user_id>', methods=['GET'])
-def get_user_account_api(user_id):
-    account = GetUserAccount().getUserAccount(user_id)
-    if account is None:
-        return jsonify({"success": False, "message": "Account not found"}), 404
-    return jsonify({
-        "success": True,
-        "data": {
-            "full_name": account.full_name,
-            "email_address": account.email_address,
-            "phone_number": account.phone_number,
-            "address": account.address,
-            "user_type": account.user_type,
-            "account_status": account.account_status
-        }
-    }), 200
-
-
-# BCE BOUNDARY: SearchUserAccount — GET /admin/api/accounts?q=<query>
-# Returns JSON list of matching accounts for the accounts page search.
-@admin_profiles_bp.route('/api/accounts', methods=['GET'])
-def search_user_accounts_api():
-    query = request.args.get('q', '').strip()
-    accounts = SearchUserAccount().searchUserAccounts(query)
-    data = [
-        {
-            "full_name": a.full_name,
-            "email_address": a.email_address,
-            "user_type": a.user_type,
-            "account_status": a.account_status
-        }
-        for a in accounts
-    ]
-    return jsonify(data), 200
-
+@admin_profiles_bp.route('/viewprofile/<string:user_profile_name>')
+def user_profile(user_profile_name):
+    display_profile = ViewUserProfile()
+    profile = display_profile.viewUserProfile(user_profile_name)
+    return render_template('user_admin/UserAdminViewProfile.html', profile=profile)
 
 @admin_profiles_bp.route('/api/profiles/<user_profile_name>', methods=['GET'])
 def get_profile_api(user_profile_name):
@@ -195,6 +92,21 @@ def get_profile_api(user_profile_name):
     else:
         return jsonify({"success": False, "error": "Profile not found"}), 404
 
+
+'''
+User Story #5: As a user admin, I want to update user profile so that I can make changes to user profile.
+'''
+# Update profile
+@admin_profiles_bp.route('/updateprofile/<user_profile_name>', methods=['GET'])
+def render_update_page(user_profile_name):
+    return render_template('user_admin/UserAdminUpdateProfile.html', user_profile_name=user_profile_name)
+
+class UpdateUserProfile:
+    def __init__(self):
+        self.controller = UpdateUserProfileController()
+
+    def updateUserProfile(self, user_profile_name: str, new_name: str, new_access_level: int, new_description: str) -> bool:
+        return self.controller.updateUserProfile(user_profile_name, new_name, new_access_level, new_description)
 
 @admin_profiles_bp.route('/api/profiles/<user_profile_name>', methods=['PUT'])
 def update_profile_api(user_profile_name):
@@ -224,6 +136,9 @@ def update_profile_api(user_profile_name):
         return jsonify({"success": False, "error": "Failed to update profile in database"}), 500
 
 
+'''
+User Story #6: As a user admin, I want to suspend a user profile so that I can maintain user access.
+'''
 class SuspendUserProfile:
     def __init__(self):
         self.controller = SuspendUserProfileController()
@@ -240,7 +155,7 @@ class SuspendUserProfile:
         else:
             return self.displaySuspendFail()
 
-
+# BCE BOUNDARY: SuspendUserProfile — POST /admin/suspend_user
 @admin_profiles_bp.route('/suspend_user', methods=['POST'])
 def suspend_user():
     data = request.get_json()
@@ -249,31 +164,15 @@ def suspend_user():
     return jsonify({'message': message})
 
 
-
-
-
-class ViewUserProfile:
-    def __init__(self):
-        self.controller = ViewUserProfileController()
-
-    def viewUserProfile(self, profile_name: str) -> UserProfile:
-        return self.controller.viewUserProfile(profile_name)
-
-
-@admin_profiles_bp.route('/viewprofile/<string:user_profile_name>')
-def user_profile(user_profile_name):
-    display_profile = ViewUserProfile()
-    profile = display_profile.viewUserProfile(user_profile_name)
-    return render_template('user_admin/UserAdminViewProfile.html', profile=profile)
-
-
+'''
+User Story #7: As a user admin, I want to search for user profile using a search bar so that I can search for a specific user profile.
+'''
 class SearchUserProfile:
     def __init__(self):
         self.controller = SearchUserProfileController()
 
     def search_profiles(self, query: str):
         return self.controller.search_profiles(query)
-
 
 @admin_profiles_bp.route('/search_profiles', methods=['GET'])
 def search_user_profiles():
@@ -284,34 +183,12 @@ def search_user_profiles():
     return jsonify(data)
 
 
-# BCE BOUNDARY: SearchUserAccount — renders accounts page
-@admin_profiles_bp.route('/useraccount', methods=['GET'])
-def user_account_list():
-    return render_template('user_admin/UserAdminAccounts.html')
-
-
-# BCE BOUNDARY: ViewUserAccount
-class ViewUserAccount:
-    def __init__(self):
-        self.controller = ViewUserAccountController()
-
-    def displayViewResult(self, account: UserAccount):
-        return account
-
-    def displayViewFail(self):
-        return None
-
-    def viewUserAccount(self, account_name: str) -> UserAccount | None:
-        return self.controller.viewUserAccount(account_name)
-
-
-@admin_profiles_bp.route('/viewaccount/<account_name>', methods=['GET'])
-def view_account(account_name):
-    account = ViewUserAccount().viewUserAccount(account_name)
-    if account is None:
-        return redirect(url_for('admin_view_profile.user_account_list'))
-    return render_template('user_admin/UserAdminViewAccount.html', account=account)
-
+'''
+User Story #8: As a user admin, I want to create user account so that new users can access the platform.
+'''
+@admin_profiles_bp.route('/create_account', methods=['GET'])
+def show_create_account():
+    return render_template('user_admin/UserAdminCreateUserAccount.html')
 
 class CreateUserAccount:
     def __init__(self):
@@ -328,7 +205,105 @@ class CreateUserAccount:
 
     def displaySuccess(self):
         return 'Account created successfully!'
+    
+@admin_profiles_bp.route('/create_account', methods=['POST'])
+def create_user_account_route():
+    data = request.get_json()
+    email = data.get('email', '').strip()
+    name = data.get('name', '').strip()
+    phone = data.get('phone', '').strip()
+    address = data.get('address', '').strip()
+    hash_password = data.get('password', '').strip()
+    account_status = data.get('account_status', '').strip()
+    user_type = data.get('user_type', '').strip()
+    if UserAccount.userAccountExists(email):
+        return jsonify({"success": False, "message": "User account already exists."}), 400
+    message = CreateUserAccount().clickCreateAccount(name, email, phone, address, user_type, account_status, hash_password)
+    return jsonify({'message': message})
 
+
+'''
+User Story #9: As a user admin, I want to view user account so that I can view the user's details.
+'''
+# BCE BOUNDARY: ViewUserAccount
+class ViewUserAccount:
+    def __init__(self):
+        self.controller = ViewUserAccountController()
+
+    def displayViewResult(self, account: UserAccount):
+        return account
+
+    def displayViewFail(self):
+        return None
+
+    def viewUserAccount(self, account_name: str) -> UserAccount | None:
+        return self.controller.viewUserAccount(account_name)
+
+@admin_profiles_bp.route('/viewaccount/<account_name>', methods=['GET'])
+def view_account(account_name):
+    account = ViewUserAccount().viewUserAccount(account_name)
+    if account is None:
+        return redirect(url_for('admin_view_profile.user_account_list'))
+    return render_template('user_admin/UserAdminViewAccount.html', account=account)
+
+# BCE BOUNDARY: GetUserAccount — GET /admin/api/users/<email>
+# Used by the update form to pre-fill current account data.
+@admin_profiles_bp.route('/api/users/<path:user_id>', methods=['GET'])
+def get_user_account_api(user_id):
+    account = GetUserAccount().getUserAccount(user_id)
+    if account is None:
+        return jsonify({"success": False, "message": "Account not found"}), 404
+    return jsonify({
+        "success": True,
+        "data": {
+            "full_name": account.full_name,
+            "email_address": account.email_address,
+            "phone_number": account.phone_number,
+            "address": account.address,
+            "user_type": account.user_type,
+            "account_status": account.account_status
+        }
+    }), 200
+    
+    
+'''
+User Story #10: As a user admin, I want to update the user account so that I can ensure the information is the latest.
+'''
+# BCE BOUNDARY: UpdateUserAccount — render update form
+# Passes user_id (email address) to the template so it can pre-fill and submit correctly.
+@admin_profiles_bp.route('/updateaccount/<user_id>', methods=['GET'])
+def render_update_account_page(user_id):
+    return render_template('user_admin/UserAdminUpdateAccount.html', user_id=user_id)
+
+# BCE BOUNDARY: UpdateUserAccount
+class UpdateUserAccount:
+    def __init__(self):
+        self.controller = UpdateUserAccountController()
+
+    def updateUserAccount(self, email_address: str, data: dict) -> bool:
+        return self.controller.updateUserAccount(email_address, data)
+
+update_user_account = UpdateUserAccount()
+
+# BCE BOUNDARY: UpdateUserAccount — PUT /admin/api/users/<email>
+@admin_profiles_bp.route('/api/users/<path:user_id>', methods=['PUT'])
+def update_user_account_api(user_id):
+    data = request.get_json()
+
+    if not data:
+        return jsonify({"success": False, "message": "No data provided"}), 400
+
+    success = update_user_account.updateUserAccount(user_id, data)
+
+    if success:
+        return jsonify({"success": True, "message": f"Account {user_id} updated successfully"}), 200
+    else:
+        return jsonify({"success": False, "message": "Failed to update account in database"}), 500
+
+
+'''
+User Story #11: As a user admin, I want to suspend a user account so that I can prevent unauthorised access.
+'''
 # BCE BOUNDARY: SuspendUserAccount
 class SuspendUserAccount:
     def __init__(self):
@@ -346,26 +321,6 @@ class SuspendUserAccount:
         else:
             return self.displaySuspendFail()
         
-@admin_profiles_bp.route('/create_account', methods=['GET'])
-def show_create_account():
-    return render_template('user_admin/UserAdminCreateUserAccount.html')
-
-
-@admin_profiles_bp.route('/create_account', methods=['POST'])
-def create_user_account_route():
-    data = request.get_json()
-    email = data.get('email', '').strip()
-    name = data.get('name', '').strip()
-    phone = data.get('phone', '').strip()
-    address = data.get('address', '').strip()
-    hash_password = data.get('password', '').strip()
-    account_status = data.get('account_status', '').strip()
-    user_type = data.get('user_type', '').strip()
-    if UserAccount.userAccountExists(email):
-        return jsonify({"success": False, "message": "User account already exists."}), 400
-    message = CreateUserAccount().clickCreateAccount(name, email, phone, address, user_type, account_status, hash_password)
-    return jsonify({'message': message})
-
 @admin_profiles_bp.route('/suspend_account', methods=['POST'])
 def suspend_account():
     data = request.get_json()
@@ -374,4 +329,77 @@ def suspend_account():
     print("Email to suspend:", email_address)
     message = SuspendUserAccount().suspendUserAccount(email_address)
     return jsonify({'message': message})
+
+
+'''
+User Story #12: As a user admin, I want to search a user account by name so that I can get a user's information quickly.
+'''
+# BCE BOUNDARY: SearchUserAccount
+class SearchUserAccount:
+    def __init__(self):
+        self.controller = SearchUserAccountController()
+
+    def searchUserAccounts(self, query: str) -> List[UserAccount]:
+        return self.controller.searchUserAccounts(query)
+
+# BCE BOUNDARY: SearchUserAccount — GET /admin/api/accounts?q=<query>
+# Returns JSON list of matching accounts for the accounts page search.
+@admin_profiles_bp.route('/api/accounts', methods=['GET'])
+def search_user_accounts_api():
+    query = request.args.get('q', '').strip()
+    accounts = SearchUserAccount().searchUserAccounts(query)
+    data = [
+        {
+            "full_name": a.full_name,
+            "email_address": a.email_address,
+            "user_type": a.user_type,
+            "account_status": a.account_status
+        }
+        for a in accounts
+    ]
+    return jsonify(data), 200
+
+
+class DisplayUserProfile:
+    def __init__(self):
+        self.controller = DisplayUserProfileController()
+
+    def displayUserProfile(self) -> List[UserProfile]:
+        return self.controller.displayUserProfile()
+
+@admin_profiles_bp.route('/userprofile')
+def user_profile_list():
+    display_profile = DisplayUserProfile()
+    profiles = display_profile.displayUserProfile()
+    message = request.args.get('message')
+    return render_template('user_admin/UserAdminProfiles.html', profiles=profiles, message=message)
+
+
+# BCE BOUNDARY: GetUserAccount (for pre-filling the update form)
+class GetUserAccount:
+    def __init__(self):
+        self.controller = GetUserAccountController()
+
+    def getUserAccount(self, email_address: str) -> UserAccount | None:
+        return self.controller.getUserAccount(email_address)
+
+# BCE BOUNDARY: SearchUserAccount — renders accounts page
+@admin_profiles_bp.route('/useraccount', methods=['GET'])
+def user_account_list():
+    return render_template('user_admin/UserAdminAccounts.html')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

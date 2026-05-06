@@ -12,31 +12,10 @@ class UserProfile:
     status: int
     description: str = " "
 
-    @staticmethod
-    def getProfile(profile_name:str) -> "UserProfile":
-        conn, cur = connect_db()
-        # check if need use ? to replace value
-        res = cur.execute("SELECT * FROM user_profile WHERE name = ? ", (profile_name,))
-        row = res.fetchone()
-        name, access, status, description = row
-        conn.close()
 
-
-        return UserProfile(name, access, status, description) 
-
-
-
-    @staticmethod
-    def getUserProfiles() -> List["UserProfile"]:
-        conn, cur = connect_db()
-        rows = cur.execute("SELECT * FROM user_profile").fetchall()
-        conn.close()
-
-        return [
-            UserProfile(name, access, status, description)
-            for name, access, status, description in rows
-        ]
-
+    '''
+    User Story #3: As a user admin, I want to create user profile so that I can handle different types of user.
+    '''
     @staticmethod
     def userProfileExists(name: str) -> bool:
         conn, cur = connect_db()
@@ -68,50 +47,93 @@ class UserProfile:
         except Exception as e:
             print("Error:", e)
             return False
-@staticmethod
-def updateUserProfile(user_profile_name: str, new_name: str, new_access_level: int, new_description: str) -> bool:
-    """
-    Updates the profile name, access level, and description in the database.
-    """
-    conn, cur = connect_db()
-    try:
-        cur.execute(
-            "UPDATE user_profile SET name = ?, access = ?, description = ? WHERE name = ?",
-            (new_name, new_access_level, new_description, user_profile_name)
-        )
-        conn.commit()
-        return True
-    except Exception as e:
-        print(f"Database error: {e}")
-        return False
-    finally:
+    
+    
+    '''
+    User Story #4: As a user admin, I want to view user profile so that I can view the different types of user profiles.
+    '''
+    @staticmethod
+    def getProfile(profile_name:str) -> "UserProfile":
+        conn, cur = connect_db()
+        # check if need use ? to replace value
+        res = cur.execute("SELECT * FROM user_profile WHERE name = ? ", (profile_name,))
+        row = res.fetchone()
+        name, access, status, description = row
         conn.close()
 
+        return UserProfile(name, access, status, description) 
 
-@staticmethod
-def suspendProfile(user_profile_name : str) -> bool:
-    conn, cur = None, None
 
-    try:
+    '''
+    User Story #5: As a user admin, I want to update user profile so that I can make changes to user profile.
+    '''
+    @staticmethod
+    def updateUserProfile(user_profile_name: str, new_name: str, new_access_level: int, new_description: str) -> bool:
+        """
+        Updates the profile name, access level, and description in the database.
+        """
         conn, cur = connect_db()
-        cur.execute("""
-            UPDATE user_profile
-            SET status = 0
-            WHERE name = ?
-    """, (user_profile_name,))
-        
-        conn.commit() 
-        if cur.rowcount == 0: 
-            return False
-        else:
+        try:
+            cur.execute(
+                "UPDATE user_profile SET name = ?, access_level = ?, description = ? WHERE name = ?",
+                (new_name, new_access_level, new_description, user_profile_name)
+            )
+            conn.commit()
             return True
-    
-    except Exception:
-        return False
-    
-    finally:
-        if cur:
-            cur.close()
-        if conn:
+        except Exception as e:
+            print(f"Database error: {e}")
+            return False
+        finally:
             conn.close()
+
+    
+    '''
+    User Story #6: As a user admin, I want to suspend a user profile so that I can maintain user access.
+    '''
+    @staticmethod
+    def suspendProfile(user_profile_name : str) -> bool:
+        conn, cur = None, None
+
+        try:
+            conn, cur = connect_db()
+            cur.execute("""
+                UPDATE user_profile
+                SET status = 0
+                WHERE name = ?
+        """, (user_profile_name,))
+            
+            conn.commit() 
+            if cur.rowcount == 0: 
+                return False
+            else:
+                return True
+        
+        except Exception:
+            return False
+        
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
+        
+
+    '''
+    User Story #7: As a user admin, I want to search for user profile using a search bar so that I can search for a specific user profile.
+    '''
+    @staticmethod
+    def getUserProfiles() -> List["UserProfile"]:
+        conn, cur = connect_db()
+        rows = cur.execute("SELECT * FROM user_profile").fetchall()
+        conn.close()
+
+        return [
+            UserProfile(name, access, status, description)
+            for name, access, status, description in rows
+        ]
+
+    
+
+
+
 

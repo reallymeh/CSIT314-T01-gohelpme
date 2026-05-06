@@ -15,7 +15,9 @@ class UserAccount:
     account_status: int
     password: str
 
-    # Create user account
+    '''
+    User Story #8: As a user admin, I want to create user account so that new users can access the platform.
+    '''
     @staticmethod
     def createUserAccount(full_name: str, email_address: str, phone_number: str, address: str, user_type: str, account_status: int, password: str) -> bool:
         try:
@@ -35,6 +37,112 @@ class UserAccount:
         finally:
             conn.close()
 
+
+    '''
+    User Story #9: As a user admin, I want to view user account so that I can view the user's details.
+    '''
+    @staticmethod
+    def getAccount(account_name: str) -> UserAccount | None:
+        """Fetch account by full_name (used by ViewUserAccount)."""
+        conn, cur = connect_db()
+        row = cur.execute(
+            "SELECT full_name, email_address, phone_number, address, user_type, account_status, password "
+            "FROM user_account WHERE full_name = ?", (account_name,)
+        ).fetchone()
+        cur.close()
+        conn.close()
+        if row is None:
+            return None
+        return UserAccount(row[0], row[1], row[2], row[3], row[4], row[5], row[6])
+
+
+    '''
+    User Story #10: As a user admin, I want to update the user account so that I can ensure the information is the latest.
+    '''
+    @staticmethod
+    def updateUserAccount(email_address: str, user_data: 'UserAccount') -> bool:
+        """
+        Updates the user account in the database, identified by email_address (primary key).
+        Password is only updated when a non-empty value is supplied.
+        """
+        conn, cur = connect_db()
+        try:
+            if user_data.password:
+                cur.execute(
+                    """UPDATE user_account
+                    SET full_name = ?, email_address = ?, phone_number = ?, address = ?,
+                        user_type = ?, account_status = ?, password = ?
+                    WHERE email_address = ?""",
+                    (user_data.full_name, user_data.email_address, user_data.phone_number,
+                     user_data.address, user_data.user_type, user_data.account_status,
+                     user_data.password, email_address)
+                )
+            else:
+                cur.execute(
+                    """UPDATE user_account
+                    SET full_name = ?, email_address = ?, phone_number = ?, address = ?,
+                        user_type = ?, account_status = ?
+                    WHERE email_address = ?""",
+                    (user_data.full_name, user_data.email_address, user_data.phone_number,
+                     user_data.address, user_data.user_type, user_data.account_status,
+                     email_address)
+                )
+            conn.commit()
+            return cur.rowcount > 0
+        except Exception as e:
+            print(f"Database error updating user account: {e}")
+            return False
+        finally:
+            conn.close()
+            
+    '''
+    User Story #11: As a user admin, I want to suspend a user account so that I can prevent unauthorised access.
+    '''        
+    @staticmethod
+    def suspendAccount(email_address: str) -> bool:
+        """Sets account_status = 0 for the given email address."""
+        conn, cur = None, None
+        try:
+            conn, cur = connect_db()
+            cur.execute(
+                "UPDATE user_account SET account_status = 0 WHERE email_address = ?",
+                (email_address,)
+            )
+            conn.commit()
+            return cur.rowcount > 0
+        except Exception:
+            return False
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
+                
+    
+    '''
+    User Story #12: As a user admin, I want to search a user account by name so that I can get a user's information quickly.
+    '''
+    @staticmethod
+    def searchAccounts(query: str) -> List['UserAccount']:
+        """Search accounts by full_name (case-insensitive partial match). Empty query returns all."""
+        conn, cur = connect_db()
+        if query and query.strip():
+            cur.execute(
+                "SELECT full_name, email_address, phone_number, address, user_type, account_status, password "
+                "FROM user_account WHERE LOWER(full_name) LIKE ?",
+                (f"%{query.strip().lower()}%",)
+            )
+        else:
+            cur.execute(
+                "SELECT full_name, email_address, phone_number, address, user_type, account_status, password "
+                "FROM user_account"
+            )
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
+        return [UserAccount(r[0], r[1], r[2], r[3], r[4], r[5], r[6]) for r in rows]
+
+
     @staticmethod
     def userAccountExists(email_address: str) -> bool:
         conn, cur = connect_db()
@@ -45,6 +153,9 @@ class UserAccount:
         conn.close()
         return row is not None
 
+    '''
+    User Story #13: As a user admin, I want to log in my user account so that I can access the platform.
+    '''
     @staticmethod
     def login(email_address: str, password: str) -> bool:
         conn, cur = connect_db()
@@ -87,92 +198,9 @@ class UserAccount:
             return None
         return UserAccount(row[0], row[1], row[2], row[3], row[4], row[5], row[6])
 
-    @staticmethod
-    def searchAccounts(query: str) -> List['UserAccount']:
-        """Search accounts by full_name (case-insensitive partial match). Empty query returns all."""
-        conn, cur = connect_db()
-        if query and query.strip():
-            cur.execute(
-                "SELECT full_name, email_address, phone_number, address, user_type, account_status, password "
-                "FROM user_account WHERE LOWER(full_name) LIKE ?",
-                (f"%{query.strip().lower()}%",)
-            )
-        else:
-            cur.execute(
-                "SELECT full_name, email_address, phone_number, address, user_type, account_status, password "
-                "FROM user_account"
-            )
-        rows = cur.fetchall()
-        cur.close()
-        conn.close()
-        return [UserAccount(r[0], r[1], r[2], r[3], r[4], r[5], r[6]) for r in rows]
+    
+    
+    
 
-    @staticmethod
-    def updateUserAccount(email_address: str, user_data: 'UserAccount') -> bool:
-        """
-        Updates the user account in the database, identified by email_address (primary key).
-        Password is only updated when a non-empty value is supplied.
-        """
-        conn, cur = connect_db()
-        try:
-            if user_data.password:
-                cur.execute(
-                    """UPDATE user_account
-                    SET full_name = ?, email_address = ?, phone_number = ?, address = ?,
-                        user_type = ?, account_status = ?, password = ?
-                    WHERE email_address = ?""",
-                    (user_data.full_name, user_data.email_address, user_data.phone_number,
-                     user_data.address, user_data.user_type, user_data.account_status,
-                     user_data.password, email_address)
-                )
-            else:
-                cur.execute(
-                    """UPDATE user_account
-                    SET full_name = ?, email_address = ?, phone_number = ?, address = ?,
-                        user_type = ?, account_status = ?
-                    WHERE email_address = ?""",
-                    (user_data.full_name, user_data.email_address, user_data.phone_number,
-                     user_data.address, user_data.user_type, user_data.account_status,
-                     email_address)
-                )
-            conn.commit()
-            return cur.rowcount > 0
-        except Exception as e:
-            print(f"Database error updating user account: {e}")
-            return False
-        finally:
-            conn.close()
-    @staticmethod
-    def suspendAccount(email_address: str) -> bool:
-        """Sets account_status = 0 for the given email address."""
-        conn, cur = None, None
-        try:
-            conn, cur = connect_db()
-            cur.execute(
-                "UPDATE user_account SET account_status = 0 WHERE email_address = ?",
-                (email_address,)
-            )
-            conn.commit()
-            return cur.rowcount > 0
-        except Exception:
-            return False
-        finally:
-            if cur:
-                cur.close()
-            if conn:
-                conn.close()
-
-def getAccount(account_name: str) -> UserAccount | None:
-    """Fetch account by full_name (used by ViewUserAccount)."""
-    conn, cur = connect_db()
-    row = cur.execute(
-        "SELECT full_name, email_address, phone_number, address, user_type, account_status, password "
-        "FROM user_account WHERE full_name = ?", (account_name,)
-    ).fetchone()
-    cur.close()
-    conn.close()
-    if row is None:
-        return None
-    return UserAccount(row[0], row[1], row[2], row[3], row[4], row[5], row[6])
 
 
