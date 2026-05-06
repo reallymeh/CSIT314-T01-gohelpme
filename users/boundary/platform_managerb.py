@@ -46,7 +46,7 @@ class ViewFRACategoryBoundary:
         self.controller = ViewFRACategoryController()
 
     # viewFRACategory(): FRACategory — receives category_name and returns FRACategory from controller
-    def viewFRACategory(self, category_name: str) -> FRACategory:
+    def viewFRACategory(self, category_name: str) -> FRACategory | None:
         return self.controller.viewFRACategory(category_name)
 
 @platform_manager_bp.route('/viewcategory/<category_name>', methods=['GET'])
@@ -67,7 +67,7 @@ class UpdateFRACategoryBoundary:
     def __init__(self):
         self.controller = UpdateFRACategoryController()
     
-    def displayUpdateSucess(self):
+    def displayUpdateSuccess(self):
         message = "Update Successful!"
         return {"success": True, "message": message}
 
@@ -77,7 +77,7 @@ class UpdateFRACategoryBoundary:
     
     def updateFRACategory(self, old_name:str, new_name:str, description: str, status:int) -> FRACategory:
         if self.controller.updateFRACategory(old_name, new_name, description, status):
-            return self.displayUpdateSucess()
+            return self.displayUpdateSuccess()
         
         else:
             return self.displayUpdateFail()
