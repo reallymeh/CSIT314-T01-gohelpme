@@ -93,13 +93,13 @@
                 </div>
 
                 <div class="field-row" style="padding:10px 24px;">
-                    <span class="field-label">Target Quantity</span>
-                    <span class="field-val"> {{S$ "{:,}".format(fra.target_amount) }}</span>
+                    <span class="field-label">Target Amount</span>
+                    <span class="field-val"> S$ {{ "{:,}".format(fra.target_amount) }}</span>
                 </div>
 
                 <div class="field-row" style="padding:10px 24px;">
-                    <span class="field-label">Total Contribution</span>
-                    <span class="field-val"> {{S$ "{:,}".format(fra.collected_amount) }}</span>
+                    <span class="field-label">Amount Donated</span>
+                    <span class="field-val"> S$ {{ "{:,}".format(fra.collected_amount) }}</span>
                 </div>
 
                 <!-- Progress bar -->
