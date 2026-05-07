@@ -42,12 +42,12 @@ class UserAccount:
     User Story #9: As a user admin, I want to view user account so that I can view the user's details.
     '''
     @staticmethod
-    def getAccount(account_name: str) -> UserAccount | None:
-        """Fetch account by full_name (used by ViewUserAccount)."""
+    def getAccount(email_address: str) -> UserAccount | None:
+        """Fetch account by email (used by ViewUserAccount)."""
         conn, cur = connect_db()
         row = cur.execute(
             "SELECT full_name, email_address, phone_number, address, user_type, account_status, password "
-            "FROM user_account WHERE full_name = ?", (account_name,)
+            "FROM user_account WHERE email_address = ?", (email_address,)
         ).fetchone()
         cur.close()
         conn.close()
@@ -143,16 +143,6 @@ class UserAccount:
         return [UserAccount(r[0], r[1], r[2], r[3], r[4], r[5], r[6]) for r in rows]
 
 
-    @staticmethod
-    def userAccountExists(email_address: str) -> bool:
-        conn, cur = connect_db()
-        row = cur.execute(
-            "SELECT 1 FROM user_account WHERE LOWER(TRIM(email_address)) = LOWER(TRIM(?))",
-            (email_address,)
-        ).fetchone()
-        conn.close()
-        return row is not None
-
     '''
     User Story #13: As a user admin, I want to log in my user account so that I can access the platform.
     '''
@@ -183,6 +173,8 @@ class UserAccount:
             return result[0]
         return None
 
+
+# users/entity/useraccount.py
     @staticmethod
     def getAccountByEmail(email_address: str) -> 'UserAccount | None':
         """Fetch a single account by email address (primary key)."""
@@ -198,7 +190,15 @@ class UserAccount:
             return None
         return UserAccount(row[0], row[1], row[2], row[3], row[4], row[5], row[6])
 
-    
+    @staticmethod
+    def userAccountExists(email_address: str) -> bool:
+        conn, cur = connect_db()
+        row = cur.execute(
+            "SELECT 1 FROM user_account WHERE LOWER(TRIM(email_address)) = LOWER(TRIM(?))",
+            (email_address,)
+        ).fetchone()
+        conn.close()
+        return row is not None
     
     
 

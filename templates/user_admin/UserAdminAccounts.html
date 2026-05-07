@@ -61,117 +61,107 @@
     </div>
 
     <script>
-        // BCE BOUNDARY: SearchUserAccount
-        // Calls GET /admin/api/accounts?q=<input> → SearchUserAccountController → UserAccount.searchAccounts()
-        async function searchAccount(event) {
-            event.preventDefault();
-            const input = document.getElementById('search-input').value.trim();
+    // BCE BOUNDARY: SearchUserAccount
+    async function searchAccount(event) {
+        if (event) event.preventDefault();
+        const input = document.getElementById('search-input').value.trim();
 
-            try {
-                const response = await fetch('/admin/api/accounts?q=' + encodeURIComponent(input));
-                if (!response.ok) throw new Error('Server error');
-                const accounts = await response.json();
+        try {
+            const response = await fetch('/admin/api/accounts?q=' + encodeURIComponent(input));
+            if (!response.ok) throw new Error('Server error');
+            const accounts = await response.json();
 
-                if (accounts.length === 0) {
-                    displaySearchFail();
-                } else {
-                    displaySearchResult(accounts);
-                }
-            } catch (error) {
-                console.error('Search failed:', error);
-                document.getElementById('empty-state').style.display = 'block';
-                document.getElementById('empty-state').querySelector('.empty-text').textContent =
-                    'Failed to connect to the server. Please try again.';
-                document.getElementById('results-grid').style.display = 'none';
+            if (accounts.length === 0) {
+                displaySearchFail();
+            } else {
+                displaySearchResult(accounts);
             }
-        }
-
-        // BCE BOUNDARY: displaySearchResult()
-        // Renders account cards dynamically from the accounts array returned by the controller.
-        function displaySearchResult(accounts) {
-            document.getElementById('empty-state').style.display = 'none';
-            const grid = document.getElementById('results-grid');
-            grid.innerHTML = '';
-
-            accounts.forEach(account => {
-                const initials = account.full_name
-                    .split(' ')
-                    .map(w => w[0])
-                    .join('')
-                    .substring(0, 2)
-                    .toUpperCase();
-
-                const userTypeClass = account.user_type
-                    ? 'icon-' + account.user_type.toLowerCase().replace(/\s+/g, '_')
-                    : 'icon-default';
-
-                const statusLabel = account.account_status === 1 ? 'Active' : 'Inactive';
-
-                const card = document.createElement('div');
-                card.className = 'account-card';
-                card.innerHTML = `
-                    <div class="card-top">
-                        <div class="icon-circle ${userTypeClass}">${initials}</div>
-                        <div>
-                            <div class="card-name">${account.full_name}</div>
-                            <div class="card-desc">${account.user_type} &mdash; ${statusLabel}</div>
-                        </div>
-                    </div>
-                    <div class="card-actions">
-                        <button class="act-btn view"
-                            onclick="window.location.href='/admin/viewaccount/${encodeURIComponent(account.full_name)}'">
-                            View
-                        </button>
-                        <button class="act-btn"
-                            onclick="window.location.href='/admin/updateaccount/${encodeURIComponent(account.email_address)}'">
-                            Update
-                        </button>
-                        <button class="act-btn danger"
-                            onclick="suspendAccount('${account.email_address}', '${account.full_name}')">
-                            Suspend
-                        </button>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-
-            grid.style.display = 'grid';
-        }
-
-        // BCE BOUNDARY: displaySearchFail()
-        // Called when SearchUserAccountController returns an empty list.
-        function displaySearchFail() {
-            document.getElementById('results-grid').style.display = 'none';
-            document.getElementById('results-grid').innerHTML = '';
+        } catch (error) {
+            console.error('Search failed:', error);
             document.getElementById('empty-state').style.display = 'block';
             document.getElementById('empty-state').querySelector('.empty-text').textContent =
-                'No accounts found for that name.';
+                'Failed to connect to the server. Please try again.';
+            document.getElementById('results-grid').style.display = 'none';
         }
+    }
 
-        // BCE BOUNDARY: SuspendUserAccount
-        // BACKEND: Hook to POST /admin/suspend_account → SuspendUserAccount boundary
-        function suspendAccount(emailAddress, fullName) {
-            if (confirm("Are you sure you want to suspend " + fullName + "?")) {
-                fetch('/admin/suspend_account', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email_address: emailAddress })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                    document.getElementById('search-form').dispatchEvent(new Event('submit'));
-                })
-                .catch(() => alert('Failed to suspend account. Please try again.'));
-            }
+    // BCE BOUNDARY: displaySearchResult()
+    function displaySearchResult(accounts) {
+        document.getElementById('empty-state').style.display = 'none';
+        const grid = document.getElementById('results-grid');
+        grid.innerHTML = '';
+
+        accounts.forEach(account => {
+            const initials = account.full_name
+                ? account.full_name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase()
+                : 'U';
+
+            const userTypeClass = account.user_type
+                ? 'icon-' + account.user_type.toLowerCase().replace(/\s+/g, '_')
+                : 'icon-default';
+
+            const statusLabel = account.account_status === 1 ? 'Active' : 'Inactive';
+
+            const card = document.createElement('div');
+            card.className = 'account-card';
+            card.innerHTML = `
+                <div class="card-top">
+                    <div class="icon-circle ${userTypeClass}">${initials}</div>
+                    <div>
+                        <div class="card-name">${account.full_name}</div>
+                        <div class="card-desc">${account.user_type} &mdash; ${statusLabel}</div>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="act-btn view"
+                        onclick="window.location.href='/admin/viewaccount/${encodeURIComponent(account.email_address)}'">
+                        View
+                    </button>
+                    <button class="act-btn"
+                        onclick="window.location.href='/admin/updateaccount/${encodeURIComponent(account.email_address)}'">
+                        Update
+                    </button>
+                    <button class="act-btn danger"
+                        onclick="suspendAccount('${account.email_address}', '${account.full_name}')">
+                        Suspend
+                    </button>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+
+        grid.style.display = 'grid';
+    }
+
+    // BCE BOUNDARY: displaySearchFail()
+    function displaySearchFail() {
+        document.getElementById('results-grid').style.display = 'none';
+        document.getElementById('results-grid').innerHTML = '';
+        document.getElementById('empty-state').style.display = 'block';
+        document.getElementById('empty-state').querySelector('.empty-text').textContent =
+            'No accounts found.';
+    }
+
+    // BCE BOUNDARY: SuspendUserAccount
+    function suspendAccount(emailAddress, fullName) {
+        if (confirm("Are you sure you want to suspend " + fullName + "?")) {
+            fetch('/admin/suspend_account', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email_address: emailAddress })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                searchAccount(); // Refresh list dynamically
+            })
+            .catch(() => alert('Failed to suspend account. Please try again.'));
         }
-        window.onload = async function () {
-        const accounts = await fetch('/admin/api/accounts?q=').then(r => r.json());
-        if (accounts.length === 0) {
-            displaySearchFail();
-        } else {
-            displaySearchResult(accounts);
-        }
+    }
+
+    // Load initial accounts list
+    window.onload = function() {
+        searchAccount();
     };
     </script>
 

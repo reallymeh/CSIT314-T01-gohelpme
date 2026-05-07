@@ -236,12 +236,12 @@ class ViewUserAccount:
     def displayViewFail(self):
         return None
 
-    def viewUserAccount(self, account_name: str) -> UserAccount | None:
-        return self.controller.viewUserAccount(account_name)
+    def viewUserAccount(self, email_address: str) -> UserAccount | None:
+        return self.controller.viewUserAccount(email_address)
 
-@admin_profiles_bp.route('/viewaccount/<account_name>', methods=['GET'])
-def view_account(account_name):
-    account = ViewUserAccount().viewUserAccount(account_name)
+@admin_profiles_bp.route('/viewaccount/<email_address>', methods=['GET'])
+def view_account(email_address):
+    account = ViewUserAccount().viewUserAccount(email_address)
     if account is None:
         return redirect(url_for('admin_view_profile.user_account_list'))
     return render_template('user_admin/UserAdminViewAccount.html', account=account)

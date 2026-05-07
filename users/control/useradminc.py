@@ -76,8 +76,8 @@ User Story #9: As a user admin, I want to view user account so that I can view t
 '''
 # BCE CONTROLLER: ViewUserAccountController
 class ViewUserAccountController:
-    def viewUserAccount(self, account_name: str) -> UserAccount | None:
-        return UserAccount.getAccount(account_name)
+    def viewUserAccount(self, email_address: str) -> UserAccount | None:
+        return UserAccount.getAccount(email_address)
 
 
 '''
