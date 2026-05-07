@@ -69,6 +69,8 @@ class CreateUserAccountController:
         if not email_address or not password:
             return False
         return UserAccount.createUserAccount(full_name, email_address, phone_number, address, user_type, account_status, password)
+    def userAccountExists(self, email_address: str) -> bool:
+        return UserAccount.getAccount(email_address) is not None
 
 
 '''

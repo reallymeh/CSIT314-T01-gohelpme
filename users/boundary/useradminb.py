@@ -195,6 +195,8 @@ class CreateUserAccount:
         self.controller = CreateUserAccountController()
 
     def clickCreateAccount(self, full_name: str, email_address: str, phone_number: str, address: str, user_type: str, account_status: int, password: str):
+        if self.controller.userAccountExists(email_address):
+            return jsonify({"success": False, "message": "User account already exists."}), 400
         if self.controller.createUserAccount(full_name, email_address, phone_number, address, user_type, account_status, password):
             return self.displaySuccess()
         else:
@@ -216,8 +218,7 @@ def create_user_account_route():
     hash_password = data.get('password', '').strip()
     account_status = data.get('account_status', '').strip()
     user_type = data.get('user_type', '').strip()
-    if UserAccount.userAccountExists(email):
-        return jsonify({"success": False, "message": "User account already exists."}), 400
+    
     message = CreateUserAccount().clickCreateAccount(name, email, phone, address, user_type, account_status, hash_password)
     return jsonify({'message': message})
 

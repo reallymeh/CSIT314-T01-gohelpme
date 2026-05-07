@@ -42,7 +42,7 @@ class UserAccount:
     User Story #9: As a user admin, I want to view user account so that I can view the user's details.
     '''
     @staticmethod
-    def getAccount(email_address: str) -> UserAccount | None:
+    def getAccount(email_address: str) -> 'UserAccount | None':
         """Fetch account by email (used by ViewUserAccount)."""
         conn, cur = connect_db()
         row = cur.execute(
