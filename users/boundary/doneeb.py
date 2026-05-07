@@ -11,7 +11,7 @@ from users.control.doneec import (
     ViewDonationHistoryController,
     SearchDonationHistoryController,
 )
-from users.entity.fra_view import FRAView
+from users.control.fundraiserc import ViewFRAViewStatsController
 
 donee_bp = Blueprint('donee', __name__, url_prefix='/donee')
 
@@ -162,7 +162,7 @@ def view_fra(fraId):
     if not fra:
         return redirect(url_for('donee.dashboard'))
 
-    FRAView.recordView(fraId, donee_email, fra["created_by"], fra["title"], fra["category"])
+    ViewFRAViewStatsController.recordView(fraId, donee_email, fra["created_by"], fra["title"], fra["category"])
 
     is_fav = page.fav_controller.isFavourited(donee_email, fraId)
     return render_template('donee/DoneeViewFRA.html', fra=fra, is_favourited=is_fav)

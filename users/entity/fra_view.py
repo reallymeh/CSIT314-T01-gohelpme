@@ -62,7 +62,10 @@ class FRAView:
       finally:
          cur.close()
          conn.close()
-
+   
+   '''
+   User Story #20: As a Fund Raiser, I want to view the number of views of a FRA so that I can analyze the view of a FRA and adjust my strategy to attract more donees.
+   '''
    @staticmethod
    def recordView(fraId: str, viewer_email: str, owner_email: str, fra_name: str, fra_category: str) -> bool:
       if not fraId or not viewer_email:

@@ -94,13 +94,17 @@ class SearchFRAController:
 
     def searchFRA(self, name: str) -> list:
         return FRA.searchFRA(name)
-
+    
 '''
 User Story #20: As a Fund Raiser, I want to view the number of views of a FRA so that I can analyze the view of a FRA and adjust my strategy to attract more donees.
 '''
 class ViewFRAViewStatsController:
     def getStats(self, fraId):
         return FRAView.getViewStatsByDateAndUser(fraId)
+
+    @staticmethod
+    def recordView(fraId, viewer_email, owner_email, fra_name, fra_category):
+        return FRAView.recordView(fraId, viewer_email, owner_email, fra_name, fra_category)
 '''
 User Story #21: As a Fund Raiser, I want to view the number of times a FRA is shortlisted so that I can know how many people are interested in this FRA.
 '''

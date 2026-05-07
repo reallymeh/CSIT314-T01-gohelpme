@@ -1,8 +1,7 @@
 # FRA Boundary
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session
 from typing import List
-from users.control.fundraiserc import CreateFRAController, DisplayFRAController, ViewFRAController, UpdateFRAController, SuspendFRAController, SearchFRAController, SearchCompletedFRAHistoryController, ViewCompletedFRAController, ViewFRAShortlistCountController,  ViewFRAViewStatsController
-from users.entity.fra_view import FRAView
+from users.control.fundraiserc import CreateFRAController, DisplayFRAController, ViewFRAController, UpdateFRAController, SuspendFRAController, SearchFRAController, SearchCompletedFRAHistoryController, ViewCompletedFRAController, ViewFRAShortlistCountController, ViewFRAViewStatsController
 from users.entity.fracategory import FRACategory
 
 
@@ -224,33 +223,21 @@ User Story #20: As a Fund Raiser,I want to view the number of views of a FRA so 
 '''
 class ViewFRAViewCountPage:
     def __init__(self):
-        self.fra_controller = ViewFRAController()
         self.stats_controller = ViewFRAViewStatsController()
-
     def getStats(self, fraId):
-        fra = self.fra_controller.viewFRA(fraId)
         stats = self.stats_controller.getStats(fraId)
-
         total_views = sum(stat['count'] for stat in stats) if stats else 0
-
         return {
-            "fra": fra,
             "stats": stats,
             "total_views": total_views
         }
     
 @fundraiser_bp.route('/viewCount/<fraId>', methods=['GET'])
 def view_fra_view_count(fraId):
-
     page = ViewFRAViewCountPage()
     data = page.getStats(fraId)
-
-    if not data["fra"]:
-        return redirect(url_for('fundraiser.homepage'))
-
     return render_template(
         "fundraiser/FundRaiserViewFRAViewCount.html",
-        fra=data["fra"],
         stats=data["stats"],
         total_views=data["total_views"]
     )
