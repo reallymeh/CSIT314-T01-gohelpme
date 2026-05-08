@@ -65,12 +65,11 @@ class SearchUserProfileController:
 User Story #8: As a user admin, I want to create user account so that new users can access the platform.
 '''
 class CreateUserAccountController:
-    def createUserAccount(self, full_name: str, email_address: str, phone_number: str, address: str, user_type: str, account_status: int, password: str) -> bool:
+    def createUserAccount(self, full_name: str, email_address: str, phone_number: str, address: str, user_type: str, account_status: int, password: str) -> bool | str:
         if not email_address or not password:
             return False
         return UserAccount.createUserAccount(full_name, email_address, phone_number, address, user_type, account_status, password)
-    def userAccountExists(self, email_address: str) -> bool:
-        return UserAccount.getAccount(email_address) is not None
+
 
 
 '''

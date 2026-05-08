@@ -19,12 +19,20 @@ class UserAccount:
     User Story #8: As a user admin, I want to create user account so that new users can access the platform.
     '''
     @staticmethod
-    def createUserAccount(full_name: str, email_address: str, phone_number: str, address: str, user_type: str, account_status: int, password: str) -> bool:
+    def createUserAccount(full_name: str, email_address: str, phone_number: str, address: str, user_type: str, account_status: int, password: str) -> bool | str:
+        conn, cur = None, None
         try:
             if not full_name or not email_address or not phone_number or not address or not user_type or not password:
                 return False
 
             conn, cur = connect_db()
+            cur.execute(
+                "SELECT 1 FROM user_account WHERE LOWER(email_address) = LOWER(?)",
+                (email_address,)
+            )
+            if cur.fetchone():
+                return "duplicate_email"
+
             cur.execute(
                 "INSERT INTO user_account (full_name, email_address, phone_number, address, user_type, account_status, password) VALUES (?, ?, ?, ?, ?, ?, ?)",
                 (full_name, email_address, phone_number, address, user_type, account_status, password)
@@ -35,7 +43,10 @@ class UserAccount:
             print(f"Database error creating user account: {e}")
             return False
         finally:
-            conn.close()
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
 
 
     '''
@@ -190,15 +201,7 @@ class UserAccount:
             return None
         return UserAccount(row[0], row[1], row[2], row[3], row[4], row[5], row[6])
 
-    @staticmethod
-    def userAccountExists(email_address: str) -> bool:
-        conn, cur = connect_db()
-        row = cur.execute(
-            "SELECT 1 FROM user_account WHERE LOWER(TRIM(email_address)) = LOWER(TRIM(?))",
-            (email_address,)
-        ).fetchone()
-        conn.close()
-        return row is not None
+
     
     
 
