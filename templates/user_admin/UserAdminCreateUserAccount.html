@@ -135,15 +135,20 @@
         })
         .then(response => response.json())
         .then(data => {
-            messageBox.style.color = "#3B6D11";
-            messageBox.innerText = "Success: Account created successfully.";
-            setTimeout(() => {
-                window.location.href = '/admin/useraccount';
-            }, 2000);
-                })
-                .catch(() => {
-                    alert("Something went wrong!");
-                });
+            if (data.success) {
+                messageBox.style.color = "#3B6D11";
+                messageBox.innerText = "Success: " + data.message;
+                setTimeout(() => {
+                    window.location.href = '/admin/useraccount';
+                }, 2000);
+            } else {
+                messageBox.style.color = "#A32D2D";
+                messageBox.innerText = "Error: " + data.message;
+            }
+        })
+        .catch(() => {
+            alert("Something went wrong!");
+        });
         
     }
 </script>
