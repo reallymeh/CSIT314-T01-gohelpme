@@ -94,20 +94,22 @@ def init_db():
     
 
     fra_category_data = [
-        ('equipment', 'donation of equipment', 1),
-        ('cash', 'cash donation', 1)
+        ('Education', 'support students, schools, tuition fees, learning materials, or educational programs', 1),
+        ('Medical', 'help cover medical treatments, hospital bills, healthcare expenses, or emergency medical support', 1),
+        ('Charity', 'assist individuals, families, or communities in need with basic necessities, shelter, food, or financial aid', 1)
     ]
     cur.executemany("INSERT OR IGNORE INTO fra_category VALUES(?, ?, ?)", fra_category_data)
     conn.commit()
     
+    
     fra_data = [
-    ("FRA001", "Education Fund 2026", "Support students with tuition fees", "cash", 10000, 4500,
+    ("FRA001", "Education Fund 2026", "Support students with tuition fees", "Education", 10000, 4500,
         "2026-01-01", "2026-12-31", 1, 120, "Admiralty Link Singapore","fundraiser1@email.com"),
-    ("FRA002", "Medical Aid Fund", "Help patients with hospital bills", "cash", 20000, 12300,
+    ("FRA002", "Medical Aid Fund", "Help patients with hospital bills", "Medical", 20000, 12300,
         "2026-02-01", "2026-10-30", 1, 98, "Steven Road Singapore", "fundraiser1@email.com"),
-    ("FRA003", "Charity Relief Fund", "Community support for families", "cash", 5000, 5000,
+    ("FRA003", "Charity Relief Fund", "Community support for families", "Charity", 5000, 5000,
         "2025-05-01","2025-12-31", 0, 210, "Bedok North Singapore", "fundraiser1@email.com"),
-    ("FRA004", "Disaster Relief Fund", "Support for communities affected by disasters", "cash", 15000, 8000,
+    ("FRA004", "Disaster Relief Fund", "Support for communities affected by disasters", "Medical", 15000, 8000,
         "2025-05-01", "2025-12-31", 0, 150, "Choa Chu Kang Singapore", "fundraiser1@email.com")
     ]
     cur.executemany("""INSERT OR IGNORE INTO fra (fraId, title, description, category, target_amount, collected_amount,
