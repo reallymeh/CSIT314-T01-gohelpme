@@ -75,7 +75,7 @@ class UpdateFRACategoryBoundary:
         message = "Update Failed!"
         return {"success": False, "message": message}
     
-    def updateFRACategory(self, old_name:str, new_name:str, description: str, status:int) -> FRACategory:
+    def updateFRACategory(self, old_name:str, new_name:str, description: str, status:int) -> dict:
         if self.controller.updateFRACategory(old_name, new_name, description, status):
             return self.displayUpdateSuccess()
         
