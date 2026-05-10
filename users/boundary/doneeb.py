@@ -131,7 +131,7 @@ class ViewActiveFRAPage:
         self.controller = ViewActiveFRAController()
         self.fav_controller = SaveFavouriteController()
 
-    def displayFRA(self, fraId: str) -> dict | None:
+    def viewActiveFRA(self, fraId: str) -> dict | None:
         return self.controller.viewActiveFRA(fraId)
 
     def displayError(self) -> str:
@@ -151,7 +151,7 @@ def view_fra(fraId):
 
     donee_email = get_donee_email()
     page = ViewActiveFRAPage()
-    fra = page.displayFRA(fraId)
+    fra = page.viewActiveFRA(fraId)
 
     if not fra:
         return redirect(url_for('donee.dashboard'))
