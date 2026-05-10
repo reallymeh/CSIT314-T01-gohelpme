@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from datetime import datetime
 from database import connect_db
 from typing import List
 
@@ -114,8 +113,35 @@ class FRA:
             "created_by": row[12]
         }
 
-        return None    
-    
+        return None
+
+    @staticmethod
+    def viewActiveFRA(fraId: str) -> "FRA":
+        conn, cur = connect_db()
+
+        cur.execute("SELECT * FROM fra WHERE fraId = ? AND status = 1", (fraId,))
+        row = cur.fetchone()
+
+        conn.close()
+
+        if row:
+            return {
+            "fraId": row[1],
+            "title": row[2],
+            "description": row[3],
+            "category": row[4],
+            "target_amount": row[5],
+            "collected_amount": row[6],
+            "start_date": row[7],
+            "end_date": row[8],
+            "status": row[9],
+            "view_count": row[10],
+            "location": row[11],
+            "created_by": row[12]
+        }
+
+        return None
+
     '''
     User Story #17: As a Fund Raiser, I want to update a FRA so that I can show my current status and need.
     '''
@@ -209,10 +235,38 @@ class FRA:
 
         return result
     
+    @staticmethod
+    def searchActiveFRA(name: str) -> list:
+        conn, cur = connect_db()
 
-    '''
-    User Story #1 (Donee): View all active FRAs. Returns all FRAs with status = 1, no filter.
-    '''
+        cur.execute("""
+            SELECT * FROM fra
+            WHERE title LIKE ?
+            AND status = 1
+        """, ('%' + name + '%',))
+
+        rows = cur.fetchall()
+        conn.close()
+
+        result = []
+
+        for row in rows:
+            result.append({
+                "fraId": row[1],
+                "title": row[2],
+                "description": row[3],
+                "category": row[4],
+                "target_amount": row[5],
+                "collected_amount": row[6],
+                "start_date": row[7],
+                "end_date": row[8],
+                "status": row[9],
+                "view_count": row[10],
+                "location": row[11]
+            })
+
+        return result
+
     @staticmethod
     def viewAllActiveFRA() -> list:
         conn, cur = connect_db()

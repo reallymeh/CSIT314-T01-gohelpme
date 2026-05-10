@@ -51,8 +51,8 @@
                        class="search-box"
                        placeholder="Search FRA by name..."
                        style="width:280px;"
-                       onkeydown="if(event.key==='Enter') searchFRA()">
-                <button class="btn-primary" onclick="searchFRA()">Search</button>
+                       onkeydown="if(event.key==='Enter') searchActiveFRA()">
+                <button class="btn-primary" onclick="searchActiveFRA()">Search</button>
             </div>
         </div>
 
@@ -74,10 +74,10 @@
 
 <script>
 /* ── US1: Search active FRAs by name (empty name = view all) ────────────────
-   BCE BOUNDARY: SearchFRAPage
-   Calls POST /donee/api/search_fra → SearchFRAController → FRA.searchActiveFRA()
+   BCE BOUNDARY: SearchActiveFRAPage
+   Calls POST /donee/api/search_fra → SearchActiveFRAController → FRA.searchActiveFRA()
    ─────────────────────────────────────────────────────────────────────────── */
-function searchFRA() {
+function searchActiveFRA() {
     const name = document.getElementById('searchInput').value.trim();
 
     document.getElementById('loading-state').style.display   = 'flex';
@@ -110,7 +110,7 @@ function searchFRA() {
 }
 
 /* ── US2 entry point: clicking View navigates to /donee/view/<fraId> ────────
-   BCE BOUNDARY: ViewFRAPage (rendered in DoneeViewFRA.html)
+   BCE BOUNDARY: ViewActiveFRAPage (rendered in DoneeViewActiveFRA.html)
    ─────────────────────────────────────────────────────────────────────────── */
 function renderFRACards(fras) {
     const container = document.getElementById('fra-container');
@@ -149,7 +149,7 @@ function esc(str) {
 }
 
 // Load all active FRAs on page open (empty search = all)
-window.onload = () => searchFRA();
+window.onload = () => searchActiveFRA();
 </script>
 
 </body>

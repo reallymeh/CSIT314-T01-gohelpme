@@ -47,7 +47,7 @@ class Favourite:
             return False
 
     @staticmethod
-    def isFavourited(donee_email: str, fraId: str) -> bool:
+    def isFavourite(donee_email: str, fraId: str) -> bool:
         """Check whether an FRA is already in the donee's favourite list."""
         conn, cur = connect_db()
         row = cur.execute(

@@ -5,30 +5,26 @@ from users.entity.donationhistory import DonationHistory
 
 
 class ViewAllFRAController:
-    """
-    User Story #1 (Donee): As a Donee, I want to view all active FRAs on the
-    dashboard so that I can browse all available fundraising activities.
-    """
     def viewAllFRA(self) -> list:
         return FRA.viewAllActiveFRA()
 
 
-class SearchFRAController:
+class SearchActiveFRAController:
     """
-    User Story #1 (Donee): As a Donee, I want to search all FRA by name
+    User Story #1 (Donee): As a Donee, I want to search all active FRA by name
     so that I can find a specific FRA that I am interested in.
     """
-    def searchFRA(self, name: str) -> list:
+    def searchActiveFRA(self, name: str) -> list:
         return FRA.searchActiveFRA(name)
 
 
-class ViewFRAController:
+class ViewActiveFRAController:
     """
     User Story #2 (Donee): As a Donee, I want to view a FRA
     so that I can view existing FRA information that needs donation.
     """
-    def viewFRA(self, fraId: str) -> dict | None:
-        return FRA.viewFRA(fraId)
+    def viewActiveFRA(self, fraId: str) -> dict | None:
+        return FRA.viewActiveFRA(fraId)
 
 
 class SaveFavouriteController:
@@ -37,12 +33,12 @@ class SaveFavouriteController:
     so that I can decide a donation later.
     """
     def saveFavourite(self, donee_email: str, fraId: str) -> bool:
-        if Favourite.isFavourited(donee_email, fraId):
+        if Favourite.isFavourite(donee_email, fraId):
             return False  # already saved — not a DB error, just a duplicate
         return Favourite.saveFavourite(donee_email, fraId)
 
-    def isFavourited(self, donee_email: str, fraId: str) -> bool:
-        return Favourite.isFavourited(donee_email, fraId)
+    def isFavourite(self, donee_email: str, fraId: str) -> bool:
+        return Favourite.isFavourite(donee_email, fraId)
 
 
 class RemoveFavouriteController:

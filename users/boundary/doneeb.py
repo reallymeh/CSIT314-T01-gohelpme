@@ -2,8 +2,8 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session
 from users.control.doneec import (
     ViewAllFRAController,
-    SearchFRAController,
-    ViewFRAController,
+    SearchActiveFRAController,
+    ViewActiveFRAController,
     SaveFavouriteController,
     RemoveFavouriteController,
     ViewFavouriteController,
@@ -33,12 +33,6 @@ def require_donee_login():
 # ─────────────────────────────────────────────────────────────────────────────
 
 class ViewAllFRAPage:
-    """
-    Boundary: ViewAllFRAPage
-    User Story #1 (Donee): As a Donee, I want to view all active FRAs on the
-    dashboard so that I can browse all available fundraising activities.
-    Sequence: Donee → ViewAllFRAPage → ViewAllFRAController → FRA
-    """
     def __init__(self):
         self.controller = ViewAllFRAController()
 
@@ -82,18 +76,18 @@ def api_view_all_fra():
 #  US1 — Search all active FRAs by name
 # ─────────────────────────────────────────────────────────────────────────────
 
-class SearchFRAPage:
+class SearchActiveFRAPage:
     """
-    Boundary: SearchFRAPage
-    User Story #1 (Donee): As a Donee, I want to search all FRA by name
+    Boundary: SearchActiveFRAPage
+    User Story #1 (Donee): As a Donee, I want to search all active FRA by name
     so that I can find a specific FRA that I am interested in.
-    Sequence: Donee → SearchFRAPage → SearchFRAController → FRA
+    Sequence: Donee → SearchActiveFRAPage → SearchActiveFRAController → FRA
     """
     def __init__(self):
-        self.controller = SearchFRAController()
+        self.controller = SearchActiveFRAController()
 
-    def searchFRA(self, name: str) -> list:
-        return self.controller.searchFRA(name)
+    def searchActiveFRA(self, name: str) -> list:
+        return self.controller.searchActiveFRA(name)
 
     def displayNoResult(self) -> str:
         return "No active fundraising activities found."
@@ -103,7 +97,7 @@ class SearchFRAPage:
 def api_search_fra():
     """
     API: POST /donee/api/search_fra   Body: { "name": "<search term>" }
-    US1 — SearchFRAPage → SearchFRAController → FRA.searchActiveFRA()
+    US1 — SearchActiveFRAPage → SearchActiveFRAController → FRA.searchActiveFRA()
     """
     guard = require_donee_login()
     if guard:
@@ -112,8 +106,8 @@ def api_search_fra():
     data = request.get_json()
     name = data.get('name', '')
 
-    page = SearchFRAPage()
-    results = page.searchFRA(name)
+    page = SearchActiveFRAPage()
+    results = page.searchActiveFRA(name)
 
     return jsonify({
         "success": True,
@@ -126,19 +120,19 @@ def api_search_fra():
 #  US2 — View a single FRA
 # ─────────────────────────────────────────────────────────────────────────────
 
-class ViewFRAPage:
+class ViewActiveFRAPage:
     """
-    Boundary: ViewFRAPage
+    Boundary: ViewActiveFRAPage
     User Story #2 (Donee): As a Donee, I want to view a FRA
     so that I can view existing FRA information that needs donation.
-    Sequence: Donee → ViewFRAPage → ViewFRAController → FRA
+    Sequence: Donee → ViewActiveFRAPage → ViewActiveFRAController → FRA
     """
     def __init__(self):
-        self.controller = ViewFRAController()
+        self.controller = ViewActiveFRAController()
         self.fav_controller = SaveFavouriteController()
 
     def displayFRA(self, fraId: str) -> dict | None:
-        return self.controller.viewFRA(fraId)
+        return self.controller.viewActiveFRA(fraId)
 
     def displayError(self) -> str:
         return "FRA not found."
@@ -149,14 +143,14 @@ def view_fra(fraId):
     """
     Render the FRA detail page.
     Passes is_favourited flag so the Save button shows the correct state (US3).
-    US2 — ViewFRAPage → ViewFRAController → FRA.viewFRA()
+    US2 — ViewActiveFRAPage → ViewActiveFRAController → FRA.viewActiveFRA()
     """
     guard = require_donee_login()
     if guard:
         return guard
 
     donee_email = get_donee_email()
-    page = ViewFRAPage()
+    page = ViewActiveFRAPage()
     fra = page.displayFRA(fraId)
 
     if not fra:
@@ -164,7 +158,7 @@ def view_fra(fraId):
 
     ViewFRAViewStatsController.recordView(fraId, donee_email, fra["created_by"], fra["title"], fra["category"])
 
-    is_fav = page.fav_controller.isFavourited(donee_email, fraId)
+    is_fav = page.fav_controller.isFavourite(donee_email, fraId)
     return render_template('donee/DoneeViewFRA.html', fra=fra, is_favourited=is_fav)
 
 
@@ -214,7 +208,7 @@ def save_favourite():
 
     page = SaveFavouritePage()
 
-    if page.controller.isFavourited(donee_email, fraId):
+    if page.controller.isFavourite(donee_email, fraId):
         return jsonify({"success": False, "message": page.displayAlreadySaved()})
 
     saved = page.saveFavourite(donee_email, fraId)
