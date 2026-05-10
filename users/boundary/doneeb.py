@@ -29,7 +29,7 @@ def require_donee_login():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  US1 — View all active FRAs (Donee Dashboard)
+#  Donee Dashboard (view all active FRAs)
 # ─────────────────────────────────────────────────────────────────────────────
 
 class ViewAllFRAPage:
@@ -73,13 +73,13 @@ def api_view_all_fra():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  US1 — Search all active FRAs by name
+#  User Story #26 — Search all active FRAs by name
 # ─────────────────────────────────────────────────────────────────────────────
 
 class SearchActiveFRAPage:
     """
     Boundary: SearchActiveFRAPage
-    User Story #1 (Donee): As a Donee, I want to search all active FRA by name
+    User Story #26 (Donee): As a Donee, I want to search all active FRA by name 
     so that I can find a specific FRA that I am interested in.
     Sequence: Donee → SearchActiveFRAPage → SearchActiveFRAController → FRA
     """
@@ -97,7 +97,7 @@ class SearchActiveFRAPage:
 def api_search_fra():
     """
     API: POST /donee/api/search_fra   Body: { "name": "<search term>" }
-    US1 — SearchActiveFRAPage → SearchActiveFRAController → FRA.searchActiveFRA()
+    US26 — SearchActiveFRAPage → SearchActiveFRAController → FRA.searchActiveFRA()
     """
     guard = require_donee_login()
     if guard:
@@ -117,13 +117,13 @@ def api_search_fra():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  US2 — View a single FRA
+#  User Story #27 — View a FRA
 # ─────────────────────────────────────────────────────────────────────────────
 
 class ViewActiveFRAPage:
     """
     Boundary: ViewActiveFRAPage
-    User Story #2 (Donee): As a Donee, I want to view a FRA
+    User Story #27 (Donee): As a Donee, I want to view an active FRA 
     so that I can view existing FRA information that needs donation.
     Sequence: Donee → ViewActiveFRAPage → ViewActiveFRAController → FRA
     """
@@ -142,8 +142,8 @@ class ViewActiveFRAPage:
 def view_fra(fraId):
     """
     Render the FRA detail page.
-    Passes is_favourited flag so the Save button shows the correct state (US3).
-    US2 — ViewActiveFRAPage → ViewActiveFRAController → FRA.viewActiveFRA()
+    Passes is_favourited flag so the Save button shows the correct state (US28).
+    US27 — ViewActiveFRAPage → ViewActiveFRAController → FRA.viewActiveFRA()
     """
     guard = require_donee_login()
     if guard:
@@ -163,14 +163,14 @@ def view_fra(fraId):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  US3 — Save a FRA to favourite list
+#  User Story #28 — Save a FRA to favourite list
 # ─────────────────────────────────────────────────────────────────────────────
 
 class SaveFavouritePage:
     """
     Boundary: SaveFavouritePage
-    User Story #3 (Donee): As a Donee, I want to save a FRA to favourite list
-    so that I can decide a donation later.
+    User Story #28 (Donee): As a Donee, I want to save a FRA to my favourite list
+    so that I can decide on a donation later.
     Sequence: Donee → SaveFavouritePage → SaveFavouriteController → Favourite
     """
     def __init__(self):
@@ -193,7 +193,7 @@ class SaveFavouritePage:
 def save_favourite():
     """
     API: POST /donee/save_favourite   Body: { "fraId": "<FRA001>" }
-    US3 — SaveFavouritePage → SaveFavouriteController → Favourite.saveFavourite()
+    US28 — SaveFavouritePage → SaveFavouriteController → Favourite.saveFavourite()
     """
     guard = require_donee_login()
     if guard:
@@ -216,15 +216,10 @@ def save_favourite():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  US3b — Remove a FRA from favourite list
+# Remove a FRA from favourite list
 # ─────────────────────────────────────────────────────────────────────────────
 
 class RemoveFavouritePage:
-    """
-    Boundary: RemoveFavouritePage
-    User Story #3b (Donee): As a Donee, I want to remove a FRA from my favourite list.
-    Sequence: Donee → RemoveFavouritePage → RemoveFavouriteController → Favourite
-    """
     def __init__(self):
         self.controller = RemoveFavouriteController()
 
@@ -242,7 +237,6 @@ class RemoveFavouritePage:
 def remove_favourite():
     """
     API: POST /donee/remove_favourite   Body: { "fraId": "<FRA001>" }
-    US3b — RemoveFavouritePage → RemoveFavouriteController → Favourite.removeFavourite()
     """
     guard = require_donee_login()
     if guard:
@@ -261,13 +255,13 @@ def remove_favourite():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  US4 — Search FRA in favourite list by name
+#  User Story #29 — Search FRA in favourite list by name
 # ─────────────────────────────────────────────────────────────────────────────
 
 class SearchFavouritePage:
     """
     Boundary: SearchFavouritePage
-    User Story #4 (Donee): As a Donee, I want to search FRA in favourite list by name
+    User Story #29 (Donee): As a Donee, I want to search for an active FRA in my favourite list by name 
     so that I can find a specific FRA within the favourite list.
     Sequence: Donee → SearchFavouritePage → SearchFavouriteController → Favourite
     """
@@ -285,7 +279,7 @@ class SearchFavouritePage:
 def api_search_favourites():
     """
     API: POST /donee/api/search_favourites   Body: { "name": "<search term>" }
-    US4 — SearchFavouritePage → SearchFavouriteController → Favourite.searchFavourites()
+    US29 — SearchFavouritePage → SearchFavouriteController → Favourite.searchFavourites()
     """
     guard = require_donee_login()
     if guard:
@@ -306,13 +300,13 @@ def api_search_favourites():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  US5 — View all FRAs in favourite list
+#  User Story #30 — View all FRAs in favourite list
 # ─────────────────────────────────────────────────────────────────────────────
 
 class ViewFavouritePage:
     """
     Boundary: ViewFavouritePage
-    User Story #5 (Donee): As a Donee, I want to view FRA in favourite list
+    User Story #30 (Donee): As a Donee, I want to view FRA in my favourite list
     so that I can view all FRA within the favourite list.
     Sequence: Donee → ViewFavouritePage → ViewFavouriteListController → Favourite
     """
@@ -339,7 +333,7 @@ def favourites():
 def api_view_favourites():
     """
     API: GET /donee/api/view_favourites
-    US5 — ViewFavouritePage → ViewFavouriteListController → Favourite.searchFavourites("")
+    US30 — ViewFavouritePage → ViewFavouriteListController → Favourite.searchFavourites("")
     """
     guard = require_donee_login()
     if guard:
@@ -357,13 +351,13 @@ def api_view_favourites():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  US6 — Search donation history by FRA category and date period
+#  User Story #31 — Search donation history by FRA category and date period
 # ─────────────────────────────────────────────────────────────────────────────
 
 class SearchDonationHistoryPage:
     """
     Boundary: SearchDonationHistoryPage
-    User Story #6 (Donee): As a Donee, I want to search history of donation by
+    User Story #31 (Donee): As a Donee, I want to search history of donation by
     FRA category and date period so that I can find a specific FRA I had donated.
     Sequence: Donee → SearchDonationHistoryPage → SearchDonationHistoryController → DonationHistory
     """
@@ -383,7 +377,7 @@ def api_search_history():
     """
     API: POST /donee/api/search_history
     Body: { "category": "", "date_from": "YYYY-MM-DD", "date_to": "YYYY-MM-DD" }
-    US6 — SearchDonationHistoryPage → SearchDonationHistoryController → DonationHistory.searchHistory()
+    US31 — SearchDonationHistoryPage → SearchDonationHistoryController → DonationHistory.searchHistory()
     """
     guard = require_donee_login()
     if guard:
@@ -406,13 +400,13 @@ def api_search_history():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  US7 — View all donation history
+#  User Story #32 — View all donation history
 # ─────────────────────────────────────────────────────────────────────────────
 
 class ViewDonationHistoryPage:
     """
     Boundary: ViewDonationHistoryPage
-    User Story #7 (Donee): As a Donee, I want to view history of donation
+    User Story #32 (Donee): As a Donee, I want to view the history of donation 
     so that I can evaluate the impact of my donation and consider another donation.
     Sequence: Donee → ViewDonationHistoryPage → ViewDonationHistoryController → DonationHistory
     """
@@ -444,7 +438,7 @@ def donation_history():
 def api_view_history():
     """
     API: GET /donee/api/view_history
-    US7 — ViewDonationHistoryPage → ViewDonationHistoryController → DonationHistory.searchHistory()
+    US32 — ViewDonationHistoryPage → ViewDonationHistoryController → DonationHistory.searchHistory()
     """
     guard = require_donee_login()
     if guard:

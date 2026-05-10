@@ -18,18 +18,13 @@ class DonationHistory:
     amount: float
     donation_date: str
 
-    '''
-    User Story #6 (Donee): Search history of donation by FRA category and date period.
-    User Story #7 (Donee): View all history of donation (no filters = all records).
-    '''
+    """
+    User Story #31 (Donee): As a Donee, I want to search history of donation by
+    FRA category and date period so that I can find a specific FRA I had donated.
+    """
     @staticmethod
     def searchHistory(donee_email: str, category: str,
                       date_from: str, date_to: str) -> List[dict]:
-        """
-        Filters donation records by donee_email.
-        Optionally also filters by category and/or date range.
-        All three filters are optional — omitting them returns the full history.
-        """
         conn, cur = connect_db()
 
         sql = """
@@ -66,12 +61,12 @@ class DonationHistory:
             for r in rows
         ]
 
+    """
+    User Story #32 (Donee): As a Donee, I want to view the history of donation 
+    so that I can evaluate the impact of my donation and consider another donation.
+    """
     @staticmethod
     def viewHistory(donee_email: str) -> List[dict]:
-        """
-        Returns all donation records for the given donee with no filters applied.
-        User Story #7 (Donee): View all history of donation.
-        """
         conn, cur = connect_db()
         cur.execute(
             """

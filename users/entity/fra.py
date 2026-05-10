@@ -21,9 +21,9 @@ class FRA:
     location: str
     created_by: str  # email of the fund raiser who created this FRA
 
-    '''
+    """
     User Story #344: As a Fund Raiser, I want to view all FRAs so that I can view many FRAs at the same time .
-    '''
+    """
     @staticmethod
     def displayFRA() -> List["FRA"]:
         conn, cur = connect_db()
@@ -42,9 +42,9 @@ class FRA:
         return rows
     
     
-    '''
+    """
     User Story #15: As a Fund Raiser, I want to create a FRA so that I can share my story and start receiving donations.
-    '''
+    """
     @staticmethod
     def createFRA(title: str, description: str, category: str,
                 target_amount: int, start_date: str, end_date: str,
@@ -85,9 +85,9 @@ class FRA:
 
         return True
         
-    '''
+    """
     User Story #16: As a Fund Raiser, I want to view a FRA so that I can know my fund raising progress.
-    '''
+    """
     @staticmethod
     def viewFRA(fraId: str) -> "FRA":
         conn, cur = connect_db()
@@ -115,6 +115,10 @@ class FRA:
 
         return None
 
+    """
+    User Story #27 (Donee): As a Donee, I want to view an active FRA 
+    so that I can view existing FRA information that needs donation.
+    """
     @staticmethod
     def viewActiveFRA(fraId: str) -> "FRA":
         conn, cur = connect_db()
@@ -142,9 +146,10 @@ class FRA:
 
         return None
 
-    '''
-    User Story #17: As a Fund Raiser, I want to update a FRA so that I can show my current status and need.
-    '''
+    """
+    User Story #17: As a Fund Raiser, I want to update a FRA 
+    so that I can show my current status and need.
+    """
     @staticmethod
     def updateFRA(fraId: str, title: str, description: str, category: str,
                 target_amount: int, start_date: str, end_date: str, location: str) -> bool:
@@ -175,9 +180,10 @@ class FRA:
             conn.close()
             
 
-    '''
-    User Story #18: As a Fund Raiser, I want to suspend a FRA so that I can stop the fund raising activity.
-    '''
+    """
+    User Story #18: As a Fund Raiser, I want to suspend a FRA 
+    so that I can stop the fund raising activity.
+    """
     @staticmethod
     def suspendFRA(fraId: str) -> bool:
         conn, cur = connect_db()
@@ -201,9 +207,9 @@ class FRA:
             conn.close()
             
 
-    '''
+    """
     User Story #19: As a Fund Raiser, I want to search a FRA so that I can manage and update specific FRA efficiently.
-    '''
+    """
     @staticmethod
     def searchFRA(name: str) -> list:
         conn, cur = connect_db()
@@ -235,6 +241,10 @@ class FRA:
 
         return result
     
+    """
+    User Story #26 (Donee): As a Donee, I want to search all active FRA by name
+    so that I can find a specific FRA that I am interested in.
+    """
     @staticmethod
     def searchActiveFRA(name: str) -> list:
         conn, cur = connect_db()
@@ -290,9 +300,9 @@ class FRA:
             for r in rows
         ]
 
-    '''
+    """
     User Story # (Donee): Search all active FRAs by name. Only returns FRAs with status = 1 (active), unlike the fund raiser searchFRA.
-    '''
+    """
     @staticmethod
     def searchActiveFRA(name: str) -> list:
         conn, cur = connect_db()
@@ -320,13 +330,13 @@ class FRA:
   
   
     
-    '''
+    """
     User Story #21: As a Fund Raiser, I want to view the number of times a FRA is shortlisted so that I can know how many people are interested in this FRA.
-    '''
+    """
     @staticmethod
     def getFRAShortlistCount(fraId):
         conn, cur = connect_db()
-        ''' Assuming there is a "favorite" table that tracks which FRA has been favorited by users'''
+        """ Assuming there is a "favorite" table that tracks which FRA has been favorited by users"""
         cur.execute("SELECT COUNT(*) FROM donee_favourite WHERE fraId = ?", (fraId,))
         row = cur.fetchone()
 
@@ -338,9 +348,9 @@ class FRA:
         return None
     
     
-    ''' 
+    """ 
     User Story #22: As a Fund Raiser, I want to search history of completed FRA by service category and date period so that I can search for the past FRA that is completed.
-    '''
+    """
 
     @staticmethod 
     def searchCompletedFRAHistory(category, start_date, end_date)->list:
@@ -381,9 +391,9 @@ class FRA:
         return result
     
     
-    '''
+    """
     User Story #23: As a Fund Raiser, I want to view the history of completed FRA by service category and date period so that I can review how the past FRA has progressed.
-    '''
+    """
     @staticmethod
     def viewCompletedFRA(fraId: str):
         conn, cur = connect_db()

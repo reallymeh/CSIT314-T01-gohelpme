@@ -27,6 +27,10 @@ class Favourite:
     location: str = ""
     created_by: str = ""
 
+    """
+    User Story #28 (Donee): As a Donee, I want to save a FRA to my favourite list
+    so that I can decide on a donation later.
+    """
     @staticmethod
     def saveFavourite(donee_email: str, fraId: str) -> bool:
         """
@@ -76,11 +80,12 @@ class Favourite:
             print(f"DB error removing favourite: {e}")
             return False
 
+    """
+    User Story #30 (Donee): As a Donee, I want to view FRA in my favourite list
+    so that I can view all FRA within the favourite list.
+    """
     @staticmethod
     def viewFavourites(donee_email: str) -> List[dict]:
-        """
-        User Story #5 (Donee): View all FRA in favourite list.
-        """
         conn, cur = connect_db()
         cur.execute("""
             SELECT df.id, df.donee_email, df.fraId, df.saved_date,
@@ -104,12 +109,13 @@ class Favourite:
             }
             for r in rows
         ]
-
+    
+    """
+    User Story #29 (Donee): As a Donee, I want to search for an active FRA in my favourite list by name 
+    so that I can find a specific FRA within the favourite list.
+    """
     @staticmethod
     def searchFavourites(donee_email: str, name: str) -> List[dict]:
-        """
-        User Story #4 (Donee): Search FRA in favourite list by name.
-        """
         conn, cur = connect_db()
         cur.execute("""
             SELECT df.id, df.donee_email, df.fraId, df.saved_date,
