@@ -374,9 +374,6 @@ class SearchDonationHistoryPage:
                       date_from: str, date_to: str) -> list:
         return self.controller.searchHistory(donee_email, category, date_from, date_to)
 
-    def getCategories(self, donee_email: str) -> list:
-        return self.controller.getCategories(donee_email)
-
     def displayNoResult(self) -> str:
         return "No donation records found for the selected filters."
 
@@ -438,7 +435,8 @@ def donation_history():
 
     donee_email = get_donee_email()
     page = SearchDonationHistoryPage()
-    categories = page.getCategories(donee_email)
+    records = page.searchHistory(donee_email, '', '', '')
+    categories = sorted({r['fra_category'] for r in records})
     return render_template('donee/DoneeDonationHistory.html', categories=categories)
 
 

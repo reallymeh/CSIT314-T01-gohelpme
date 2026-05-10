@@ -76,8 +76,6 @@ class SearchDonationHistoryController:
                       date_from: str, date_to: str) -> list:
         return DonationHistory.searchHistory(donee_email, category, date_from, date_to)
 
-    def getCategories(self, donee_email: str) -> list:
-        return DonationHistory.getCategories(donee_email)
 
 
 class ViewDonationHistoryController:

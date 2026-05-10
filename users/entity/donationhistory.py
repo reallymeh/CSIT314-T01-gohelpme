@@ -93,14 +93,3 @@ class DonationHistory:
             for r in rows
         ]
 
-    @staticmethod
-    def getCategories(donee_email: str) -> List[str]:
-        """Return the distinct FRA categories that appear in this donee's history."""
-        conn, cur = connect_db()
-        rows = cur.execute(
-            "SELECT DISTINCT fra_category FROM donation_history "
-            "WHERE donee_email = ? ORDER BY fra_category",
-            (donee_email,)
-        ).fetchall()
-        conn.close()
-        return [r[0] for r in rows]
