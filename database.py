@@ -161,6 +161,46 @@ def init_db():
 
     conn.commit()
 
+    # Sample fra_view data for platform manager reports (daily/weekly/monthly)
+    fra_view_seed = [
+        # January 2026
+        ("FRA001", "johndoe@email.com", "2026-01-05 10:00:00", "Education Fund 2026", "Education"),
+        ("FRA002", "johndoe@email.com", "2026-01-05 11:00:00", "Medical Aid Fund", "Medical"),
+        ("FRA001", "johndoe@email.com", "2026-01-12 09:30:00", "Education Fund 2026", "Education"),
+        ("FRA003", "johndoe@email.com", "2026-01-20 14:00:00", "Charity Relief Fund", "Charity"),
+        ("FRA004", "johndoe@email.com", "2026-01-20 15:00:00", "Disaster Relief Fund", "Medical"),
+        # February 2026
+        ("FRA001", "johndoe@email.com", "2026-02-03 08:00:00", "Education Fund 2026", "Education"),
+        ("FRA002", "johndoe@email.com", "2026-02-03 09:00:00", "Medical Aid Fund", "Medical"),
+        ("FRA003", "johndoe@email.com", "2026-02-10 13:00:00", "Charity Relief Fund", "Charity"),
+        ("FRA001", "johndoe@email.com", "2026-02-17 10:00:00", "Education Fund 2026", "Education"),
+        ("FRA004", "johndoe@email.com", "2026-02-24 16:00:00", "Disaster Relief Fund", "Medical"),
+        # March 2026
+        ("FRA002", "johndoe@email.com", "2026-03-02 11:00:00", "Medical Aid Fund", "Medical"),
+        ("FRA001", "johndoe@email.com", "2026-03-09 09:00:00", "Education Fund 2026", "Education"),
+        ("FRA003", "johndoe@email.com", "2026-03-09 10:00:00", "Charity Relief Fund", "Charity"),
+        ("FRA004", "johndoe@email.com", "2026-03-16 14:00:00", "Disaster Relief Fund", "Medical"),
+        ("FRA001", "johndoe@email.com", "2026-03-23 08:30:00", "Education Fund 2026", "Education"),
+        ("FRA002", "johndoe@email.com", "2026-03-30 12:00:00", "Medical Aid Fund", "Medical"),
+        # April 2026
+        ("FRA003", "johndoe@email.com", "2026-04-06 10:00:00", "Charity Relief Fund", "Charity"),
+        ("FRA001", "johndoe@email.com", "2026-04-06 11:00:00", "Education Fund 2026", "Education"),
+        ("FRA004", "johndoe@email.com", "2026-04-13 15:00:00", "Disaster Relief Fund", "Medical"),
+        ("FRA002", "johndoe@email.com", "2026-04-20 09:00:00", "Medical Aid Fund", "Medical"),
+        ("FRA001", "johndoe@email.com", "2026-04-27 10:00:00", "Education Fund 2026", "Education"),
+        # May 2026 (current month)
+        ("FRA001", "johndoe@email.com", "2026-05-04 08:00:00", "Education Fund 2026", "Education"),
+        ("FRA002", "johndoe@email.com", "2026-05-04 09:00:00", "Medical Aid Fund", "Medical"),
+        ("FRA003", "johndoe@email.com", "2026-05-11 10:00:00", "Charity Relief Fund", "Charity"),
+        ("FRA004", "johndoe@email.com", "2026-05-11 11:00:00", "Disaster Relief Fund", "Medical"),
+    ]
+    cur.executemany(
+        "INSERT OR IGNORE INTO fra_view (fraId, user_email, view_date, fra_name, fra_category) VALUES (?, ?, ?, ?, ?)",
+        fra_view_seed
+    )
+
+    conn.commit()
+
     cur.close()
     conn.close()
 

@@ -29,40 +29,37 @@
             <button onclick="window.location.href='/manager/reports'" class="btn-primary" style="margin-bottom: 20px;">&#8592; Back to Reports</button>
 
             <div class="page-title">Daily Report</div>
-            <div class="page-sub">
-                FRA and category views for today
-            </div>
+            <div class="page-sub">Total FRA views per day (all time)</div>
 
-            <!-- FRA Views Section -->
+            <h2>Total Views (All Time): {{ daily.total_views }}</h2>
+
+            <!-- Views Per Day -->
             <div class="section-title" style="font-size:15px; font-weight:bold; margin-bottom:10px; margin-top:20px;">
-                FRA Views
+                Views Per Day
             </div>
-
-            <!-- Total Views -->
-            <h2>Total Views: {{ daily.total_views }}</h2>
-
-
-            <div class="profile-card">
+            <div class="profile-card" style="margin-bottom:20px;">
                 <table style="width:100%; border-collapse:collapse; font-size:13px;">
                     <thead>
                         <tr style="background:var(--color-background-secondary);">
-                            <th style="padding:10px 16px; text-align:left; border-bottom:1px solid #e0e0e0;">
-                                Category Name
-                            </th>
-                            <th style="padding:10px 16px; text-align:left; border-bottom:1px solid #e0e0e0;">
-                                Total Views Today
-                            </th>
+                            <th style="padding:10px 16px; text-align:left; border-bottom:1px solid #e0e0e0;">Date</th>
+                            {% for cat in daily.categories %}
+                            <th style="padding:10px 16px; text-align:left; border-bottom:1px solid #e0e0e0;">{{ cat }}</th>
+                            {% endfor %}
+                            <th style="padding:10px 16px; text-align:left; border-bottom:1px solid #e0e0e0;">Total Views</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for category, count in daily.category.items() %}
+                        {% for row in daily.rows %}
                         <tr>
-                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">
-                                {{ category }}
-                            </td>
-                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">
-                                {{ count }}
-                            </td>
+                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">{{ row.period }}</td>
+                            {% for cat in daily.categories %}
+                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">{{ row.by_category.get(cat, 0) }}</td>
+                            {% endfor %}
+                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">{{ row.count }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="{{ 2 + daily.categories|length }}" style="padding:10px 16px; color:#999;">No data available.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
