@@ -36,7 +36,7 @@
         {# BACKEND: displayMonthlyReport() renders this page when report data is returned #}
         <div class="main" id="GenerateMonthlyReport">
 
-            <a href="/manager/reports" class="back-link">← Back to Reports</a>
+            <button onclick="window.location.href='/manager/reports'" class="btn-primary" style="margin-bottom: 20px;">&#8592; Back to Reports</button>
 
             <div class="page-title">Monthly Report</div>
             {# BACKEND: Replace hardcoded month with {{ month }} #}
