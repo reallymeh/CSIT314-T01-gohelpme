@@ -40,6 +40,10 @@ class SuspendFRACategoryController:
         return FRACategory.suspendCategory(category_name)
     
 class DailyReportController:
+    """
+    User Story #40 (Platform Manager): As a platform manager, I want to generate a daily report, 
+    so that I can analyze the total number of views of all FRA and each FRA category.
+    """
     def generateDailyReport(self) -> Dict[str, Any]:
         category_rows = FRAView.getViewsGroupedByDayAndCategory()
         categories = sorted({r["fra_category"] for r in category_rows})
@@ -53,6 +57,10 @@ class DailyReportController:
         return {"total_views": sum(r["count"] for r in rows), "categories": categories, "rows": rows}
 
 class WeeklyReportController:
+    """
+    User Story #41 (Platform Manager): As a platform manager, I want to generate a weekly report, 
+    so that I can analyze the total number of views of all FRA and each FRA category.
+    """
     def generateWeeklyReport(self) -> Dict[str, Any]:
         category_rows = FRAView.getViewsGroupedByWeekAndCategory()
         categories = sorted({r["fra_category"] for r in category_rows})
@@ -66,6 +74,10 @@ class WeeklyReportController:
         return {"total_views": sum(r["count"] for r in rows), "categories": categories, "rows": rows}
 
 class MonthlyReportController:
+    """
+    User Story #42 (Platform Manager): As a platform manager, I want to generate a monthly report, 
+    so that I can analyze the total number of views of all FRA and each FRA category.
+    """
     def generateMonthlyReport(self) -> Dict[str, Any]:
         category_rows = FRAView.getViewsGroupedByMonthAndCategory()
         categories = sorted({r["fra_category"] for r in category_rows})
