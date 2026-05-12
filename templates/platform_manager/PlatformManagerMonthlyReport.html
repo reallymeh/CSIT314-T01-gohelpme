@@ -8,18 +8,9 @@
 </head>
 <body>
 
-    {# BCE BOUNDARY: GenerateMonthlyReportBoundary #}
-    {# User Story: #42 As a platform manager, I want to generate monthly report #}
-    {# Sequence: Platform Manager clicks Monthly → GenerateMonthlyReportBoundary(Boundary) → GenerateMonthlyReportController(Controller) → FRA/FRACategory(Entity) #}
-    {# Flask route: GET /manager/reports/monthly in platform_managerb.py #}
-    {# BACKEND: report data passed from GenerateMonthlyReportController via render_template('PlatformManagerMonthlyReport.html', fra_data=fra_data, category_data=category_data, month=month) #}
-    {# BACKEND: fra_data list has: title, view_count #}
-    {# BACKEND: category_data list has: category_name, total_views #}
-
     <div class="topbar">
         <span class="topbar-logo">Online Fundraising System — Platform Manager Portal</span>
         <div class="topbar-user">
-            {# BACKEND: Replace "Platform Manager" with logged-in manager's username from session #}
             <span id="manager-name">Platform Manager</span>
             <div class="avatar">PM</div>
         </div>
@@ -33,46 +24,48 @@
             <a href="/user/logout" class="nav-item logout">Log Out</a>
         </div>
 
-        {# BACKEND: displayMonthlyReport() renders this page when report data is returned #}
         <div class="main" id="GenerateMonthlyReport">
 
             <button onclick="window.location.href='/manager/reports'" class="btn-primary" style="margin-bottom: 20px;">&#8592; Back to Reports</button>
 
             <div class="page-title">Monthly Report</div>
-            {# BACKEND: Replace hardcoded month with {{ month }} #}
-            <div class="page-sub">FRA and category views for this month</div>
+            <div class="page-sub">Total FRA views per month (all time)</div>
 
-            <!-- FRA Views Section -->
+            <h2>Total Views (All Time): {{ monthly.total_views or 0 }}</h2>
+
+            <!-- Views Per Month -->
             <div class="section-title" style="font-size:15px; font-weight:bold; margin-bottom:10px; margin-top:20px;">
-                FRA Views
+                Views Per Month
             </div>
-            
-            <!-- Total Views -->
-            <h2>Total Views: {{ monthly.total_views or 0 }}</h2>
-
             <div class="profile-card" style="margin-bottom:20px;">
                 <table style="width:100%; border-collapse:collapse; font-size:13px;">
                     <thead>
                         <tr style="background:var(--color-background-secondary);">
-                            <th style="padding:10px 16px; text-align:left; border-bottom:1px solid #e0e0e0;">FRA Title</th>
-                            <th style="padding:10px 16px; text-align:left; border-bottom:1px solid #e0e0e0;">Views This Month</th>
+                            <th style="padding:10px 16px; text-align:left; border-bottom:1px solid #e0e0e0;">Month</th>
+                            {% for cat in monthly.categories %}
+                            <th style="padding:10px 16px; text-align:left; border-bottom:1px solid #e0e0e0;">{{ cat }}</th>
+                            {% endfor %}
+                            <th style="padding:10px 16px; text-align:left; border-bottom:1px solid #e0e0e0;">Total Views</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for category, count in monthly.category.items() %}
-                          <tr>
-                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">
-                                {{ category }}
-                            </td>
-                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">
-                                {{ count }}
-                            </td>
+                        {% for row in monthly.rows %}
+                        <tr>
+                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">{{ row.period }}</td>
+                            {% for cat in monthly.categories %}
+                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">{{ row.by_category.get(cat, 0) }}</td>
+                            {% endfor %}
+                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">{{ row.count }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="{{ 2 + monthly.categories|length }}" style="padding:10px 16px; color:#999;">No data available.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-                
             </div>
+
         </div>
 
     </div>

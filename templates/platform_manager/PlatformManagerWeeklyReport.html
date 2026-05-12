@@ -8,18 +8,9 @@
 </head>
 <body>
 
-    {# BCE BOUNDARY: GenerateWeeklyReportBoundary #}
-    {# User Story: #41 As a platform manager, I want to generate weekly report #}
-    {# Sequence: Platform Manager clicks Weekly → GenerateWeeklyReportBoundary(Boundary) → GenerateWeeklyReportController(Controller) → FRA/FRACategory(Entity) #}
-    {# Flask route: GET /manager/reports/weekly in platform_managerb.py #}
-    {# BACKEND: report data passed from GenerateWeeklyReportController via render_template('PlatformManagerWeeklyReport.html', fra_data=fra_data, category_data=category_data, week=week) #}
-    {# BACKEND: fra_data list has: title, view_count #}
-    {# BACKEND: category_data list has: category_name, total_views #}
-
     <div class="topbar">
         <span class="topbar-logo">Online Fundraising System — Platform Manager Portal</span>
         <div class="topbar-user">
-            {# BACKEND: Replace "Platform Manager" with logged-in manager's username from session #}
             <span id="manager-name">Platform Manager</span>
             <div class="avatar">PM</div>
         </div>
@@ -33,40 +24,42 @@
             <a href="/user/logout" class="nav-item logout">Log Out</a>
         </div>
 
-        {# BACKEND: displayWeeklyReport() renders this page when report data is returned #}
         <div class="main" id="GenerateWeeklyReport">
 
             <button onclick="window.location.href='/manager/reports'" class="btn-primary" style="margin-bottom: 20px;">&#8592; Back to Reports</button>
 
             <div class="page-title">Weekly Report</div>
-            {# BACKEND: Replace hardcoded week with {{ week }} #}
-            <div class="page-sub">FRA and category views for this week</div>
+            <div class="page-sub">Total FRA views per week (all time)</div>
 
-            <!-- FRA Views Section -->
+            <h2>Total Views (All Time): {{ weekly.total_views or 0 }}</h2>
+
+            <!-- Views Per Week -->
             <div class="section-title" style="font-size:15px; font-weight:bold; margin-bottom:10px; margin-top:20px;">
-                FRA Views
+                Views Per Week
             </div>
-
-            <!-- Total Views -->
-            <h2>Total Views: {{ weekly.total_views or 0 }}</h2>
-
             <div class="profile-card" style="margin-bottom:20px;">
                 <table style="width:100%; border-collapse:collapse; font-size:13px;">
                     <thead>
                         <tr style="background:var(--color-background-secondary);">
-                            <th style="padding:10px 16px; text-align:left; border-bottom:1px solid #e0e0e0;">FRA Title</th>
-                            <th style="padding:10px 16px; text-align:left; border-bottom:1px solid #e0e0e0;">Views This Week</th>
+                            <th style="padding:10px 16px; text-align:left; border-bottom:1px solid #e0e0e0;">Week</th>
+                            {% for cat in weekly.categories %}
+                            <th style="padding:10px 16px; text-align:left; border-bottom:1px solid #e0e0e0;">{{ cat }}</th>
+                            {% endfor %}
+                            <th style="padding:10px 16px; text-align:left; border-bottom:1px solid #e0e0e0;">Total Views</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for category, count in weekly.category.items() %}
-                          <tr>
-                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">
-                                {{ category }}
-                            </td>
-                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">
-                                {{ count }}
-                            </td>
+                        {% for row in weekly.rows %}
+                        <tr>
+                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">{{ row.period }}</td>
+                            {% for cat in weekly.categories %}
+                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">{{ row.by_category.get(cat, 0) }}</td>
+                            {% endfor %}
+                            <td style="padding:10px 16px; border-bottom:1px solid #f0f0f0;">{{ row.count }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="{{ 2 + weekly.categories|length }}" style="padding:10px 16px; color:#999;">No data available.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
