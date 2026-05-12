@@ -45,7 +45,7 @@ class ViewAllFRAPage:
 
 @donee_bp.route('/dashboard', methods=['GET'])
 def dashboard():
-    """Render the Donee dashboard (US1 entry point)."""
+    """Render the Donee dashboard"""
     guard = require_donee_login()
     if guard:
         return guard
@@ -54,10 +54,7 @@ def dashboard():
 
 @donee_bp.route('/api/view_all_fra', methods=['GET'])
 def api_view_all_fra():
-    """
-    API: GET /donee/api/view_all_fra
-    US1 — ViewAllFRAPage → ViewAllFRAController → FRA.viewAllActiveFRA()
-    """
+    """API: GET /donee/api/view_all_fra"""
     guard = require_donee_login()
     if guard:
         return jsonify({"success": False, "message": "Not logged in"}), 401
