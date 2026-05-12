@@ -78,8 +78,9 @@ class UserProfile:
                 "UPDATE user_profile SET name = ?, access_level = ?, description = ? WHERE name = ?",
                 (new_name, new_access_level, new_description, user_profile_name)
             )
+            rows_affected = cur.rowcount
             conn.commit()
-            return True
+            return rows_affected > 0    
         except Exception as e:
             print(f"Database error: {e}")
             return False
