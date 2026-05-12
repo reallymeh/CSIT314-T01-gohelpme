@@ -37,7 +37,7 @@ class UserProfile:
 
             conn, cur = connect_db()
             cur.execute(
-                "INSERT INTO user_profile (name, access, status, description) VALUES (?, ?, ?, ?)",
+                "INSERT INTO user_profile (name, access_level, status, description) VALUES (?, ?, ?, ?)",
                 (name, access_level, status, description)
             )
             conn.commit()
