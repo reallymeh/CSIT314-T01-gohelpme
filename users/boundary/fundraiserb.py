@@ -110,13 +110,10 @@ class ViewFRAPage:
     def __init__(self):
         self.controller = ViewFRAController()
 
-    def displayFRA(self, fraId: str):    
+    def viewFRA(self, fraId: str):    
         fra = self.controller.viewFRA(fraId)
 
-        if fra:
-            return fra
-        else:
-            return None
+        return fra
 
     
 # Link to View FRA page once clicked on "View" button for each FRA in the Fund Raiser Homepage
@@ -126,7 +123,7 @@ def view_fra(fraId):
     if guard:
         return guard
     page = ViewFRAPage()
-    fra = page.displayFRA(fraId)
+    fra = page.viewFRA(fraId)
     
     return render_template('fundraiser/FundRaiserViewFRA.html', fra=fra)
 
@@ -141,7 +138,7 @@ def show_update_page(fraId):
     if guard:
         return guard
     page = ViewFRAPage()
-    fra = page.displayFRA(fraId)
+    fra = page.viewFRA(fraId)
     categories = [c.category_name for c in FRACategory.getAllCategory() if c.status == 1]
     
     return render_template('fundraiser/FundRaiserUpdateFRA.html', fra=fra, categories=categories)

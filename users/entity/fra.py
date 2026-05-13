@@ -20,26 +20,6 @@ class FRA:
     view_count: int
     location: str
     created_by: str  # email of the fund raiser who created this FRA
-
-    """
-    User Story #344: As a Fund Raiser, I want to view all FRAs so that I can view many FRAs at the same time .
-    """
-    @staticmethod
-    def displayFRA() -> list["FRA"]:
-        conn, cur = connect_db()
-
-        cur.execute("""
-            SELECT fraId, title, description, category,
-                   target_amount, collected_amount,
-                   start_date, end_date, status,
-                   view_count, location
-            FROM fra
-        """)
-
-        rows = cur.fetchall()
-        conn.close()
-
-        return rows
     
     
     """
@@ -97,45 +77,12 @@ class FRA:
 
         conn.close()
 
-        if row:
-            return {
-            "fraId": row[1],
-            "title": row[2],
-            "description": row[3],
-            "category": row[4],
-            "target_amount": row[5],
-            "collected_amount": row[6],
-            "start_date": row[7],
-            "end_date": row[8],
-            "status": row[9],
-            "view_count": row[10],
-            "location": row[11],
-            "created_by": row[12]
-        }
-
-        return None
+        fra = FRA(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11])
+        return fra
+        
 
     """
-    User Story #27 (Donee): As a Donee, I want to view an active FRA
-    so that I can view existing FRA information that needs donation.
-    """
-    @staticmethod
-    def viewActiveFRA(fraId: str) -> "FRA":
-        conn, cur = connect_db()
-
-        cur.execute("SELECT * FROM fra WHERE fraId = ? AND status = 1", (fraId,))
-        row = cur.fetchone()
-
-        conn.close()
-
-        if row:
-            return FRA(row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12])
-
-        return None
-
-    """
-    User Story #17: As a Fund Raiser, I want to update a FRA 
-    so that I can show my current status and need.
+    User Story #17: As a Fund Raiser, I want to update a FRA so that I can show my current status and need.
     """
     @staticmethod
     def updateFRA(fraId: str, title: str, description: str, category: str,
@@ -198,7 +145,7 @@ class FRA:
     User Story #19: As a Fund Raiser, I want to search a FRA so that I can manage and update specific FRA efficiently.
     """
     @staticmethod
-    def searchFRA(name: str) -> list:
+    def searchFRA(name: str):
         conn, cur = connect_db()
 
         cur.execute("""
@@ -210,23 +157,30 @@ class FRA:
         conn.close()
 
         result = []
-
         for row in rows:
-            result.append({
-                "fraId": row[1],
-                "title": row[2],
-                "description": row[3],
-                "category": row[4],
-                "target_amount": row[5],
-                "collected_amount": row[6],
-                "start_date": row[7],
-                "end_date": row[8],
-                "status": row[9],
-                "view_count": row[10],
-                "location": row[11]
-            })
-
+            fra = FRA(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11])
+            result.append(fra)
         return result
+
+    
+    """
+    User Story #27 (Donee): As a Donee, I want to view an active FRA
+    so that I can view existing FRA information that needs donation.
+    """
+    @staticmethod
+    def viewActiveFRA(fraId: str) -> "FRA":
+        conn, cur = connect_db()
+
+        cur.execute("SELECT * FROM fra WHERE fraId = ? AND status = 1", (fraId,))
+        row = cur.fetchone()
+
+        conn.close()
+
+        if row:
+            return FRA(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11])
+
+        return None
+    
     
     @staticmethod
     def viewAllActiveFRA() -> List["FRA"]:
@@ -283,10 +237,7 @@ class FRA:
 
         conn.close()
 
-        if row:
-            return row[0]
-
-        return None
+        return row[0]
     
     
     """ 
@@ -315,7 +266,7 @@ class FRA:
         result = []
 
         for row in rows:
-            fra = FRA(row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12])
+            fra = FRA(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11])
             result.append(fra)
 
         return result
@@ -334,7 +285,31 @@ class FRA:
         conn.close()
 
         if row:
-            fra =FRA(row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12])
+            fra =FRA(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11])
             return fra
 
         return None
+    
+    """
+    User Story #344: As a Fund Raiser, I want to view all FRAs so that I can view many FRAs at the same time .
+    """
+    @staticmethod
+    def displayFRA() -> list["FRA"]:
+        conn, cur = connect_db()
+
+        cur.execute("""
+            SELECT fraId, title, description, category,
+                   target_amount, collected_amount,
+                   start_date, end_date, status,
+                   view_count, location
+            FROM fra
+        """)
+
+        rows = cur.fetchall()
+        conn.close()
+
+        result = []
+        for row in rows:
+            fra =FRA(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], None)
+            result.append(fra)
+        return result

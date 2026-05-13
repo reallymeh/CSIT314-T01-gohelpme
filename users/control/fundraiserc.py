@@ -3,32 +3,6 @@ import time
 from users.entity.fra import FRA
 from users.entity.fra_view import FRAView
 from typing import List
-
-
-'''
-User Story #344: As a Fund Raiser, I want to view all FRAs so that I can view many FRAs at the same time .
-'''
-class DisplayFRAController:
-    def displayFRA(self) -> list[FRA]:
-        rows = FRA.displayFRA()
-
-        return [
-        {
-        "fraId": r[0],
-        "title": r[1],
-        "description": r[2],
-        "category": r[3],
-        "target_amount": r[4],
-        "collected_amount": r[5],
-        "start_date": r[6],
-        "end_date": r[7],
-        "status": r[8],
-        "view_count": r[9],
-        "location": r[10]
-    }
-    for r in rows
-]
-      
         
 '''
 User Story #15: As a Fund Raiser, I want to create a FRA so that I can share my story and start receiving donations.
@@ -36,15 +10,9 @@ User Story #15: As a Fund Raiser, I want to create a FRA so that I can share my 
 class CreateFRAController:    
     def createFRA(self, title: str, description: str, category: str, target_amount: int,  \
                     start_date: str, end_date: str, status: int, location: str, created_by: str) -> bool:
-        
-        try:
-            FRA.createFRA(title, description, category, target_amount, \
+        return FRA.createFRA(title, description, category, target_amount, \
             start_date, end_date, status, location, created_by)
-            return True
 
-        except Exception as e:
-            print(e)
-            return False
 
 
 '''
@@ -52,11 +20,8 @@ User Story #16: As a Fund Raiser, I want to view a FRA so that I can know my fun
 '''
 class ViewFRAController:
     def viewFRA(self, fraId: str)-> FRA:
-        fra = FRA.viewFRA(fraId)
+        return FRA.viewFRA(fraId)
 
-        if fra:
-            return fra
-        return None
 
 '''
 User Story #17: As a Fund Raiser, I want to update a FRA so that I can show my current status and need.
@@ -66,16 +31,8 @@ class UpdateFRAController:
     def updateFRA(self, fraId: str, title: str, description: str, category: str,
                   target_amount: int, start_date: str, end_date: str, location: str) -> bool:
 
-        if not fraId or not title:
-            return False
-
-        try:
-            return FRA.updateFRA(fraId, title, description, category, \
-                target_amount, start_date, end_date, location)
-            
-        except Exception as e:
-            print("UPDATE ERROR:", e)
-            return False
+        return FRA.updateFRA(fraId, title, description, category, \
+            target_amount, start_date, end_date, location)
         
 
 '''
@@ -105,6 +62,8 @@ class ViewFRAViewStatsController:
     @staticmethod
     def recordView(fraId, viewer_email, owner_email, fra_name, fra_category):
         return FRAView.recordView(fraId, viewer_email, owner_email, fra_name, fra_category)
+    
+    
 '''
 User Story #21: As a Fund Raiser, I want to view the number of times a FRA is shortlisted so that I can know how many people are interested in this FRA.
 '''
@@ -126,3 +85,10 @@ class ViewCompletedFRAController:
     def viewCompletedFRA(self, fraId):
         return FRA.viewCompletedFRA(fraId)
     
+
+'''
+User Story #344: As a Fund Raiser, I want to view all FRAs so that I can view many FRAs at the same time .
+'''
+class DisplayFRAController:
+    def displayFRA(self) -> list[FRA]:
+        return FRA.displayFRA()
