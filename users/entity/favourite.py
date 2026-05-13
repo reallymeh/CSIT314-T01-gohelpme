@@ -85,7 +85,7 @@ class Favourite:
     so that I can view all FRA within the favourite list.
     """
     @staticmethod
-    def viewFavourites(donee_email: str) -> List[dict]:
+    def viewFavourites(donee_email: str) -> List["Favourite"]:
         conn, cur = connect_db()
         cur.execute("""
             SELECT df.id, df.donee_email, df.fraId, df.saved_date,
@@ -100,13 +100,12 @@ class Favourite:
         rows = cur.fetchall()
         conn.close()
         return [
-            {
-                "id": r[0], "donee_email": r[1], "fraId": r[2],
-                "saved_date": r[3], "title": r[4], "description": r[5],
-                "category": r[6], "target_amount": r[7], "collected_amount": r[8],
-                "start_date": r[9], "end_date": r[10],
-                "status": r[11], "location": r[12]
-            }
+            Favourite(
+                id=r[0], donee_email=r[1], fraId=r[2], saved_date=r[3],
+                title=r[4], description=r[5], category=r[6],
+                target_amount=r[7], collected_amount=r[8],
+                start_date=r[9], end_date=r[10], status=r[11], location=r[12]
+            )
             for r in rows
         ]
     
@@ -115,7 +114,7 @@ class Favourite:
     so that I can find a specific FRA within the favourite list.
     """
     @staticmethod
-    def searchFavourites(donee_email: str, name: str) -> List[dict]:
+    def searchFavourites(donee_email: str, name: str) -> List["Favourite"]:
         conn, cur = connect_db()
         cur.execute("""
             SELECT df.id, df.donee_email, df.fraId, df.saved_date,
@@ -131,12 +130,11 @@ class Favourite:
         rows = cur.fetchall()
         conn.close()
         return [
-            {
-                "id": r[0], "donee_email": r[1], "fraId": r[2],
-                "saved_date": r[3], "title": r[4], "description": r[5],
-                "category": r[6], "target_amount": r[7], "collected_amount": r[8],
-                "start_date": r[9], "end_date": r[10],
-                "status": r[11], "location": r[12]
-            }
+            Favourite(
+                id=r[0], donee_email=r[1], fraId=r[2], saved_date=r[3],
+                title=r[4], description=r[5], category=r[6],
+                target_amount=r[7], collected_amount=r[8],
+                start_date=r[9], end_date=r[10], status=r[11], location=r[12]
+            )
             for r in rows
         ]

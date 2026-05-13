@@ -116,7 +116,7 @@ class FRA:
         return None
 
     """
-    User Story #27 (Donee): As a Donee, I want to view an active FRA 
+    User Story #27 (Donee): As a Donee, I want to view an active FRA
     so that I can view existing FRA information that needs donation.
     """
     @staticmethod
@@ -129,20 +129,7 @@ class FRA:
         conn.close()
 
         if row:
-            return {
-            "fraId": row[1],
-            "title": row[2],
-            "description": row[3],
-            "category": row[4],
-            "target_amount": row[5],
-            "collected_amount": row[6],
-            "start_date": row[7],
-            "end_date": row[8],
-            "status": row[9],
-            "view_count": row[10],
-            "location": row[11],
-            "created_by": row[12]
-        }
+            return FRA(row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12])
 
         return None
 
@@ -278,7 +265,7 @@ class FRA:
         return result
 
     @staticmethod
-    def viewAllActiveFRA() -> list:
+    def viewAllActiveFRA() -> List["FRA"]:
         conn, cur = connect_db()
         cur.execute("""
             SELECT fraId, title, description, category,
@@ -291,12 +278,7 @@ class FRA:
         rows = cur.fetchall()
         conn.close()
         return [
-            {
-                "fraId": r[0], "title": r[1], "description": r[2],
-                "category": r[3], "target_amount": r[4], "collected_amount": r[5],
-                "start_date": r[6], "end_date": r[7], "status": r[8],
-                "view_count": r[9], "location": r[10]
-            }
+            FRA(r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9], r[10], None)
             for r in rows
         ]
 
@@ -304,7 +286,7 @@ class FRA:
     User Story # (Donee): Search all active FRAs by name. Only returns FRAs with status = 1 (active), unlike the fund raiser searchFRA.
     """
     @staticmethod
-    def searchActiveFRA(name: str) -> list:
+    def searchActiveFRA(name: str) -> List["FRA"]:
         conn, cur = connect_db()
         cur.execute("""
             SELECT fraId, title, description, category,
@@ -317,12 +299,7 @@ class FRA:
         rows = cur.fetchall()
         conn.close()
         return [
-            {
-                "fraId": r[0], "title": r[1], "description": r[2],
-                "category": r[3], "target_amount": r[4], "collected_amount": r[5],
-                "start_date": r[6], "end_date": r[7], "status": r[8],
-                "view_count": r[9], "location": r[10]
-            }
+            FRA(r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9], r[10], None)
             for r in rows
         ]
         

@@ -24,7 +24,7 @@ class DonationHistory:
     """
     @staticmethod
     def searchHistory(donee_email: str, category: str,
-                      date_from: str, date_to: str) -> List[dict]:
+                      date_from: str, date_to: str) -> List["DonationHistory"]:
         conn, cur = connect_db()
 
         sql = """
@@ -53,20 +53,16 @@ class DonationHistory:
         conn.close()
 
         return [
-            {
-                "id": r[0], "donee_email": r[1], "fraId": r[2],
-                "fra_title": r[3], "fra_category": r[4],
-                "amount": r[5], "donation_date": r[6]
-            }
+            DonationHistory(r[0], r[1], r[2], r[3], r[4], r[5], r[6])
             for r in rows
         ]
 
     """
-    User Story #32 (Donee): As a Donee, I want to view the history of donation 
+    User Story #32 (Donee): As a Donee, I want to view the history of donation
     so that I can evaluate the impact of my donation and consider another donation.
     """
     @staticmethod
-    def viewHistory(donee_email: str) -> List[dict]:
+    def viewHistory(donee_email: str) -> List["DonationHistory"]:
         conn, cur = connect_db()
         cur.execute(
             """
@@ -80,11 +76,7 @@ class DonationHistory:
         rows = cur.fetchall()
         conn.close()
         return [
-            {
-                "id": r[0], "donee_email": r[1], "fraId": r[2],
-                "fra_title": r[3], "fra_category": r[4],
-                "amount": r[5], "donation_date": r[6]
-            }
+            DonationHistory(r[0], r[1], r[2], r[3], r[4], r[5], r[6])
             for r in rows
         ]
 
