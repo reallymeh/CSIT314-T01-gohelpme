@@ -279,9 +279,6 @@ class ViewUserAccount:
     def displayViewResult(self, account: UserAccount):
         return account
 
-    def displayViewFail(self):
-        return None
-
     def viewUserAccount(self, email_address: str) -> UserAccount | None:
         return self.controller.viewUserAccount(email_address)
 
