@@ -374,19 +374,8 @@ class FRA:
         result = []
 
         for row in rows:
-            result.append({
-                "fraId": row[1],
-                "title": row[2],
-                "description": row[3],
-                "category": row[4],
-                "target_amount": row[5],
-                "collected_amount": row[6],
-                "start_date": row[7],
-                "end_date": row[8],
-                "status": row[9],
-                "view_count": row[10],
-                "location": row[11]
-            })
+            fra = FRA(row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12])
+            result.append(fra)
 
         return result
     

@@ -336,7 +336,7 @@ def search_completed_fra_history():
     page = SearchCompletedFRAHistoryPage()
     if not category or not start_date or not end_date:
       return jsonify({
-        "success": True,
+        "success": False,
         "data": [],
         "message": "Please select all filters"
     })
@@ -344,7 +344,7 @@ def search_completed_fra_history():
     return jsonify({
         "success": True,
         "data": results,
-        "message": "" if results else page.displaySearchFailed()
+        "message": "" if results is not None else page.displaySearchFailed()
     })
   
   
