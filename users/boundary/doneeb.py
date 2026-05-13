@@ -1,4 +1,5 @@
 # Donee Boundary
+from dataclasses import asdict
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session
 from users.control.doneec import (
     ViewAllFRAController,
@@ -153,7 +154,7 @@ def view_fra(fraId):
     if not fra:
         return redirect(url_for('donee.dashboard'))
 
-    ViewFRAViewStatsController.recordView(fraId, donee_email, fra["created_by"], fra["title"], fra["category"])
+    ViewFRAViewStatsController.recordView(fraId, donee_email, fra.created_by, fra.title, fra.category)
 
     is_fav = page.fav_controller.isFavourite(donee_email, fraId)
     return render_template('donee/DoneeViewFRA.html', fra=fra, is_favourited=is_fav)
@@ -291,7 +292,7 @@ def api_search_favourites():
 
     return jsonify({
         "success": True,
-        "data": results,
+        "data": [asdict(r) for r in results],
         "message": "" if results else page.displayNoResult()
     })
 
@@ -342,7 +343,7 @@ def api_view_favourites():
 
     return jsonify({
         "success": True,
-        "data": results,
+        "data": [asdict(r) for r in results],
         "message": "" if results else page.displayEmpty()
     })
 
@@ -391,7 +392,7 @@ def api_search_history():
 
     return jsonify({
         "success": True,
-        "data": results,
+        "data": [asdict(r) for r in results],
         "message": "" if results else page.displayNoResult()
     })
 
@@ -427,7 +428,7 @@ def donation_history():
     donee_email = get_donee_email()
     page = SearchDonationHistoryPage()
     records = page.searchHistory(donee_email, '', '', '')
-    categories = sorted({r['fra_category'] for r in records})
+    categories = sorted({r.fra_category for r in records})
     return render_template('donee/DoneeDonationHistory.html', categories=categories)
 
 
@@ -447,6 +448,6 @@ def api_view_history():
 
     return jsonify({
         "success": True,
-        "data": results,
+        "data": [asdict(r) for r in results],
         "message": "" if results else page.displayEmpty()
     })

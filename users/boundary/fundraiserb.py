@@ -261,7 +261,7 @@ class ViewFRAViewCountPage:
         self.stats_controller = ViewFRAViewStatsController()
     def getStats(self, fraId):
         stats = self.stats_controller.getStats(fraId)
-        total_views = sum(stat['count'] for stat in stats) if stats else 0
+        total_views = sum(stat.count for stat in stats) if stats else 0
         return {
             "stats": stats,
             "total_views": total_views
