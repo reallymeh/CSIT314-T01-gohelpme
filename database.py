@@ -283,7 +283,7 @@ def init_db():
 
     conn.commit()
 
-    
+    # ── ADD USER ACCOUNTS ──────────────────────────────────────────────────────
     # 50 unique donees
     donee_names = [
     'John Tan', 'Michael Lim', 'Sarah Lee', 'Emily Wong', 'Daniel Koh',
@@ -342,6 +342,97 @@ def init_db():
       
     cur.executemany("INSERT OR IGNORE INTO user_account VALUES(?, ?, ?, ?, ?, ?, ?)", user_account_data)
     conn.commit() 
+
+    #── ADD USER PROFILES ──────────────────────────────────────────────────────
+    profile_names = [f"profile_{i:03}" for i in range(1, 101)]  # Generate 100 unique profile names
+    for i, name in enumerate(profile_names, start = 1):
+        user_profile_data.append((
+            profile_names[i-1],
+            5,  # access_level
+            1,  # status
+            f"Description for {name}"
+        ))
+    cur.executemany("INSERT OR IGNORE INTO user_profile VALUES(?, ?, ?, ?)", user_profile_data)
+    conn.commit()
+
+    #── ADD FRA  ──────────────────────────────────────────────────────
+    categories = ["Education", "Medical", "Animal", "Charity"]
+    locations = [
+    "Tampines, Singapore",
+    "Yishun, Singapore",
+    "Hougang, Singapore",
+    "Jurong East, Singapore",
+    "Bukit Panjang, Singapore",
+    "Marine Parade, Singapore",
+    "Bishan, Singapore",
+    "Orchard, Singapore"
+   ]
+
+    emails = [
+    "alex@email.com",
+    "linda@email.com",
+    "kevin@email.com",
+    "olivia@email.com",
+    "david@email.com",
+    "emma@email.com"
+ ]
+
+    generated_fra_data = []
+
+    for i in range(10, 101):
+      category = categories[i % 4]
+
+      title = f"{category} Support Fund {i}"
+      description = f"Support community initiatives under {category.lower()} programs"
+
+      target_amount = 5000 + (i * 300)
+      current_amount = int(target_amount * 0.45)
+
+      start_date = f"2026-{(i % 12) + 1:02d}-01"
+      end_date = f"2026-{(i % 12) + 1:02d}-28"
+
+      status = 1 if i <= 70 else 0
+      donor_count = 20 + i
+
+      location = locations[i % len(locations)]
+      email = emails[i % len(emails)]
+
+      generated_fra_data.append((
+        f"FRA{i:03d}",
+        title,
+        description,
+        category,
+        target_amount,
+        current_amount,
+        start_date,
+        end_date,
+        status,
+        donor_count,
+        location,
+        email
+     ))
+    cur.executemany(
+        "INSERT OR IGNORE INTO fra (fraId, title, description, category, target_amount, collected_amount, "
+        "start_date, end_date, status, view_count, location, created_by) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        generated_fra_data)
+    conn.commit()
+
+    #── ADD FRA CATEGORIES ──────────────────────────────────────────────────────
+    for i in range(5, 101):
+      category_name = f"Category_{i:03d}"
+      description = (
+        f"Description for {category_name} fundraising activities and community support"
+    )
+      status = 1 if i <= 80 else 0
+      fra_category_data.append((
+        category_name,
+        description,
+        status
+    ))
+    cur.executemany("INSERT OR IGNORE INTO fra_category VALUES (?, ?, ?)", fra_category_data)
+
+    conn.commit()
+
     cur.close()
     conn.close()
 def connect_db():
