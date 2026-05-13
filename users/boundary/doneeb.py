@@ -65,7 +65,7 @@ def api_view_all_fra():
 
     return jsonify({
         "success": True,
-        "data": results,
+        "data": [asdict(r) for r in results],
         "message": "" if results else page.displayNoResult()
     })
 
@@ -109,7 +109,7 @@ def api_search_fra():
 
     return jsonify({
         "success": True,
-        "data": results,
+        "data": [asdict(r) for r in results],
         "message": "" if results else page.displayNoResult()
     })
 

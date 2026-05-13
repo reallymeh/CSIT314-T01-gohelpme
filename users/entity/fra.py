@@ -228,42 +228,6 @@ class FRA:
 
         return result
     
-    """
-    User Story #26 (Donee): As a Donee, I want to search all active FRA by name
-    so that I can find a specific FRA that I am interested in.
-    """
-    @staticmethod
-    def searchActiveFRA(name: str) -> list:
-        conn, cur = connect_db()
-
-        cur.execute("""
-            SELECT * FROM fra
-            WHERE title LIKE ?
-            AND status = 1
-        """, ('%' + name + '%',))
-
-        rows = cur.fetchall()
-        conn.close()
-
-        result = []
-
-        for row in rows:
-            result.append({
-                "fraId": row[1],
-                "title": row[2],
-                "description": row[3],
-                "category": row[4],
-                "target_amount": row[5],
-                "collected_amount": row[6],
-                "start_date": row[7],
-                "end_date": row[8],
-                "status": row[9],
-                "view_count": row[10],
-                "location": row[11]
-            })
-
-        return result
-
     @staticmethod
     def viewAllActiveFRA() -> List["FRA"]:
         conn, cur = connect_db()
