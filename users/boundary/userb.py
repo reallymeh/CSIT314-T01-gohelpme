@@ -1,4 +1,3 @@
-from users.entity.user import User
 from flask import Blueprint, render_template, request, jsonify, url_for, redirect, session
 from users.control.userc import LoginController
 

@@ -14,7 +14,7 @@ class Favourite:
     donee_email: str
     fraId: str
     saved_date: str
-    # Joined fields from fra table (populated on read)
+    '''These fields are not stored in the donee_favourite table but are included here for convenience when viewing/searching favourites.'''
     title: str = ""
     description: str = ""
     category: str = ""
@@ -61,6 +61,7 @@ class Favourite:
         conn.close()
         return row is not None
 
+    '''Not a user story'''
     @staticmethod
     def removeFavourite(donee_email: str, fraId: str) -> bool:
         """

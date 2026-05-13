@@ -115,8 +115,7 @@ class FRA:
             
 
     """
-    User Story #18: As a Fund Raiser, I want to suspend a FRA 
-    so that I can stop the fund raising activity.
+    User Story #18: As a Fund Raiser, I want to suspend a FRA so that I can stop the fund raising activity.
     """
     @staticmethod
     def suspendFRA(fraId: str) -> bool:
@@ -145,7 +144,7 @@ class FRA:
     User Story #19: As a Fund Raiser, I want to search a FRA so that I can manage and update specific FRA efficiently.
     """
     @staticmethod
-    def searchFRA(name: str):
+    def searchFRA(name: str) -> List["FRA"]:
         conn, cur = connect_db()
 
         cur.execute("""
