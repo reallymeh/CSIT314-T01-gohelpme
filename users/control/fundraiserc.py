@@ -9,7 +9,7 @@ from typing import List
 User Story #344: As a Fund Raiser, I want to view all FRAs so that I can view many FRAs at the same time .
 '''
 class DisplayFRAController:
-    def displayFRA(self) -> List[FRA]:
+    def displayFRA(self) -> list[FRA]:
         rows = FRA.displayFRA()
 
         return [

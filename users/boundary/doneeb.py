@@ -13,6 +13,9 @@ from users.control.doneec import (
     SearchDonationHistoryController,
 )
 from users.control.fundraiserc import ViewFRAViewStatsController
+from users.entity.fra import FRA
+from users.entity.favourite import Favourite
+from users.entity.donationhistory import DonationHistory
 
 donee_bp = Blueprint('donee', __name__, url_prefix='/donee')
 
@@ -37,7 +40,7 @@ class ViewAllFRAPage:
     def __init__(self):
         self.controller = ViewAllFRAController()
 
-    def displayAllFRA(self) -> list:
+    def displayAllFRA(self) -> list[FRA]:
         return self.controller.viewAllFRA()
 
     def displayNoResult(self) -> str:
@@ -84,7 +87,7 @@ class SearchActiveFRAPage:
     def __init__(self):
         self.controller = SearchActiveFRAController()
 
-    def searchActiveFRA(self, name: str) -> list:
+    def searchActiveFRA(self, name: str) -> list[FRA]:
         return self.controller.searchActiveFRA(name)
 
     def displayNoResult(self) -> str:
@@ -129,7 +132,7 @@ class ViewActiveFRAPage:
         self.controller = ViewActiveFRAController()
         self.fav_controller = SaveFavouriteController()
 
-    def viewActiveFRA(self, fraId: str) -> dict | None:
+    def viewActiveFRA(self, fraId: str) -> FRA | None:
         return self.controller.viewActiveFRA(fraId)
 
     def displayError(self) -> str:
@@ -266,7 +269,7 @@ class SearchFavouritePage:
     def __init__(self):
         self.controller = SearchFavouriteController()
 
-    def searchFavourites(self, donee_email: str, name: str) -> list:
+    def searchFavourites(self, donee_email: str, name: str) -> list[Favourite]:
         return self.controller.searchFavourites(donee_email, name)
 
     def displayNoResult(self) -> str:
@@ -311,7 +314,7 @@ class ViewFavouritePage:
     def __init__(self):
         self.controller = ViewFavouriteController()
 
-    def viewFavourites(self, donee_email: str) -> list:
+    def viewFavourites(self, donee_email: str) -> list[Favourite]:
         return self.controller.viewFavourites(donee_email)
 
     def displayEmpty(self) -> str:
@@ -363,7 +366,7 @@ class SearchDonationHistoryPage:
         self.controller = SearchDonationHistoryController()
 
     def searchHistory(self, donee_email: str, category: str,
-                      date_from: str, date_to: str) -> list:
+                      date_from: str, date_to: str) -> list[DonationHistory]:
         return self.controller.searchHistory(donee_email, category, date_from, date_to)
 
     def displayNoResult(self) -> str:
@@ -411,7 +414,7 @@ class ViewDonationHistoryPage:
     def __init__(self):
         self.controller = ViewDonationHistoryController()
 
-    def viewHistory(self, donee_email: str) -> list:
+    def viewHistory(self, donee_email: str) -> list[DonationHistory]:
         return self.controller.viewHistory(donee_email)
 
     def displayEmpty(self) -> str:

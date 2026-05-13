@@ -5,7 +5,7 @@ from users.entity.donationhistory import DonationHistory
 
 
 class ViewAllFRAController:
-    def viewAllFRA(self) -> list:
+    def viewAllFRA(self) -> list[FRA]:
         return FRA.viewAllActiveFRA()
 
 
@@ -14,7 +14,7 @@ class SearchActiveFRAController:
     User Story #26 (Donee): As a Donee, I want to search all active FRA by name
     so that I can find a specific FRA that I am interested in.
     """
-    def searchActiveFRA(self, name: str) -> list:
+    def searchActiveFRA(self, name: str) -> list[FRA]:
         return FRA.searchActiveFRA(name)
 
 
@@ -23,7 +23,7 @@ class ViewActiveFRAController:
     User Story #27 (Donee): As a Donee, I want to view an active FRA 
     so that I can view existing FRA information that needs donation.
     """
-    def viewActiveFRA(self, fraId: str) -> dict | None:
+    def viewActiveFRA(self, fraId: str) -> "FRA | None":
         return FRA.viewActiveFRA(fraId)
 
 
@@ -51,7 +51,7 @@ class SearchFavouriteController:
     User Story #29 (Donee): As a Donee, I want to search for an active FRA in my favourite list by name 
     so that I can find a specific FRA within the favourite list.
     """
-    def searchFavourites(self, donee_email: str, name: str) -> list:
+    def searchFavourites(self, donee_email: str, name: str) -> list[Favourite]:
         return Favourite.searchFavourites(donee_email, name)
 
 
@@ -60,7 +60,7 @@ class ViewFavouriteController:
     User Story #30 (Donee): As a Donee, I want to view FRA in my favourite list
     so that I can view all FRA within the favourite list.
     """
-    def viewFavourites(self, donee_email: str) -> list:
+    def viewFavourites(self, donee_email: str) -> list[Favourite]:
         return Favourite.viewFavourites(donee_email)
 
 
@@ -70,7 +70,7 @@ class SearchDonationHistoryController:
     FRA category and date period so that I can find a specific FRA I had donated.
     """
     def searchHistory(self, donee_email: str, category: str,
-                      date_from: str, date_to: str) -> list:
+                      date_from: str, date_to: str) -> list[DonationHistory]:
         return DonationHistory.searchHistory(donee_email, category, date_from, date_to)
 
 
@@ -80,5 +80,5 @@ class ViewDonationHistoryController:
     User Story #32 (Donee): As a Donee, I want to view the history of donation 
     so that I can evaluate the impact of my donation and consider another donation.
     """
-    def viewHistory(self, donee_email: str) -> list:
+    def viewHistory(self, donee_email: str) -> list[DonationHistory]:
         return DonationHistory.viewHistory(donee_email) 

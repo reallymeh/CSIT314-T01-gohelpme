@@ -25,7 +25,7 @@ class FRA:
     User Story #344: As a Fund Raiser, I want to view all FRAs so that I can view many FRAs at the same time .
     """
     @staticmethod
-    def displayFRA() -> List["FRA"]:
+    def displayFRA() -> list["FRA"]:
         conn, cur = connect_db()
 
         cur.execute("""
