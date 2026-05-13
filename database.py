@@ -283,9 +283,67 @@ def init_db():
 
     conn.commit()
 
+    
+    # 50 unique donees
+    donee_names = [
+    'John Tan', 'Michael Lim', 'Sarah Lee', 'Emily Wong', 'Daniel Koh',
+    'Jessica Tan', 'David Ong', 'Rachel Lim', 'Kevin Ng', 'Amanda Teo',
+    'Ryan Chua', 'Sophia Goh', 'Ethan Yeo', 'Olivia Tan', 'Lucas Lim',
+    'Grace Lee', 'Nathan Ong', 'Chloe Wong', 'Brandon Koh', 'Isabelle Ng',
+    'Aaron Tan', 'Megan Lim', 'Jason Lee', 'Natalie Ong', 'Dylan Chua',
+    'Charlotte Goh', 'Adam Teo', 'Hannah Wong', 'Benjamin Tan', 'Ella Lim',
+    'Samuel Lee', 'Alicia Koh', 'Matthew Ng', 'Zoe Tan', 'Andrew Lim',
+    'Victoria Ong', 'Joshua Chua', 'Samantha Goh', 'Caleb Teo', 'Madison Wong',
+    'Isaac Tan', 'Lily Lim', 'Christopher Lee', 'Eva Ong', 'Nathaniel Chua',
+    'Gabrielle Goh', 'Justin Teo', 'Claire Wong', 'Marcus Tan', 'Nicole Lim'
+   ]
+
+    # 50 unique fund raisers
+    fundraiser_names = [
+    'Evelyn Tan', 'Sean Lim', 'Melissa Lee', 'Jonathan Ong', 'Stephanie Chua',
+    'Kenneth Goh', 'Vanessa Teo', 'Patrick Wong', 'Cynthia Tan', 'Ivan Lim',
+    'Jasmine Lee', 'Terence Ong', 'Sharon Chua', 'Leonard Goh', 'Felicia Teo',
+    'Wesley Wong', 'Janice Tan', 'Desmond Lim', 'Joanna Lee', 'Gerald Ong',
+    'Tracy Chua', 'Nicholas Goh', 'Audrey Teo', 'Martin Wong', 'Belinda Tan',
+    'Raymond Lim', 'Vivian Lee', 'Edwin Ong', 'Phoebe Chua', 'Dominic Goh',
+    'Christine Teo', 'Alvin Wong', 'Denise Tan', 'Jeremy Lim', 'Selena Lee',
+    'Marcus Ong', 'Naomi Chua', 'Darren Goh', 'Priscilla Teo', 'Keith Wong',
+    'Sheryl Tan', 'Bryan Lim', 'Carmen Lee', 'Hugo Ong', 'Andrea Chua',
+    'Trevor Goh', 'Monica Teo', 'Vincent Wong', 'Gloria Tan', 'Felix Lim'
+   ]
+
+   # Add donees
+    for i, name in enumerate(donee_names, start=1):
+      email = f"donee{i:03}@email.com"   # unique email
+    
+      user_account_data.append((
+        name,
+        email,
+        f'+65 9000 {1000 + i}',
+        f'{i} Donee Street',
+        'donee',
+        1,
+        'password123'
+      ))
+
+   # Add fund raisers
+    for i, name in enumerate(fundraiser_names, start=1):
+      email = f"fundraiser{i:03}@email.com"   # unique email
+    
+      user_account_data.append((
+        name,
+        email,
+        f'+65 8000 {1000 + i}',
+        f'{i} Fundraiser Avenue',
+        'fund raiser',
+        1,
+        'password123'
+     ))
+      
+    cur.executemany("INSERT OR IGNORE INTO user_account VALUES(?, ?, ?, ?, ?, ?, ?)", user_account_data)
+    conn.commit() 
     cur.close()
     conn.close()
-
 def connect_db():
     conn = sqlite3.connect("gohelpme.db")
     return conn, conn.cursor()
