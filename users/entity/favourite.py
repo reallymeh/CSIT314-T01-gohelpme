@@ -136,5 +136,5 @@ class Favourite:
                 target_amount=r[7], collected_amount=r[8],
                 start_date=r[9], end_date=r[10], status=r[11], location=r[12]
             )
-            for r in rows
+            for r in rows 
         ]

@@ -71,7 +71,7 @@ class DonationHistory:
             WHERE donee_email = ?
             ORDER BY donation_date DESC
             """,
-            (donee_email,)
+            (donee_email,) 
         )
         rows = cur.fetchall()
         conn.close()
