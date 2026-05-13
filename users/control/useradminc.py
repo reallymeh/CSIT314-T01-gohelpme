@@ -12,6 +12,8 @@ User Story #3: As a user admin, I want to create user profile so that I can hand
 class CreateUserProfileController:
     def createUserProfile(self, name: str, access_level: int, status: int, description: str) -> bool:
         return UserProfile.createUserProfile(name, access_level, status, description)
+    def userProfileExists(self, name: str) -> bool:
+        return UserProfile.userProfileExists(name)
 
 
 '''

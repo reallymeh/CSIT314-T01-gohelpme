@@ -71,7 +71,7 @@ def create_user_profile():
     access_level = int(data.get('access'))
     status = int(data.get('status'))
     description = data.get('description', '')
-    if UserProfile.userProfileExists(name):
+    if CreateUserProfileController().userProfileExists(name):
         return jsonify({"success": False, "message": "User profile already exists."}), 400
     message = create_profile.clickCreate(name, access_level, status, description)
     return jsonify({'message': message})
@@ -84,7 +84,7 @@ class ViewUserProfile:
     def __init__(self):
         self.controller = ViewUserProfileController()
 
-    def viewUserProfile(self, profile_name: str) -> UserProfile:
+    def viewUserProfile(self, profile_name: str):
         return self.controller.viewUserProfile(profile_name)
 
 @admin_profiles_bp.route('/viewprofile/<string:user_profile_name>')
@@ -275,9 +275,6 @@ User Story #9: As a user admin, I want to view user account so that I can view t
 class ViewUserAccount:
     def __init__(self):
         self.controller = ViewUserAccountController()
-
-    def displayViewResult(self, account: UserAccount):
-        return account
 
     def viewUserAccount(self, email_address: str) -> UserAccount | None:
         return self.controller.viewUserAccount(email_address)
