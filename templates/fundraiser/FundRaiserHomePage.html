@@ -10,9 +10,6 @@
 </head>
 
 <body>
-{% if message %}
-<div id="alert-box">{{ message }}</div>
-{% endif %}
 
 <!-- TOP BAR -->
 <div class="topbar">
@@ -134,12 +131,6 @@ function suspendFRA(fraId) {
         alert("Suspend failed");
     });
 }
-setTimeout(function() {
-    const alertBox = document.getElementById("alert-box");
-    if (alertBox) {
-        alertBox.style.display = "none";
-    }
-}, 3000);
 
 function searchFRA() {
     const name = document.getElementById('searchInput').value;

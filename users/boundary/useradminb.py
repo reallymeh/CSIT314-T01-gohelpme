@@ -11,11 +11,23 @@ from users.control.useradminc import (
     SuspendUserAccountController
 )
 
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session
 from typing import List
 
 # flask integration
 admin_profiles_bp = Blueprint('admin_view_profile', __name__, url_prefix='/admin')
+
+
+def get_admin_email():
+    """Returns the logged-in admin's email from session, or None."""
+    return session.get('email_address')
+
+
+def require_admin_login():
+    """Redirect to login if no session. Returns None when session is valid."""
+    if not get_admin_email():
+        return redirect(url_for('user.show_login'))
+    return None
 
 
 '''
@@ -24,6 +36,9 @@ User Story #3: As a user admin, I want to create user profile so that I can hand
 # BCE BOUNDARY: ShowCreateUserProfilePage
 @admin_profiles_bp.route('/create_profile', methods=['GET'])
 def show_create_profile():
+    guard = require_admin_login()
+    if guard:
+        return guard
     return render_template('user_admin/UserAdminCreateUserProfile.html')
 
 # Create user profile
@@ -48,6 +63,9 @@ create_profile = CreateUserProfile()
 # BCE BOUNDARY: CreateUserProfile — POST /admin/create_profile
 @admin_profiles_bp.route('/create_profile', methods=['POST'])
 def create_user_profile():
+    guard = require_admin_login()
+    if guard:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
     data = request.get_json()
     name = data.get('name', '').strip()
     access_level = int(data.get('access'))
@@ -71,12 +89,18 @@ class ViewUserProfile:
 
 @admin_profiles_bp.route('/viewprofile/<string:user_profile_name>')
 def user_profile(user_profile_name):
+    guard = require_admin_login()
+    if guard:
+        return guard
     display_profile = ViewUserProfile()
     profile = display_profile.viewUserProfile(user_profile_name)
     return render_template('user_admin/UserAdminViewProfile.html', profile=profile)
 
 @admin_profiles_bp.route('/api/profiles/<user_profile_name>', methods=['GET'])
 def get_profile_api(user_profile_name):
+    guard = require_admin_login()
+    if guard:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
     display_profile = ViewUserProfile()
     profile = display_profile.viewUserProfile(user_profile_name)
 
@@ -99,6 +123,9 @@ User Story #5: As a user admin, I want to update user profile so that I can make
 # Update profile
 @admin_profiles_bp.route('/updateprofile/<user_profile_name>', methods=['GET'])
 def render_update_page(user_profile_name):
+    guard = require_admin_login()
+    if guard:
+        return guard
     return render_template('user_admin/UserAdminUpdateProfile.html', user_profile_name=user_profile_name)
 
 class UpdateUserProfile:
@@ -110,6 +137,9 @@ class UpdateUserProfile:
 
 @admin_profiles_bp.route('/api/profiles/<user_profile_name>', methods=['PUT'])
 def update_profile_api(user_profile_name):
+    guard = require_admin_login()
+    if guard:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
     data = request.get_json()
 
     if not data:
@@ -158,6 +188,9 @@ class SuspendUserProfile:
 # BCE BOUNDARY: SuspendUserProfile — POST /admin/suspend_user
 @admin_profiles_bp.route('/suspend_user', methods=['POST'])
 def suspend_user():
+    guard = require_admin_login()
+    if guard:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
     data = request.get_json()
     user_profile_name = data.get('user_profile_name')
     message = SuspendUserProfile().suspendUserProfile(user_profile_name)
@@ -176,6 +209,9 @@ class SearchUserProfile:
 
 @admin_profiles_bp.route('/search_profiles', methods=['GET'])
 def search_user_profiles():
+    guard = require_admin_login()
+    if guard:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
     query = request.args.get('q', '').strip().lower()
     boundary = SearchUserProfile()
     results = boundary.search_profiles(query)
@@ -188,6 +224,9 @@ User Story #8: As a user admin, I want to create user account so that new users 
 '''
 @admin_profiles_bp.route('/create_account', methods=['GET'])
 def show_create_account():
+    guard = require_admin_login()
+    if guard:
+        return guard
     return render_template('user_admin/UserAdminCreateUserAccount.html')
 
 class CreateUserAccount:
@@ -211,6 +250,9 @@ class CreateUserAccount:
     
 @admin_profiles_bp.route('/create_account', methods=['POST'])
 def create_user_account_route():
+    guard = require_admin_login()
+    if guard:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
     data = request.get_json()
     email = data.get('email', '').strip()
     name = data.get('name', '').strip()
@@ -237,14 +279,14 @@ class ViewUserAccount:
     def displayViewResult(self, account: UserAccount):
         return account
 
-    def displayViewFail(self):
-        return None
-
     def viewUserAccount(self, email_address: str) -> UserAccount | None:
         return self.controller.viewUserAccount(email_address)
 
 @admin_profiles_bp.route('/viewaccount/<email_address>', methods=['GET'])
 def view_account(email_address):
+    guard = require_admin_login()
+    if guard:
+        return guard
     account = ViewUserAccount().viewUserAccount(email_address)
     if account is None:
         return redirect(url_for('admin_view_profile.user_account_list'))
@@ -254,6 +296,9 @@ def view_account(email_address):
 # Used by the update form to pre-fill current account data.
 @admin_profiles_bp.route('/api/users/<path:user_id>', methods=['GET'])
 def get_user_account_api(user_id):
+    guard = require_admin_login()
+    if guard:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
     account = GetUserAccount().getUserAccount(user_id)
     if account is None:
         return jsonify({"success": False, "message": "Account not found"}), 404
@@ -277,6 +322,9 @@ User Story #10: As a user admin, I want to update the user account so that I can
 # Passes user_id (email address) to the template so it can pre-fill and submit correctly.
 @admin_profiles_bp.route('/updateaccount/<user_id>', methods=['GET'])
 def render_update_account_page(user_id):
+    guard = require_admin_login()
+    if guard:
+        return guard
     return render_template('user_admin/UserAdminUpdateAccount.html', user_id=user_id)
 
 # BCE BOUNDARY: UpdateUserAccount
@@ -292,6 +340,9 @@ update_user_account = UpdateUserAccount()
 # BCE BOUNDARY: UpdateUserAccount — PUT /admin/api/users/<email>
 @admin_profiles_bp.route('/api/users/<path:user_id>', methods=['PUT'])
 def update_user_account_api(user_id):
+    guard = require_admin_login()
+    if guard:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
     data = request.get_json()
 
     if not data:
@@ -327,6 +378,9 @@ class SuspendUserAccount:
         
 @admin_profiles_bp.route('/suspend_account', methods=['POST'])
 def suspend_account():
+    guard = require_admin_login()
+    if guard:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
     data = request.get_json()
     print("Suspend payload received:", data)
     email_address = data.get('email_address')
@@ -350,6 +404,9 @@ class SearchUserAccount:
 # Returns JSON list of matching accounts for the accounts page search.
 @admin_profiles_bp.route('/api/accounts', methods=['GET'])
 def search_user_accounts_api():
+    guard = require_admin_login()
+    if guard:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
     query = request.args.get('q', '').strip()
     accounts = SearchUserAccount().searchUserAccounts(query)
     data = [
@@ -373,6 +430,9 @@ class DisplayUserProfile:
 
 @admin_profiles_bp.route('/userprofile')
 def user_profile_list():
+    guard = require_admin_login()
+    if guard:
+        return guard
     display_profile = DisplayUserProfile()
     profiles = display_profile.displayUserProfile()
     message = request.args.get('message')
@@ -390,6 +450,9 @@ class GetUserAccount:
 # BCE BOUNDARY: SearchUserAccount — renders accounts page
 @admin_profiles_bp.route('/useraccount', methods=['GET'])
 def user_account_list():
+    guard = require_admin_login()
+    if guard:
+        return guard
     return render_template('user_admin/UserAdminAccounts.html')
 
 

@@ -2,8 +2,6 @@ from dataclasses import dataclass
 from database import connect_db
 from typing import List
 
-from datetime import date
-
 
 @dataclass
 class FRAView:
@@ -14,26 +12,70 @@ class FRAView:
    fra_name: str
    fra_category: str
 
+   """
+    User Story #40 (Platform Manager): As a platform manager, I want to generate a daily report, 
+    so that I can analyze the total number of views of all FRA and each FRA category.
+    """
    @staticmethod
-   def getDailyCategoryView() -> List["FRAView"]:
+   def getViewsGroupedByDayAndCategory() -> List[dict]:
       conn, cur = connect_db()
-
-      today = date.today()
       try:
          cur.execute('''
-            SELECT fra_category, COUNT(*) AS total_view 
+            SELECT DATE(view_date) AS day, fra_category, COUNT(*) AS total_view
             FROM fra_view
-            WHERE DATE(view_date) = DATE(?) 
-            GROUP BY fra_category
-            ''', (today,))
+            GROUP BY DATE(view_date), fra_category
+            ORDER BY DATE(view_date)
+         ''')
          rows = cur.fetchall()
-         return [
-            {  
-                  "fra_category": r[0],
-                  "count": r[1],
-            }
-            for r in rows
-         ]
+         return [{"period": r[0], "fra_category": r[1], "count": r[2]} for r in rows]
+      except Exception as e:
+         print(e)
+         return []
+      finally:
+         cur.close()
+         conn.close()
+
+   """
+    User Story #41 (Platform Manager): As a platform manager, I want to generate a weekly report, 
+    so that I can analyze the total number of views of all FRA and each FRA category.
+    """
+   @staticmethod
+   def getViewsGroupedByWeekAndCategory() -> List[dict]:
+      conn, cur = connect_db()
+      try:
+         cur.execute('''
+            SELECT strftime('%Y', view_date) AS year,
+                   strftime('%W', view_date) AS week,
+                   fra_category, COUNT(*) AS total_view
+            FROM fra_view
+            GROUP BY year, week, fra_category
+            ORDER BY year, week
+         ''')
+         rows = cur.fetchall()
+         return [{"period": f"{r[0]}-W{r[1]}", "fra_category": r[2], "count": r[3]} for r in rows]
+      except Exception as e:
+         print(e)
+         return []
+      finally:
+         cur.close()
+         conn.close()
+
+   """
+    User Story #42 (Platform Manager): As a platform manager, I want to generate a monthly report, 
+    so that I can analyze the total number of views of all FRA and each FRA category.
+    """
+   @staticmethod
+   def getViewsGroupedByMonthAndCategory() -> List[dict]:
+      conn, cur = connect_db()
+      try:
+         cur.execute('''
+            SELECT strftime('%Y-%m', view_date) AS month, fra_category, COUNT(*) AS total_view
+            FROM fra_view
+            GROUP BY month, fra_category
+            ORDER BY month
+         ''')
+         rows = cur.fetchall()
+         return [{"period": r[0], "fra_category": r[1], "count": r[2]} for r in rows]
       except Exception as e:
          print(e)
          return []
@@ -42,23 +84,20 @@ class FRAView:
          conn.close()
 
    @staticmethod
-   def getDailyFRAView() -> int:
+   def getAllCategoryViews() -> List[dict]:
       conn, cur = connect_db()
-
-      today = date.today()
-
       try:
          cur.execute('''
-            SELECT COUNT(*) AS TOTAL_VIEW FROM fra_view
-            WHERE DATE(view_date) = DATE(?)
-         ''', (today,))
-
-         row = cur.fetchone()
-         return row[0] if row else 0
-
+            SELECT fra_category, COUNT(*) AS total_view
+            FROM fra_view
+            GROUP BY fra_category
+            ORDER BY total_view DESC
+         ''')
+         rows = cur.fetchall()
+         return [{"fra_category": r[0], "count": r[1]} for r in rows]
       except Exception as e:
          print(e)
-      
+         return []
       finally:
          cur.close()
          conn.close()
@@ -135,126 +174,3 @@ class FRAView:
          if conn:
             conn.close()
 
-   @staticmethod
-   def getWeeklyCategoryViews() -> List[dict]:
-      conn, cur = connect_db()
-
-      # get current year, month, date
-      today = date.today()
-      # extract week number
-      week_num = today.isocalendar().week
-      year_num = str(today.year)
-
-      try:
-         cur.execute('''
-            SELECT fra_category, COUNT(*) AS total_view 
-            FROM fra_view
-            WHERE strftime('%Y', view_date) = ?
-            AND CAST(strftime('%W', view_date) AS INTEGER) + 1 = ?
-            GROUP BY fra_category
-            ''', (year_num, week_num,))
-         rows = cur.fetchall()
-         return [
-            {  
-                  "fra_category": r[0],
-                  "count": r[1],
-            }
-            for r in rows
-         ]
-      except Exception as e:
-         print(e)
-         return []
-      finally:
-         cur.close()
-         conn.close()
-
-   @staticmethod
-   def getWeeklyFRAViews() -> int:
-      conn, cur = connect_db()
-
-      today = date.today()
-      # extract week number
-      week_num = today.isocalendar().week
-      year_num = str(today.year)
-
-      try:
-         cur.execute('''
-            SELECT COUNT(*) 
-            FROM fra_view
-            WHERE strftime('%Y', view_date) = ?
-            AND CAST(strftime('%W', view_date) AS INTEGER) + 1 = ?
-        ''', (year_num, week_num))
-         row = cur.fetchone()
-         return row[0] if row else 0
-
-      except Exception as e:
-         print(e)
-      
-      finally:
-         cur.close()
-         conn.close()
-   
-   @staticmethod
-   def getMonthlyCategoryViews() -> List[dict]:
-      conn, cur = connect_db()
-
-      # get current year, month, date
-      today = date.today()
-      year_num = str(today.year)
-      month_num = today.month
-      if month_num < 10:
-         month_num = "0" + (str(month_num))
-      else:
-         month_num = str(month_num)
-      try:
-         cur.execute('''
-            SELECT fra_category, COUNT(*) AS total_view 
-            FROM fra_view
-            WHERE strftime('%Y', view_date) = ?
-            AND strftime('%m', view_date) = ?
-            GROUP BY fra_category
-            ''', (year_num, month_num,))
-         rows = cur.fetchall()
-         print(rows)
-         return [
-            {  
-                  "fra_category": r[0],
-                  "count": r[1],
-            }
-            for r in rows
-         ]
-      except Exception as e:
-         print(e)
-         return []
-      finally:
-         cur.close()
-         conn.close()
-
-   @staticmethod
-   def getMonthlyFRAViews() -> int:
-      conn, cur = connect_db()
-
-      today = date.today()
-      # extract week number
-      year_num = str(today.year)
-      month_num = today.month
-      if month_num < 10:
-         month_num = "0" + (str(month_num))
-      else:
-         month_num = str(month_num)
-
-      try:
-         cur.execute('''
-            SELECT COUNT(*) 
-            FROM fra_view
-            WHERE strftime('%Y', view_date) = ?
-            AND strftime('%m', view_date) = ?
-        ''', (year_num, month_num))
-         row = cur.fetchone()
-         return row[0] if row else 0
-
-      except Exception as e:
-         print(e)
-      finally:
-         cur.close()
-         conn.close()

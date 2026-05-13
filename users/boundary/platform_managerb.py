@@ -1,11 +1,22 @@
 from users.control.platform_managerc import CreateFRACategoryController, ViewFRACategoryController, UpdateFRACategoryController, ViewAllFRACategoryController, SearchFRACategoryController, SuspendFRACategoryController, DailyReportController, WeeklyReportController, MonthlyReportController
 from users.entity.fracategory import FRACategory
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for
-
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session
 
 from typing import List, Dict, Any
 
 platform_manager_bp = Blueprint('platform_manager', __name__, url_prefix='/manager')
+
+
+def get_manager_email():
+    """Returns the logged-in platform manager's email from session, or None."""
+    return session.get('email_address')
+
+
+def require_manager_login():
+    """Redirect to login if no session. Returns None when session is valid."""
+    if not get_manager_email():
+        return redirect(url_for('user.show_login'))
+    return None
 
 # ========== BCE BOUNDARY: CreateFRACategory ==========
 # User Story: #35 As a platform management, I want to create FRA categories
@@ -24,10 +35,16 @@ class CreateFRACategoryBoundary:
 
 @platform_manager_bp.route('/create_category', methods=['GET'])
 def show_create_category():
+    guard = require_manager_login()
+    if guard:
+        return guard
     return render_template('platform_manager/PlatformManagerCreateCategory.html')
 
 @platform_manager_bp.route('/create_category', methods=['POST'])
 def create_category():
+    guard = require_manager_login()
+    if guard:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
     data = request.get_json()
     name = data.get('name', '').strip()
     description = data.get('description', '').strip()
@@ -51,6 +68,9 @@ class ViewFRACategoryBoundary:
 
 @platform_manager_bp.route('/viewcategory/<category_name>', methods=['GET'])
 def view_category(category_name):
+    guard = require_manager_login()
+    if guard:
+        return guard
     category = ViewFRACategoryBoundary().viewFRACategory(category_name)
     # BCE BOUNDARY: displayViewResult() — Flask renders category details via Jinja2
     return render_template('platform_manager/PlatformManagerViewCategory.html', category=category)
@@ -84,6 +104,9 @@ class UpdateFRACategoryBoundary:
 
 @platform_manager_bp.route('/updatecategory/<category_name>', methods=['GET'])
 def update_category(category_name):
+    guard = require_manager_login()
+    if guard:
+        return guard
     boundary = UpdateFRACategoryBoundary()
     category = FRACategory.getCategory(category_name)
     
@@ -98,6 +121,9 @@ def update_category(category_name):
 
 @platform_manager_bp.route('/updatecategory/<category_name>', methods=['POST'])
 def update_category_post(category_name):
+    guard = require_manager_login()
+    if guard:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
     boundary = UpdateFRACategoryBoundary()
     
     data = request.get_json()
@@ -124,6 +150,9 @@ class ViewAllFRACategoryBoundary:
     
 @platform_manager_bp.route('/categories', methods=['GET'])
 def view_all_category():
+    guard = require_manager_login()
+    if guard:
+        return guard
     boundary = ViewAllFRACategoryBoundary()
     categories = boundary.viewAllFRACategory()
     
@@ -138,6 +167,9 @@ class SearchFRACategory:
 
 @platform_manager_bp.route('/search_categories', methods=['GET'])
 def search_categories():
+    guard = require_manager_login()
+    if guard:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
     query = request.args.get('q', '').strip().lower()
     
     boundary = SearchFRACategory()
@@ -171,6 +203,9 @@ class SuspendFRACategoryBoundary:
 
 @platform_manager_bp.route('/suspend_category', methods=['POST'])
 def suspend_category():
+    guard = require_manager_login()
+    if guard:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
     data = request.get_json()
     category_name = data.get('category_name', '').strip()
 
@@ -185,63 +220,82 @@ def suspend_category():
 
 @platform_manager_bp.route('/reports', methods=['GET'])
 def show_reports():
+    guard = require_manager_login()
+    if guard:
+        return guard
     return render_template('platform_manager/PlatformManagerReports.html')
 
-# ========== BCE BOUNDARY: GenerateDailyReport ==========
-# User Story: #40 As a platform manager, I want to generate daily report
-# HARDCODED — backend needs to:
-# 1. Create GenerateDailyReportController in platform_managerc.py
-# 2. Query FRA and FRACategory views for today from database
-# 3. Pass fra_data, category_data, date to render_template
+# ─────────────────────────────────────────────────────────────────────────────
+#  User Story #40 — Generate Daily Report
+# ─────────────────────────────────────────────────────────────────────────────
 class DailyReportBoundary:
+    """
+    Boundary: GenerateDailyReport
+    User Story #40 (Platform Manager): As a platform manager, I want to generate a daily report, 
+    so that I can analyze the total number of views of all FRA and each FRA category.
+    Sequence: Platform Manager → GenerateDailyReport → DailyReportController → FRA and FRACategory data
+    """
     def __init__(self):
         self.controller = DailyReportController()
-    
-    def getReport(self) -> Dict[str, Any]:
+
+    def generateDailyReport(self) -> Dict[str, Any]:
         return self.controller.generateDailyReport()
 
 @platform_manager_bp.route('/reports/daily', methods=['GET'])
 def daily_report():
+    guard = require_manager_login()
+    if guard:
+        return guard
     boundary = DailyReportBoundary()
-    daily = boundary.getReport()
+    daily = boundary.generateDailyReport()
     return render_template('platform_manager/PlatformManagerDailyReport.html', daily=daily)
 
-# ========== BCE BOUNDARY: GenerateWeeklyReport ==========
-# User Story: #41 As a platform manager, I want to generate weekly report
-# HARDCODED — backend needs to:
-# 1. Create GenerateWeeklyReportController in platform_managerc.py
-# 2. Query FRA and FRACategory views for this week from database
-# 3. Pass fra_data, category_data, week to render_template
+# ─────────────────────────────────────────────────────────────────────────────
+#  User Story #41 — Generate Weekly Report
+# ─────────────────────────────────────────────────────────────────────────────
 class WeeklyReportBoundary:
+    """
+    Boundary: GenerateWeeklyReport
+    User Story #41 (Platform Manager): As a platform manager, I want to generate a weekly report, 
+    so that I can analyze the total number of views of all FRA and each FRA category.
+    Sequence: Platform Manager → GenerateWeeklyReport → WeeklyReportController → FRA and FRACategory data
+    """
     def __init__(self):
         self.controller = WeeklyReportController()
-    
-    def getReport(self) -> Dict[str, Any]:
-        return self.controller.getReport()
-    
+
+    def generateWeeklyReport(self) -> Dict[str, Any]:
+        return self.controller.generateWeeklyReport()
+
 @platform_manager_bp.route('/reports/weekly', methods=['GET'])
 def weekly_report():
+    guard = require_manager_login()
+    if guard:
+        return guard
     boundary = WeeklyReportBoundary()
-    weekly = boundary.getReport()
+    weekly = boundary.generateWeeklyReport()
     return render_template('platform_manager/PlatformManagerWeeklyReport.html', weekly=weekly)
 
-# ========== BCE BOUNDARY: GenerateMonthlyReport ==========
-# User Story: #42 As a platform manager, I want to generate monthly report
-# HARDCODED — backend needs to:
-# 1. Create GenerateMonthlyReportController in platform_managerc.py
-# 2. Query FRA and FRACategory views for this month from database
-# 3. Pass fra_data, category_data, month to render_template
+# ─────────────────────────────────────────────────────────────────────────────
+#  User Story #42 — Generate Monthly Report
+# ─────────────────────────────────────────────────────────────────────────────
 class MonthlyReportBoundary:
+    """
+    Boundary: GenerateMonthlyReport
+    User Story #42 (Platform Manager): As a platform manager, I want to generate a monthly report, 
+    so that I can analyze the total number of views of all FRA and each FRA category.
+    Sequence: Platform Manager → GenerateMonthlyReport → MonthlyReportController → FRA and FRACategory data
+    """
     def __init__(self):
         self.controller = MonthlyReportController()
-    
-    def getReport(self) -> Dict[str, Any]:
-        return self.controller.getReport()
-    
+
+    def generateMonthlyReport(self) -> Dict[str, Any]:
+        return self.controller.generateMonthlyReport()
 
 @platform_manager_bp.route('/reports/monthly', methods=['GET'])
 def monthly_report():
+    guard = require_manager_login()
+    if guard:
+        return guard
     boundary = MonthlyReportBoundary()
-    monthly = boundary.getReport()
-    print(monthly)
+    monthly = boundary.generateMonthlyReport()
     return render_template('platform_manager/PlatformManagerMonthlyReport.html', monthly=monthly)

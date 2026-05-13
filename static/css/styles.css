@@ -1,9 +1,15 @@
+/* =====================
+   RESET
+   ===================== */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
+/* =====================
+   BASE
+   ===================== */
 body {
     font-family: Arial, sans-serif;
     font-size: 14px;
@@ -11,6 +17,9 @@ body {
     color: #1a1a1a;
 }
 
+/* =====================
+   TOPBAR
+   ===================== */
 .topbar {
     background-color: #1a3a5c;
     padding: 12px 24px;
@@ -36,6 +45,7 @@ body {
     font-size: 13px;
 }
 
+/* Circular avatar showing user initials */
 .avatar {
     width: 32px;
     height: 32px;
@@ -49,12 +59,19 @@ body {
     font-weight: bold;
 }
 
+/* =====================
+   LAYOUT
+   ===================== */
+
+/* Full-height flex container for sidebar + main content */
 .layout {
     display: flex;
     min-height: calc(100vh - 56px);
 }
 
-
+/* =====================
+   SIDEBAR
+   ===================== */
 .sidebar {
     background-color: #142e4a;
     width: 180px;
@@ -82,11 +99,15 @@ body {
     color: #ffffff;
 }
 
+/* Logout link pushed to bottom of sidebar via margin-top: auto */
 .nav-item.logout {
     color: #f09595;
     margin-top: auto;
 }
 
+/* =====================
+   MAIN CONTENT
+   ===================== */
 .main {
     flex: 1;
     padding: 28px;
@@ -106,6 +127,9 @@ body {
     margin-bottom: 20px;
 }
 
+/* =====================
+   TOOLBAR (search + action button row)
+   ===================== */
 .toolbar {
     display: flex;
     align-items: center;
@@ -128,6 +152,9 @@ body {
     border-color: #378ADD;
 }
 
+/* =====================
+   BUTTONS
+   ===================== */
 .btn-primary {
     padding: 8px 18px;
     font-size: 13px;
@@ -143,6 +170,9 @@ body {
     background-color: #142e4a;
 }
 
+/* =====================
+   PROFILE CARD GRID
+   ===================== */
 .grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -164,6 +194,7 @@ body {
     border-bottom: 1px solid #e0e0e0;
 }
 
+/* Role icon circle — colour-coded by role */
 .icon-circle {
     width: 44px;
     height: 44px;
@@ -176,10 +207,11 @@ body {
     flex-shrink: 0;
 }
 
-.icon-fr     { background-color: #E1F5EE; color: #0F6E56; }
-.icon-donee  { background-color: #E6F1FB; color: #185FA5; }
-.icon-pm     { background-color: #FAEEDA; color: #854F0B; }
-.icon-admin  { background-color: #EEEDFE; color: #534AB7; }
+/* Role-specific icon colours */
+.icon-fr     { background-color: #E1F5EE; color: #0F6E56; } /* Food Rescue Agent */
+.icon-donee  { background-color: #E6F1FB; color: #185FA5; } /* Donee */
+.icon-pm     { background-color: #FAEEDA; color: #854F0B; } /* Project Manager */
+.icon-admin  { background-color: #EEEDFE; color: #534AB7; } /* Admin */
 
 .card-name {
     font-size: 14px;
@@ -198,6 +230,7 @@ body {
     padding: 12px 18px;
 }
 
+/* Key-value rows inside a card */
 .field-row {
     display: flex;
     justify-content: space-between;
@@ -220,9 +253,13 @@ body {
     color: #1a1a1a;
 }
 
+/* Account status colours */
 .status-active    { color: #3B6D11; }
 .status-suspended { color: #A32D2D; }
 
+/* =====================
+   ROLE BADGES
+   ===================== */
 .badge {
     font-size: 11px;
     font-weight: bold;
@@ -230,11 +267,15 @@ body {
     border-radius: 20px;
 }
 
+/* Matching colours to role icon circles */
 .badge-fr    { background-color: #E1F5EE; color: #0F6E56; }
 .badge-donee { background-color: #E6F1FB; color: #185FA5; }
 .badge-pm    { background-color: #FAEEDA; color: #854F0B; }
 .badge-admin { background-color: #EEEDFE; color: #534AB7; }
 
+/* =====================
+   CARD ACTION ROW
+   ===================== */
 .card-actions {
     display: flex;
     gap: 8px;
@@ -257,6 +298,7 @@ body {
     background-color: #f0f0f0;
 }
 
+/* Destructive action variant (e.g. suspend/delete) */
 .act-btn.danger {
     color: #A32D2D;
     border-color: #f09595;
@@ -265,10 +307,15 @@ body {
 .act-btn.danger:hover {
     background-color: #fff0f0;
 }
-/** Create User button **/
+
+/* =====================
+   HOME / LANDING PAGE
+   ===================== */
 a{
     text-decoration: none;
 }
+
+/* Centred hero section on the home page */
 .title{
     display: flex;
     justify-content: center;
@@ -277,11 +324,16 @@ a{
     height: 100%;
     margin-top: 200px;
 }
+
 .card-actions-home{
     display: flex;
     justify-content: center;
     margin-top: 20px;
 }
+
+/* =====================
+   LOGIN PAGE
+   ===================== */
 .login-btn {
     font-size: 14px;
     padding: 10px 20px;
@@ -291,15 +343,9 @@ a{
     color: #ffffff;
     width: 100px;
 }
+
 .login-btn:hover {
     background-color: #142e4a;
-}
-#alert-box {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px;
-  margin: 10px 0;
-  border-radius: 5px;
 }
 
 .search-group {
@@ -321,38 +367,8 @@ a{
 .btn-search:hover {
     background-color: #0056b3;
 }
-/* =====================
-   EMPTY STATE
-   ===================== */
-.empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 60px 20px;
-    background-color: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
-    margin-top: 10px;
-}
 
-.empty-text {
-    font-size: 14px;
-    color: #666666;
-    text-align: center;
-}
-
-/* =====================
-   ACCOUNT CARD
-   ===================== */
-.account-card {
-    background-color: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-/*Login page*/
+/* Full-page centered login layout */
 .login-wrapper {
     display: flex;
     justify-content: center;
@@ -390,6 +406,7 @@ a{
     font-size: 14px;
 }
 
+/* Labelled input field */
 .input-group {
     text-align: left;
     margin-bottom: 20px;
@@ -423,7 +440,9 @@ a{
 
 }
 
-/* DATE FILTER GROUP */
+/* =====================
+   DATE FILTER GROUP
+   ===================== */
 .filter-group {
     display: flex;
     flex-direction: column;
@@ -435,6 +454,37 @@ a{
     font-size: 18px;
     font-weight: 700;
     color:  #142e4a;
+}
+
+/* =====================
+   EMPTY STATE
+   ===================== */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+.empty-text {
+    font-size: 14px;
+    color: #666666;
+    text-align: center;
+}
+
+/* =====================
+   ACCOUNT CARD
+   ===================== */
+.account-card {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 /* =====================
@@ -473,6 +523,7 @@ a{
 .detail-body {
     padding: 4px 0;
 }
+
 /* =====================
    PROGRESS BAR (shared: DoneeViewFRA + DoneeFavourites)
    ===================== */
@@ -492,6 +543,8 @@ a{
 /* =====================
    FAVOURITE BUTTONS (DoneeViewFRA)
    ===================== */
+
+/* Already-saved state — non-interactive green */
 .fav-btn-saved {
     padding: 8px 18px;
     font-size: 13px;
@@ -502,6 +555,7 @@ a{
     cursor: default;
 }
 
+/* Save action button */
 .fav-btn-save {
     padding: 8px 18px;
     font-size: 13px;
@@ -610,6 +664,7 @@ a{
     background: #f7faff;
 }
 
+/* Donation amount shown in green */
 .amount-cell {
     font-weight: bold;
     color: #1D9E75;
@@ -640,5 +695,3 @@ a{
     font-size: 15px;
     color: #1a1a1a;
 }
-
-

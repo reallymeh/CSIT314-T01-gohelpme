@@ -7,12 +7,28 @@ from users.entity.fracategory import FRACategory
 
 fundraiser_bp = Blueprint('fundraiser', __name__, url_prefix='/fundraiser')
 
+
+def get_fundraiser_email():
+    """Returns the logged-in fundraiser's email from session, or None."""
+    return session.get('email_address')
+
+
+def require_fundraiser_login():
+    """Redirect to login if no session. Returns None when session is valid."""
+    if not get_fundraiser_email():
+        return redirect(url_for('user.show_login'))
+    return None
+
+
 '''
 User Story #344: As a Fund Raiser, I want to view all FRAs so that I can view many FRAs at the same time.
 '''
 # Link to Fund Raiser Homepage
 @fundraiser_bp.route('/homepage', methods=['GET'])
 def homepage():
+    guard = require_fundraiser_login()
+    if guard:
+        return guard
     boundary = DisplayFRAPage()
     fra_data = boundary.displayFRA()
     message = request.args.get('message')
@@ -33,6 +49,9 @@ User Story #15: As a Fund Raiser, I want to create a FRA so that I can share my 
 # Link to Create FRA page once clicked on "Create FRA" button
 @fundraiser_bp.route('/create', methods=['GET'])
 def show_create_fra():
+    guard = require_fundraiser_login()
+    if guard:
+        return guard
     categories = [c.category_name for c in FRACategory.getAllCategory() if c.status == 1]
     return render_template('fundraiser/FundRaiserCreateFRA.html', categories=categories)
 
@@ -58,6 +77,9 @@ class CreateFRAPage:
 # Link to Create FRA function once clicked on "Create FRA" button
 @fundraiser_bp.route('/create', methods=['POST'])
 def create_fra():
+    guard = require_fundraiser_login()
+    if guard:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
     data = request.get_json()
 
     boundary = CreateFRAPage()
@@ -100,8 +122,9 @@ class ViewFRAPage:
 # Link to View FRA page once clicked on "View" button for each FRA in the Fund Raiser Homepage
 @fundraiser_bp.route('/view/<fraId>', methods=['GET'])
 def view_fra(fraId):
-    #controller = ViewFRAController()
-    #fra = controller.viewFRA(fraId)
+    guard = require_fundraiser_login()
+    if guard:
+        return guard
     page = ViewFRAPage()
     fra = page.displayFRA(fraId)
     
@@ -114,6 +137,9 @@ User Story #17: As a Fund Raiser, I want to update a FRA so that I can show my c
 # Show Update FRA page once clicked on "Update" button for each FRA in the Fund Raiser Homepage
 @fundraiser_bp.route('/update/<fraId>', methods=['GET'])
 def show_update_page(fraId):
+    guard = require_fundraiser_login()
+    if guard:
+        return guard
     page = ViewFRAPage()
     fra = page.displayFRA(fraId)
     categories = [c.category_name for c in FRACategory.getAllCategory() if c.status == 1]
@@ -139,6 +165,9 @@ class UpdateFRAPage:
 
 @fundraiser_bp.route('/update', methods=['POST'])
 def update_fra():
+    guard = require_fundraiser_login()
+    if guard:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
     data = request.get_json()
     page = UpdateFRAPage()
 
@@ -180,6 +209,9 @@ class SuspendFRAPage:
     
 @fundraiser_bp.route('/suspend/<fraId>', methods=['POST'])
 def suspend_fra(fraId):
+    guard = require_fundraiser_login()
+    if guard:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
     page = SuspendFRAPage()
     success = page.suspendFRA(fraId)
     message = page.displaySuccess() if success else page.displayError()
@@ -206,6 +238,9 @@ class SearchFRAPage:
 
 @fundraiser_bp.route('/search', methods=['POST'])
 def search_fra():
+    guard = require_fundraiser_login()
+    if guard:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
     data = request.get_json()
     name = data.get('name', '')
 
@@ -234,6 +269,9 @@ class ViewFRAViewCountPage:
     
 @fundraiser_bp.route('/viewCount/<fraId>', methods=['GET'])
 def view_fra_view_count(fraId):
+    guard = require_fundraiser_login()
+    if guard:
+        return guard
     page = ViewFRAViewCountPage()
     data = page.getStats(fraId)
     return render_template(
@@ -253,6 +291,9 @@ class ViewFRAShortlistCountPage:
     
 @fundraiser_bp.route('/shortlistCount/<fraId>', methods=['GET'])
 def view_fra_shortlist_count(fraId):
+    guard = require_fundraiser_login()
+    if guard:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
     page = ViewFRAShortlistCountPage()
     shortlist_count = page.getFRAShortlistCount(fraId)
 
@@ -267,6 +308,9 @@ User Story #22: As a Fund Raiser, I want to search history of completed FRA by s
 '''
 @fundraiser_bp.route('/history', methods=['GET'])
 def view_history():
+    guard = require_fundraiser_login()
+    if guard:
+        return guard
     categories = [c.category_name for c in FRACategory.getAllCategory() if c.status == 1]
     return render_template('fundraiser/FundRaiserHistory.html',categories=categories)
 
@@ -281,6 +325,9 @@ class SearchCompletedFRAHistoryPage:
 
 @fundraiser_bp.route('/history/search', methods=['POST'])
 def search_completed_fra_history():
+    guard = require_fundraiser_login()
+    if guard:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
     data = request.get_json(silent=True) or {}
     category = data.get('category', '')
     start_date = data.get('date_from', '')
@@ -313,6 +360,9 @@ class ViewCompletedFRAPage:
 
 @fundraiser_bp.route('/viewCompleted/<fraId>', methods=['GET'])
 def view_comopleted_fra(fraId):
+    guard = require_fundraiser_login()
+    if guard:
+        return guard
     page = ViewCompletedFRAPage()
     fra = page.viewCompletedFRA(fraId)
 
