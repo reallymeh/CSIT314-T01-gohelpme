@@ -244,7 +244,7 @@ class FRA:
     """
 
     @staticmethod 
-    def searchCompletedFRAHistory(category, start_date, end_date)->list:
+    def searchCompletedFRAHistory(category, start_date, end_date)->list["FRA"]:
         conn, cur = connect_db()
 
         cur.execute("""
@@ -275,7 +275,7 @@ class FRA:
     User Story #23: As a Fund Raiser, I want to view the history of completed FRA by service category and date period so that I can review how the past FRA has progressed.
     """
     @staticmethod
-    def viewCompletedFRA(fraId: str):
+    def viewCompletedFRA(fraId: str) -> "FRA":
         conn, cur = connect_db()
 
         cur.execute("SELECT * FROM fra WHERE fraId = ? AND status = 0", (fraId,))

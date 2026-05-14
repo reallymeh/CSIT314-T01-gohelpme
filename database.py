@@ -72,6 +72,34 @@ def init_db():
          FOREIGN KEY (fra_category) REFERENCES fra(category) \
         )"
     )
+    # Donee: Favourite list 
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS donee_favourite (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            donee_email TEXT    NOT NULL,
+            fraId       TEXT    NOT NULL,
+            saved_date  TEXT    NOT NULL DEFAULT (date('now')),
+            UNIQUE(donee_email, fraId),
+            FOREIGN KEY (donee_email) REFERENCES user_account(email_address),
+            FOREIGN KEY (fraId)       REFERENCES fra(fraId)
+        )
+    """)
+
+    # Donee: Donation history
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS donation_history (
+            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            donee_email  TEXT    NOT NULL,
+            fraId        TEXT    NOT NULL,
+            fra_title    TEXT    NOT NULL,
+            fra_category TEXT    NOT NULL,
+            amount       REAL    NOT NULL,
+            donation_date TEXT   NOT NULL,
+            FOREIGN KEY (donee_email) REFERENCES user_account(email_address),
+            FOREIGN KEY (fraId)       REFERENCES fra(fraId)
+        )
+    """)
+
     # sample test data
     user_account_data = [
         ('Alice Tan', 'admin@email.com', '+65 9123 4567', '123 Example Street', 'admin', 1, 'password123'),
@@ -152,34 +180,7 @@ def init_db():
     )
     conn.commit()
 
-    # Donee: Favourite list 
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS donee_favourite (
-            id          INTEGER PRIMARY KEY AUTOINCREMENT,
-            donee_email TEXT    NOT NULL,
-            fraId       TEXT    NOT NULL,
-            saved_date  TEXT    NOT NULL DEFAULT (date('now')),
-            UNIQUE(donee_email, fraId),
-            FOREIGN KEY (donee_email) REFERENCES user_account(email_address),
-            FOREIGN KEY (fraId)       REFERENCES fra(fraId)
-        )
-    """)
-
-    # Donee: Donation history
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS donation_history (
-            id           INTEGER PRIMARY KEY AUTOINCREMENT,
-            donee_email  TEXT    NOT NULL,
-            fraId        TEXT    NOT NULL,
-            fra_title    TEXT    NOT NULL,
-            fra_category TEXT    NOT NULL,
-            amount       REAL    NOT NULL,
-            donation_date TEXT   NOT NULL,
-            FOREIGN KEY (donee_email) REFERENCES user_account(email_address),
-            FOREIGN KEY (fraId)       REFERENCES fra(fraId)
-        )
-    """)
-
+    
     # ── Donee Favourites ──────────────────────────────────────────────────────
     # Covers US #21 (shortlist count), US #28-#30 (save/search/view favourites)
     donee_favourite_seed = [
@@ -227,6 +228,24 @@ def init_db():
     # ── FRA View History ──────────────────────────────────────────────────────
     # Multiple viewers across Jan–May 2026 for daily/weekly/monthly report testing
     fra_view_seed = [
+        # December 2025 additional FRA views
+        ("FRA001", "donee001@email.com", "2025-12-01 09:00:00", "Education Fund 2026", "Education"),
+        ("FRA002", "donee002@email.com", "2025-12-02 10:15:00", "Medical Aid Fund", "Medical"),
+        ("FRA003", "donee003@email.com", "2025-12-03 11:30:00", "Animal Shelter Support", "Animal"),
+        ("FRA004", "donee004@email.com", "2025-12-04 12:45:00", "Community Charity Drive", "Charity"),
+        ("FRA005", "donee005@email.com", "2025-12-05 14:00:00", "Student Bursary Fund", "Education"),
+
+        ("FRA006", "donee006@email.com", "2025-12-06 09:20:00", "Cancer Treatment Aid", "Medical"),
+        ("FRA001", "donee007@email.com", "2025-12-07 10:40:00", "Education Fund 2026", "Education"),
+        ("FRA002", "donee008@email.com", "2025-12-08 13:10:00", "Medical Aid Fund", "Medical"),
+        ("FRA003", "donee009@email.com", "2025-12-09 15:25:00", "Animal Shelter Support", "Animal"),
+        ("FRA004", "donee010@email.com", "2025-12-10 16:45:00", "Community Charity Drive", "Charity"),
+
+        ("FRA005", "donee011@email.com", "2025-12-11 08:10:00", "Student Bursary Fund", "Education"),
+        ("FRA006", "donee012@email.com", "2025-12-12 09:35:00", "Cancer Treatment Aid", "Medical"),
+        ("FRA001", "donee013@email.com", "2025-12-13 11:00:00", "Education Fund 2026", "Education"),
+        ("FRA002", "donee014@email.com", "2025-12-14 12:20:00", "Medical Aid Fund", "Medical"),
+        ("FRA003", "donee015@email.com", "2025-12-15 13:50:00", "Animal Shelter Support", "Animal"),
         # January 2026
         ("FRA001", "johndoe@email.com", "2026-01-05 10:00:00", "Education Fund 2026",    "Education"),
         ("FRA002", "johndoe@email.com", "2026-01-05 11:00:00", "Medical Aid Fund",        "Medical"),
@@ -280,7 +299,6 @@ def init_db():
         "INSERT OR IGNORE INTO fra_view (fraId, user_email, view_date, fra_name, fra_category) VALUES (?, ?, ?, ?, ?)",
         fra_view_seed
     )
-
     conn.commit()
 
     # ── ADD USER ACCOUNTS ──────────────────────────────────────────────────────
@@ -431,6 +449,52 @@ def init_db():
     ))
     cur.executemany("INSERT OR IGNORE INTO fra_category VALUES (?, ?, ?)", fra_category_data)
 
+    conn.commit()
+
+    # ── Donee Favourite Records ──────────────────────────────
+    generated_donee_favourites = []
+
+    for i in range(1, 101):
+      donee_email = f"donee{i % 50 + 1:03}@email.com"
+      fra_id = f"FRA{i % 90 + 1:03}"
+      month = (i % 5) + 1
+      day = (i % 28) + 1
+      saved_date = f"2026-{month:02d}-{day:02d}"
+      generated_donee_favourites.append((
+        donee_email,
+        fra_id,
+        saved_date
+    ))
+    cur.executemany("INSERT OR IGNORE INTO donee_favourite (donee_email, fraId, saved_date) VALUES (?, ?, ?)",generated_donee_favourites)
+    conn.commit()
+
+    # ── Generate Additional Donation History Records ──────────────────────
+    generated_donations = []
+
+    for i in range(40, 80):
+      donee_email = f"donee{i % 50 + 1:03}@email.com"
+      fra_id = f"FRA{i:03}"
+      category = categories[i % 4]
+      fra_title = f"{category} Support Fund {i}"
+      amount = float(50 + (i * 7))
+      month = ((i - 40) // 28) + 12
+      year = 2025
+      if month > 12:
+        month -= 12
+        year = 2026
+      day = (i % 28) + 1
+      donation_date = f"{year}-{month:02d}-{day:02d}"
+      generated_donations.append((
+        donee_email,
+        fra_id,
+        fra_title,
+        category,
+        amount,
+        donation_date
+    ))
+    cur.executemany("INSERT OR IGNORE INTO donation_history "
+                    "(donee_email, fraId, fra_title, fra_category, amount, donation_date) "
+                    "VALUES (?, ?, ?, ?, ?, ?)", generated_donations)
     conn.commit()
 
     cur.close()
