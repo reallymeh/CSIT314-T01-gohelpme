@@ -138,7 +138,7 @@
                 <!-- ACTIONS -->
                 <div class="card-actions">
 
-                    <button class="act-btn view" onclick="window.location.href='/donee/view/{{ fra.fraId }}'">
+                    <button class="act-btn view" onclick="window.location.href='/fundraiser/viewCompleted/{{ fra.fraId }}'">
                     View
                     </button>
                 </div>
@@ -196,7 +196,13 @@
     const stateEl = document.getElementById('no-result-state');
     if (stateEl) stateEl.style.display = 'none';
 
-    document.getElementById('fra-container').innerHTML = '';
+    fetch('/fundraiser/history/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category: '', date_from: '', date_to: '' })
+    })
+    .then(res => res.json())
+    .then(data => { if (data.data) renderGrid(data.data); });
    }
 
    function renderGrid(records) {

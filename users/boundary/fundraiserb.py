@@ -265,7 +265,7 @@ class ViewFRAViewCountPage:
         self.stats_controller = ViewFRAViewStatsController()
     def getStats(self, fraId):
         stats = self.stats_controller.getStats(fraId)
-        total_views = sum(stat.count for stat in stats) if stats else 0
+        total_views = sum(stat["count"] for stat in stats) if stats else 0
         return {
             "stats": stats,
             "total_views": total_views
@@ -322,7 +322,9 @@ def view_history():
         for c in cat_controller.viewAllFRACategory()
         if c.status == 1
     ]
-    return render_template('fundraiser/FundRaiserHistory.html',categories=categories)
+    page = SearchCompletedFRAHistoryPage()
+    fra_data = page.searchCompletedFRAHistory('', '', '')
+    return render_template('fundraiser/FundRaiserHistory.html', categories=categories, fra_data=fra_data)
 
 class SearchCompletedFRAHistoryPage: 
     def __init__(self): 
@@ -344,12 +346,6 @@ def search_completed_fra_history():
     end_date = data.get('date_to', '')
 
     page = SearchCompletedFRAHistoryPage()
-    if not category or not start_date or not end_date:
-      return jsonify({
-        "success": False,
-        "data": [],
-        "message": "Please select all filters"
-    })
     results = page.searchCompletedFRAHistory(category, start_date, end_date)
     return jsonify({
         "success": True,
