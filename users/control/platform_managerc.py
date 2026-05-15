@@ -46,10 +46,10 @@ class DailyReportController:
     """
     def generateDailyReport(self) -> Dict[str, Any]:
         category_rows = FRAView.getViewsGroupedByDayAndCategory()
-        categories = sorted({r.fra_category for r in category_rows})
+        categories = sorted({r["fra_category"] for r in category_rows})
         period_cat: Dict[str, Dict[str, int]] = {}
         for r in category_rows:
-            period_cat.setdefault(r.period, {})[r.fra_category] = r.count
+            period_cat.setdefault(r["period"], {})[r["fra_category"]] = r["count"]
         rows = [
             {"period": period, "count": sum(by_cat.values()), "by_category": by_cat}
             for period, by_cat in sorted(period_cat.items())
@@ -63,10 +63,10 @@ class WeeklyReportController:
     """
     def generateWeeklyReport(self) -> Dict[str, Any]:
         category_rows = FRAView.getViewsGroupedByWeekAndCategory()
-        categories = sorted({r.fra_category for r in category_rows})
+        categories = sorted({r["fra_category"] for r in category_rows})
         period_cat: Dict[str, Dict[str, int]] = {}
         for r in category_rows:
-            period_cat.setdefault(r.period, {})[r.fra_category] = r.count
+            period_cat.setdefault(r["period"], {})[r["fra_category"]] = r["count"]
         rows = [
             {"period": period, "count": sum(by_cat.values()), "by_category": by_cat}
             for period, by_cat in sorted(period_cat.items())
@@ -80,10 +80,10 @@ class MonthlyReportController:
     """
     def generateMonthlyReport(self) -> Dict[str, Any]:
         category_rows = FRAView.getViewsGroupedByMonthAndCategory()
-        categories = sorted({r.fra_category for r in category_rows})
+        categories = sorted({r["fra_category"] for r in category_rows})
         period_cat: Dict[str, Dict[str, int]] = {}
         for r in category_rows:
-            period_cat.setdefault(r.period, {})[r.fra_category] = r.count
+            period_cat.setdefault(r["period"], {})[r["fra_category"]] = r["count"]
         rows = [
             {"period": period, "count": sum(by_cat.values()), "by_category": by_cat}
             for period, by_cat in sorted(period_cat.items())
