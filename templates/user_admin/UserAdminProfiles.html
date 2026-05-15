@@ -43,110 +43,109 @@
                     type="text"
                     id="search-input"
                     placeholder="Search profile type..."
+                    onkeydown="if(event.key==='Enter') searchProfiles()"
                 />
-                <button class="btn-primary" id="search-btn">Search</button>
+                <button class="btn-primary" onclick="searchProfiles()">Search</button>
             </div>
             <a href="{{ url_for('admin_view_profile.show_create_profile') }}" class="btn-primary">
                 + Create Profile
             </a>
         </div>
 
-        <div class="grid" id="profile-grid">
-            <!-- Initial profiles rendered by Jinja (server-side) -->
-            {% for profile in profiles %}
-            <div class="profile-card">
-                <div class="card-top">
-                    <div class="icon-circle 
-                        {% if profile.name | lower == 'fund raiser' %}icon-fr
-                        {% elif profile.name | lower == 'donee' %}icon-donee
-                        {% elif profile.name | lower == 'platform manager' %}icon-pm
-                        {% elif profile.name | lower == 'user admin' %}icon-admin
-                        {% endif %}">
-                        {{ profile.name[:2] | upper }}
-                    </div>
-                    <div>
-                        <div class="card-name">{{ profile.name | title }}</div>
-                        <div class="card-desc">{{ profile.description }}</div>
-                    </div>
-                </div>
-                <div class="card-actions">
-                    <button class="act-btn view" onclick="window.location.href='/admin/viewprofile/{{ profile.name }}'">View</button>
-                    <button class="act-btn" onclick="window.location.href='/admin/updateprofile/{{ profile.name }}'">Update</button>
-                    <button class="act-btn danger" onclick="suspendProfile('{{ profile.name }}')">Suspend</button>
-                </div>
-            </div>
-            {% endfor %}
+        <div id="loading-state" class="empty-state">
+            <div class="empty-text">Loading profiles...</div>
         </div>
+
+        <div id="no-result-state" class="empty-state" style="display:none;">
+            <div class="empty-text" id="no-result-msg">No profiles found.</div>
+        </div>
+
+        <div class="grid" id="profile-grid" style="display:none;"></div>
         </div>
     </div>
 
     <script>
-        const searchInput = document.getElementById('search-input');
-        const searchBtn = document.getElementById('search-btn');
-        const profileGrid = document.getElementById('profile-grid');
+        function searchProfiles() {
+            const name = document.getElementById('search-input').value.trim();
 
-         // Function to load profiles from backend
-        async function loadProfiles(query = '') {
-            try {
-                const response = await fetch(`/admin/search_profiles?q=${encodeURIComponent(query)}`);
-                const profiles = await response.json();
+            document.getElementById('loading-state').style.display   = 'flex';
+            document.getElementById('no-result-state').style.display = 'none';
+            document.getElementById('profile-grid').style.display    = 'none';
 
-                if (profiles.length === 0) {
-                    profileGrid.innerHTML = `<p class="no-results">No profiles found for "${query}".</p>`;
+            fetch('/admin/search_profiles', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name })
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('loading-state').style.display = 'none';
+
+                if (!data.data || data.data.length === 0) {
+                    document.getElementById('no-result-msg').textContent = data.message;
+                    document.getElementById('no-result-state').style.display = 'flex';
                     return;
                 }
 
-                let html = '';
-                profiles.forEach(profile => {
-                    html += `
-                        <div class="profile-card">
-                            <div class="card-top">
-                                <div class="icon-circle 
-                                    ${profile.name.toLowerCase() === 'fund raiser' ? 'icon-fr' : ''}
-                                    ${profile.name.toLowerCase() === 'donee' ? 'icon-donee' : ''}
-                                    ${profile.name.toLowerCase() === 'platform manager' ? 'icon-pm' : ''}
-                                    ${profile.name.toLowerCase() === 'user admin' ? 'icon-admin' : ''}">
-                                    ${profile.name.substring(0, 2).toUpperCase()}
-                                </div>
-                                <div>
-                                    <div class="card-name">${profile.name}</div>
-                                    <div class="card-desc">${profile.description || ''}</div>
-                                </div>
+                renderProfileCards(data.data);
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('no-result-msg').textContent = 'Failed to load profiles. Please try again.';
+                document.getElementById('no-result-state').style.display = 'flex';
+            });
+        }
+
+        function renderProfileCards(profiles) {
+            const grid = document.getElementById('profile-grid');
+            grid.innerHTML = '';
+
+            profiles.forEach(profile => {
+                const lowerName = profile.name.toLowerCase();
+                const iconClass = lowerName === 'fund raiser' ? 'icon-fr'
+                    : lowerName === 'donee' ? 'icon-donee'
+                    : lowerName === 'platform manager' ? 'icon-pm'
+                    : lowerName === 'user admin' ? 'icon-admin' : '';
+
+                grid.innerHTML += `
+                    <div class="profile-card">
+                        <div class="card-top">
+                            <div class="icon-circle ${iconClass}">
+                                ${esc(profile.name.substring(0, 2).toUpperCase())}
                             </div>
-                            <div class="card-actions">
-                                <button class="act-btn view" 
-                                        onclick="window.location.href='/admin/viewprofile/${encodeURIComponent(profile.name)}'">
-                                    View
-                                </button>
-                                <button class="act-btn" 
-                                        onclick="window.location.href='/admin/updateprofile/${encodeURIComponent(profile.name)}'">
-                                    Update
-                                </button>
-                                <button class="act-btn danger" 
-                                        onclick="suspendProfile('${profile.name}')">
-                                    Suspend
-                                </button>
+                            <div>
+                                <div class="card-name">${esc(profile.name)}</div>
+                                <div class="card-desc">${esc(profile.description || '')}</div>
                             </div>
                         </div>
-                    `;
-                });
+                        <div class="card-actions">
+                            <button class="act-btn view"
+                                    onclick="window.location.href='/admin/viewprofile/${encodeURIComponent(profile.name)}'">
+                                View
+                            </button>
+                            <button class="act-btn"
+                                    onclick="window.location.href='/admin/updateprofile/${encodeURIComponent(profile.name)}'">
+                                Update
+                            </button>
+                            <button class="act-btn danger"
+                                    onclick="suspendProfile('${esc(profile.name)}')">
+                                Suspend
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
 
-            profileGrid.innerHTML = html;
-        } catch (error) {
-            profileGrid.innerHTML = `<p class="error">Error loading profiles. Please try again later.</p>`;
-            console.error(error);
+            grid.style.display = 'grid';
         }
-    }
 
-        searchBtn.addEventListener('click', () => loadProfiles(searchInput.value.trim()));
-        searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') loadProfiles(searchInput.value.trim());
-        });
+        function esc(str) {
+            const d = document.createElement('div');
+            d.appendChild(document.createTextNode(String(str)));
+            return d.innerHTML;
+        }
 
-
-        // BCE BOUNDARY: SuspendUserProfile
-        // Sends suspend request to SuspendUserProfileController via POST /admin/suspend_user
-        // Calls displaySuspendSuccess() or displaySuspendFail() based on response
         function suspendProfile(profileName) {
             if (confirm("Are you sure you want to suspend " + profileName + "?")) {
                 fetch('/admin/suspend_user', {
@@ -156,18 +155,16 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    // displaySuspendSuccess() or displaySuspendFail()
                     alert(data.message);
-                    // Refresh current search after suspend
-                    loadProfiles(searchInput.value.trim());
+                    searchProfiles();
                 })
                 .catch(() => {
                     alert("Something went wrong!");
                 });
             }
         }
-    </script>
-    <script>
+
+        window.onload = () => searchProfiles();
     </script>
 
 </body>

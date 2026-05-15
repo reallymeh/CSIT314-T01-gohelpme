@@ -41,7 +41,8 @@
 
             <!-- SEARCH -->
             <div class="search-group">
-                <input type="text" id="searchInput" placeholder="Search FRA title...">
+                <input type="text" id="searchInput" placeholder="Search FRA title..."
+                       onkeydown="if(event.key==='Enter') searchFRA()">
                 <button onclick="searchFRA()" class="btn-primary">Search</button>
             </div>
 
@@ -52,59 +53,18 @@
 
         </div>
 
-        <!-- GRID -->
-        <div class="grid" id="fra-container">
-
-            {% for fra in fra_data %}
-
-            <div class="profile-card">
-
-                <!-- TOP -->
-                <div class="card-top">
-                    <div class="icon-circle icon-fr">
-                        {{ fra.title[:2] | upper }}
-                    </div>
-
-                    <div>
-                        <div class="card-name">{{ fra.title }}</div>
-
-                        <!-- GREY DESCRIPTION -->
-                        <div style="font-size:12px; color:grey; margin-top:2px;">
-                            {{ fra.description }}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ACTIONS -->
-                <div class="card-actions">
-
-                    <button class="act-btn view" onclick="window.location.href='/fundraiser/view/{{ fra.fraId }}'">
-                    View
-                    </button>
-                    <button class="act-btn" onclick="window.location.href='/fundraiser/update/{{ fra.fraId }}'">
-                    Update
-                    </button>
-
-                    <button class="act-btn" onclick="suspendFRA('{{ fra.fraId }}')"
-                            style="color:red; border:1px solid red;">
-                        Suspend
-                    </button>
-
-                    <button class="act-btn" onclick="window.location.href='/fundraiser/viewCount/{{ fra.fraId }}'">
-                        View Count
-                    </button>
-
-                    <button class="act-btn" onclick="viewFRAShortlistCount('{{ fra.fraId }}')">
-                        Shortlist Count
-                    </button>
-
-                </div>
-
-            </div>
-
-            {% endfor %}
-
+        <!-- LOADING STATE -->
+        <div id="loading-state" class="empty-state">
+            <div class="empty-text">Loading fundraising activities...</div>
         </div>
+
+        <!-- NO RESULTS STATE -->
+        <div id="no-result-state" class="empty-state" style="display:none;">
+            <div class="empty-text" id="no-result-msg">No FRA found.</div>
+        </div>
+
+        <!-- GRID -->
+        <div class="grid" id="fra-container" style="display:none;"></div>
 
     </div>
 </div>
@@ -133,7 +93,11 @@ function suspendFRA(fraId) {
 }
 
 function searchFRA() {
-    const name = document.getElementById('searchInput').value;
+    const name = document.getElementById('searchInput').value.trim();
+
+    document.getElementById('loading-state').style.display   = 'flex';
+    document.getElementById('no-result-state').style.display = 'none';
+    document.getElementById('fra-container').style.display   = 'none';
 
     fetch('/fundraiser/search', {
         method: 'POST',
@@ -142,71 +106,76 @@ function searchFRA() {
     })
     .then(res => res.json())
     .then(data => {
+        document.getElementById('loading-state').style.display = 'none';
 
-        const container = document.querySelector('.grid');
-        container.innerHTML = "";
-
-        if (data.data.length === 0) {
-            container.innerHTML = "<p>No FRA found</p>";
+        if (!data.data || data.data.length === 0) {
+            document.getElementById('no-result-msg').textContent = data.message;
+            document.getElementById('no-result-state').style.display = 'flex';
             return;
         }
 
-        data.data.forEach(fra => {
-            container.innerHTML += `
-            <div class="profile-card">
-
-                <div class="card-top">
-                    <div class="icon-circle icon-fr">
-                        ${fra.title.substring(0,2).toUpperCase()}
-                    </div>
-
-                    <div>
-                        <div class="card-name">${fra.title}</div>
-
-                        <div style="font-size:12px; color:grey; margin-top:2px;">
-                            ${fra.description}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card-actions">
-
-                    <button class="act-btn view"
-                        onclick="window.location.href='/fundraiser/view/${fra.fraId}'">
-                        View
-                    </button>
-
-                    <button class="act-btn"
-                        onclick="window.location.href='/fundraiser/update/${fra.fraId}'">
-                        Update
-                    </button>
-
-                    <button class="act-btn"
-                        onclick="suspendFRA('${fra.fraId}')"
-                        style="color:red; border:1px solid red;">
-                        Suspend
-                    </button>
-
-                    <button class="act-btn" onclick="viewFRAViewCount('${fra.fraId}')">
-                        View Count
-                    </button>
-
-                    <button class="act-btn" onclick="viewFRAShortlistCount('${fra.fraId}')">
-                        Shortlist Count
-                    </button>
-
-                </div>
-
-            </div>
-            `;
-        });
+        renderFRACards(data.data);
     })
     .catch(err => {
         console.error(err);
-        alert("Search failed");
+        document.getElementById('loading-state').style.display = 'none';
+        document.getElementById('no-result-msg').textContent = 'Failed to load fundraising activities. Please try again.';
+        document.getElementById('no-result-state').style.display = 'flex';
     });
 }
 
+function renderFRACards(fras) {
+    const container = document.getElementById('fra-container');
+    container.innerHTML = '';
+
+    fras.forEach(fra => {
+        container.innerHTML += `
+        <div class="profile-card">
+            <div class="card-top">
+                <div class="icon-circle icon-fr">
+                    ${esc(fra.title.substring(0, 2).toUpperCase())}
+                </div>
+                <div>
+                    <div class="card-name">${esc(fra.title)}</div>
+                    <div style="font-size:12px; color:grey; margin-top:2px;">${esc(fra.description)}</div>
+                </div>
+            </div>
+            <div class="card-actions">
+                <button class="act-btn view"
+                    onclick="window.location.href='/fundraiser/view/${esc(fra.fraId)}'">
+                    View
+                </button>
+                <button class="act-btn"
+                    onclick="window.location.href='/fundraiser/update/${esc(fra.fraId)}'">
+                    Update
+                </button>
+                <button class="act-btn"
+                    onclick="suspendFRA('${esc(fra.fraId)}')"
+                    style="color:red; border:1px solid red;">
+                    Suspend
+                </button>
+                <button class="act-btn" onclick="window.location.href='/fundraiser/viewCount/${esc(fra.fraId)}'">
+                    View Count
+                </button>
+                <button class="act-btn" onclick="viewFRAShortlistCount('${esc(fra.fraId)}')">
+                    Shortlist Count
+                </button>
+            </div>
+        </div>
+        `;
+    });
+
+    container.style.display = 'grid';
+}
+
+function esc(str) {
+    const d = document.createElement('div');
+    d.appendChild(document.createTextNode(String(str)));
+    return d.innerHTML;
+}
+
+
+window.onload = () => searchFRA();
 
 function viewFRAShortlistCount(fraId) {
     fetch(`/fundraiser/shortlistCount/${fraId}`)

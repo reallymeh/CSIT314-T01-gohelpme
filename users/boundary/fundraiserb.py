@@ -266,11 +266,13 @@ class ViewFRAViewCountPage:
     def getStats(self, fraId):
         stats = self.stats_controller.getStats(fraId)
         total_views = sum(stat["count"] for stat in stats) if stats else 0
+        fra_name = stats[0]["fra_name"] if stats else ""
         return {
             "stats": stats,
-            "total_views": total_views
+            "total_views": total_views,
+            "fra_name": fra_name
         }
-    
+
 @fundraiser_bp.route('/viewCount/<fraId>', methods=['GET'])
 def view_fra_view_count(fraId):
     guard = require_fundraiser_login()
@@ -281,7 +283,8 @@ def view_fra_view_count(fraId):
     return render_template(
         "fundraiser/FundRaiserViewFRAViewCount.html",
         stats=data["stats"],
-        total_views=data["total_views"]
+        total_views=data["total_views"],
+        fra_name=data["fra_name"]
     )
 '''
 User Story #21: As a Fund Raiser, I want to view the number of times a FRA is shortlisted so that I can know how many people are interested in this FRA.
