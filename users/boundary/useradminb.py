@@ -208,16 +208,19 @@ class SearchUserProfile:
     def search_profiles(self, query: str):
         return self.controller.search_profiles(query)
 
-@admin_profiles_bp.route('/search_profiles', methods=['GET'])
+@admin_profiles_bp.route('/search_profiles', methods=['POST'])
 def search_user_profiles():
     guard = require_admin_login()
     if guard:
         return jsonify({"success": False, "message": "Not logged in"}), 401
-    query = request.args.get('q', '').strip().lower()
+    body = request.get_json() or {}
+    query = body.get('name', '').strip().lower()
     boundary = SearchUserProfile()
     results = boundary.search_profiles(query)
     data = [{"name": p.name, "description": getattr(p, 'description', '')} for p in results]
-    return jsonify(data)
+    if not data:
+        return jsonify({"data": [], "message": "No profiles found."})
+    return jsonify({"data": data})
 
 
 '''
