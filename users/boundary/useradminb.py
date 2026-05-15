@@ -1,3 +1,4 @@
+# Entity imports (for type hints and asdict)
 from users.entity.useraccount import UserAccount
 from users.entity.userprofile import UserProfile
 

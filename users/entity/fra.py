@@ -77,7 +77,10 @@ class FRA:
 
         conn.close()
 
-        fra = FRA(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11])
+        # row[0]=id, row[1]=fraId, row[2]=title, row[3]=description, row[4]=category,
+        # row[5]=target_amount, row[6]=collected_amount, row[7]=start_date, row[8]=end_date,
+        # row[9]=status, row[10]=view_count, row[11]=location, row[12]=created_by
+        fra = FRA(row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12])
         return fra
         
 
@@ -157,7 +160,10 @@ class FRA:
 
         result = []
         for row in rows:
-            fra = FRA(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11])
+            # row[0]=id, row[1]=fraId, row[2]=title, row[3]=description, row[4]=category,
+            # row[5]=target_amount, row[6]=collected_amount, row[7]=start_date, row[8]=end_date,
+            # row[9]=status, row[10]=view_count, row[11]=location, row[12]=created_by
+            fra = FRA(row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12])
             result.append(fra)
         return result
 
@@ -176,6 +182,9 @@ class FRA:
         conn.close()
 
         if row:
+            # row[0]=id, row[1]=fraId, row[2]=title, row[3]=description, row[4]=category,
+            # row[5]=target_amount, row[6]=collected_amount, row[7]=start_date, row[8]=end_date,
+            # row[9]=status, row[10]=view_count, row[11]=location, row[12]=created_by
             return FRA(row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12])
 
         return None
@@ -265,7 +274,10 @@ class FRA:
         result = []
 
         for row in rows:
-            fra = FRA(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11])
+            # row[0]=id, row[1]=fraId, row[2]=title, row[3]=description, row[4]=category,
+            # row[5]=target_amount, row[6]=collected_amount, row[7]=start_date, row[8]=end_date,
+            # row[9]=status, row[10]=view_count, row[11]=location, row[12]=created_by
+            fra = FRA(row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12])
             result.append(fra)
 
         return result
@@ -284,7 +296,10 @@ class FRA:
         conn.close()
 
         if row:
-            fra =FRA(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11])
+            # row[0]=id, row[1]=fraId, row[2]=title, row[3]=description, row[4]=category,
+            # row[5]=target_amount, row[6]=collected_amount, row[7]=start_date, row[8]=end_date,
+            # row[9]=status, row[10]=view_count, row[11]=location, row[12]=created_by
+            fra = FRA(row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12])
             return fra
 
         return None

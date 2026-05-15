@@ -108,7 +108,7 @@ def update_category(category_name):
     if guard:
         return guard
     boundary = UpdateFRACategoryBoundary()
-    category = FRACategory.getCategory(category_name)
+    category = ViewFRACategoryController().viewFRACategory(category_name)
     
     if category is None:
         return "Category not found", 404

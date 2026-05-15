@@ -2,7 +2,7 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session
 from typing import List
 from users.control.fundraiserc import CreateFRAController, DisplayFRAController, ViewFRAController, UpdateFRAController, SuspendFRAController, SearchFRAController, SearchCompletedFRAHistoryController, ViewCompletedFRAController, ViewFRAShortlistCountController, ViewFRAViewStatsController
-from users.entity.fracategory import FRACategory
+from users.control.platform_managerc import  ViewAllFRACategoryController
 
 
 fundraiser_bp = Blueprint('fundraiser', __name__, url_prefix='/fundraiser')
@@ -52,7 +52,13 @@ def show_create_fra():
     guard = require_fundraiser_login()
     if guard:
         return guard
-    categories = [c.category_name for c in FRACategory.getAllCategory() if c.status == 1]
+    cat_controller = ViewAllFRACategoryController()
+
+    categories = [
+        c.category_name
+        for c in cat_controller.viewAllFRACategory()
+        if c.status == 1
+    ]
     return render_template('fundraiser/FundRaiserCreateFRA.html', categories=categories)
 
 class CreateFRAPage:
@@ -139,7 +145,8 @@ def show_update_page(fraId):
         return guard
     page = ViewFRAPage()
     fra = page.viewFRA(fraId)
-    categories = [c.category_name for c in FRACategory.getAllCategory() if c.status == 1]
+    cat_controller = ViewAllFRACategoryController()
+    categories = [c.category_name for c in cat_controller.viewAllFRACategory() if c.status == 1]
     
     return render_template('fundraiser/FundRaiserUpdateFRA.html', fra=fra, categories=categories)
     
@@ -308,7 +315,13 @@ def view_history():
     guard = require_fundraiser_login()
     if guard:
         return guard
-    categories = [c.category_name for c in FRACategory.getAllCategory() if c.status == 1]
+    cat_controller = ViewAllFRACategoryController()
+
+    categories = [
+        c.category_name
+        for c in cat_controller.viewAllFRACategory()
+        if c.status == 1
+    ]
     return render_template('fundraiser/FundRaiserHistory.html',categories=categories)
 
 class SearchCompletedFRAHistoryPage: 

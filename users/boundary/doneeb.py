@@ -13,6 +13,7 @@ from users.control.doneec import (
     SearchDonationHistoryController,
 )
 from users.control.fundraiserc import ViewFRAViewStatsController
+# Entity imports (for type hints and asdict)
 from users.entity.fra import FRA
 from users.entity.favourite import Favourite
 from users.entity.donationhistory import DonationHistory
