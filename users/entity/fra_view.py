@@ -13,8 +13,7 @@ class FRAView:
    fra_category: str
 
    """
-    User Story #40 (Platform Manager): As a platform manager, I want to generate a daily report, 
-    so that I can analyze the total number of views of all FRA and each FRA category.
+    User Story #40: As a platform manager, I want to generate a daily report, so that I can analyze the total number of views of all FRA and each FRA category.
     """
    @staticmethod
    def getViewsGroupedByDayAndCategory() -> List[dict]:
@@ -36,8 +35,7 @@ class FRAView:
          conn.close()
 
    """
-    User Story #41 (Platform Manager): As a platform manager, I want to generate a weekly report, 
-    so that I can analyze the total number of views of all FRA and each FRA category.
+    User Story #41: As a platform manager, I want to generate a weekly report, so that I can analyze the total number of views of all FRA and each FRA category.
     """
    @staticmethod
    def getViewsGroupedByWeekAndCategory() -> List[dict]:
@@ -61,8 +59,7 @@ class FRAView:
          conn.close()
 
    """
-    User Story #42 (Platform Manager): As a platform manager, I want to generate a monthly report, 
-    so that I can analyze the total number of views of all FRA and each FRA category.
+    User Story #42: As a platform manager, I want to generate a monthly report, so that I can analyze the total number of views of all FRA and each FRA category.
     """
    @staticmethod
    def getViewsGroupedByMonthAndCategory() -> List[dict]:

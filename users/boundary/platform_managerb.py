@@ -18,8 +18,10 @@ def require_manager_login():
         return redirect(url_for('user.show_login'))
     return None
 
-# ========== BCE BOUNDARY: CreateFRACategory ==========
-# User Story: #35 As a platform management, I want to create FRA categories
+
+'''
+User Story #35: As a platform manager, I want to create FRA categories so that I can create a new category for FRA.
+'''
 class CreateFRACategoryBoundary:
     def __init__(self):
         self.controller = CreateFRACategoryController()
@@ -56,8 +58,10 @@ def create_category():
     else:
         return jsonify({'success': False, 'message': boundary.displayFailure()})
 
-# ========== BCE BOUNDARY: ViewFRACategory ==========
-# User Story: #36 As a platform management, I want to view FRA categories
+
+'''
+User Story #36: As a platform manager, I want to view FRA categories so that I can view the FRA categories I created.
+'''
 class ViewFRACategoryBoundary:
     def __init__(self):
         self.controller = ViewFRACategoryController()
@@ -75,9 +79,10 @@ def view_category(category_name):
     # BCE BOUNDARY: displayViewResult() — Flask renders category details via Jinja2
     return render_template('platform_manager/PlatformManagerViewCategory.html', category=category)
 
-# ========== BCE BOUNDARY: UpdateFRACategory ==========
-# User Story: #37 As a platform management, I want to update FRA categories
-# HARDCODED — backend needs to:
+
+'''
+User Story #37: As a platform manager, I want to update FRA categories so that I can ensure the information is latest.
+'''
 # 1. Replace hardcoded return with real category data pre-filled
 # 2. Add POST route to process update
 # category = ViewFRACategoryBoundary().viewFRACategory(category_name)
@@ -141,6 +146,10 @@ def update_category_post(category_name):
     
     return jsonify(result)
 
+
+'''
+Not in user stories, but needed for the platform manager to view the list of FRA categories and manage them.
+'''
 class ViewAllFRACategoryBoundary:
     def __init__(self):
         self.controller = ViewAllFRACategoryController()
@@ -158,6 +167,41 @@ def view_all_category():
     
     return render_template('platform_manager/PlatformManagerCategories.html', categories=categories)
 
+
+'''
+User Story #38: As a platform manager, I want to suspend FRA categories so that I can make it easier for users to navigate the platform.
+'''   
+class SuspendFRACategoryBoundary:
+    def __init__(self):
+        self.controller = SuspendFRACategoryController()
+
+    def displaySuspendSuccess(self) -> str:
+        return 'Category suspended successfully!'
+
+    def displaySuspendFail(self) -> str:
+        return 'Failed to suspend category. Category may already be suspended or does not exist.'
+
+    def suspendFRACategory(self, category_name: str) -> bool:
+        return self.controller.suspendFRACategory(category_name)
+
+@platform_manager_bp.route('/suspend_category', methods=['POST'])
+def suspend_category():
+    guard = require_manager_login()
+    if guard:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
+    data = request.get_json()
+    category_name = data.get('category_name', '').strip()
+
+    boundary = SuspendFRACategoryBoundary()
+    if boundary.suspendFRACategory(category_name):
+        return jsonify({'success': True, 'message': boundary.displaySuspendSuccess()})
+    else:
+        return jsonify({'success': False, 'message': boundary.displaySuspendFail()})
+    
+
+'''
+User Story #39: As a platform manager, I want to search FRA categories so that I can filter the current FRA categories the platform has.
+'''
 class SearchFRACategory:
     def __init__(self):
         self.controller = SearchFRACategoryController()
@@ -186,35 +230,7 @@ def search_categories():
     
     return jsonify(data)
 
-# ========== BCE BOUNDARY: SuspendFRACategory ==========
-# User Story: #38 As a platform management, I want to suspend FRA categories
-class SuspendFRACategoryBoundary:
-    def __init__(self):
-        self.controller = SuspendFRACategoryController()
 
-    def displaySuspendSuccess(self) -> str:
-        return 'Category suspended successfully!'
-
-    def displaySuspendFail(self) -> str:
-        return 'Failed to suspend category. Category may already be suspended or does not exist.'
-
-    def suspendFRACategory(self, category_name: str) -> bool:
-        return self.controller.suspendFRACategory(category_name)
-
-@platform_manager_bp.route('/suspend_category', methods=['POST'])
-def suspend_category():
-    guard = require_manager_login()
-    if guard:
-        return jsonify({"success": False, "message": "Not logged in"}), 401
-    data = request.get_json()
-    category_name = data.get('category_name', '').strip()
-
-    boundary = SuspendFRACategoryBoundary()
-    if boundary.suspendFRACategory(category_name):
-        return jsonify({'success': True, 'message': boundary.displaySuspendSuccess()})
-    else:
-        return jsonify({'success': False, 'message': boundary.displaySuspendFail()})
-    
 # ========== BCE BOUNDARY: GenerateReport ==========
 # User Stories: #40 Daily, #41 Weekly, #42 Monthly
 
@@ -225,14 +241,12 @@ def show_reports():
         return guard
     return render_template('platform_manager/PlatformManagerReports.html')
 
-# ─────────────────────────────────────────────────────────────────────────────
-#  User Story #40 — Generate Daily Report
-# ─────────────────────────────────────────────────────────────────────────────
+"""
+User Story #40: As a platform manager, I want to generate a daily report, so that I can analyze the total number of views of all FRA and each FRA category.
+"""
 class DailyReportBoundary:
     """
     Boundary: GenerateDailyReport
-    User Story #40 (Platform Manager): As a platform manager, I want to generate a daily report, 
-    so that I can analyze the total number of views of all FRA and each FRA category.
     Sequence: Platform Manager → GenerateDailyReport → DailyReportController → FRA and FRACategory data
     """
     def __init__(self):
@@ -250,14 +264,13 @@ def daily_report():
     daily = boundary.generateDailyReport()
     return render_template('platform_manager/PlatformManagerDailyReport.html', daily=daily)
 
-# ─────────────────────────────────────────────────────────────────────────────
-#  User Story #41 — Generate Weekly Report
-# ─────────────────────────────────────────────────────────────────────────────
+
+"""
+User Story #41: As a platform manager, I want to generate a weekly report, so that I can analyze the total number of views of all FRA and each FRA category.
+"""
 class WeeklyReportBoundary:
     """
     Boundary: GenerateWeeklyReport
-    User Story #41 (Platform Manager): As a platform manager, I want to generate a weekly report, 
-    so that I can analyze the total number of views of all FRA and each FRA category.
     Sequence: Platform Manager → GenerateWeeklyReport → WeeklyReportController → FRA and FRACategory data
     """
     def __init__(self):
@@ -275,14 +288,13 @@ def weekly_report():
     weekly = boundary.generateWeeklyReport()
     return render_template('platform_manager/PlatformManagerWeeklyReport.html', weekly=weekly)
 
-# ─────────────────────────────────────────────────────────────────────────────
-#  User Story #42 — Generate Monthly Report
-# ─────────────────────────────────────────────────────────────────────────────
+
+"""
+User Story #42: As a platform manager, I want to generate a monthly report, so that I can analyze the total number of views of all FRA and each FRA category.
+"""
 class MonthlyReportBoundary:
     """
     Boundary: GenerateMonthlyReport
-    User Story #42 (Platform Manager): As a platform manager, I want to generate a monthly report, 
-    so that I can analyze the total number of views of all FRA and each FRA category.
     Sequence: Platform Manager → GenerateMonthlyReport → MonthlyReportController → FRA and FRACategory data
     """
     def __init__(self):

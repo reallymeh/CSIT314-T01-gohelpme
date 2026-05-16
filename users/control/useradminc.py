@@ -127,7 +127,9 @@ class SearchUserAccountController:
     def searchUserAccounts(self, query: str) -> List[UserAccount]:
         return UserAccount.searchAccounts(query)
 
-
+'''
+Not specifically mentioned in user stories, but needed for the donee to view the list of active FRAs and find one they are interested in.
+'''
 @dataclass
 class DisplayUserProfileController:
     def displayUserProfile(self) -> List[UserProfile]:

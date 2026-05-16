@@ -74,10 +74,9 @@ def api_view_all_fra():
     })
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-#  User Story #26 — Search all active FRAs by name
-# ─────────────────────────────────────────────────────────────────────────────
-
+"""
+User Story #26: As a Donee, I want to search all active FRA by name so that I can find a specific FRA that I am interested in.
+"""
 class SearchActiveFRAPage:
     """
     Boundary: SearchActiveFRAPage
@@ -118,10 +117,9 @@ def api_search_fra():
     })
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-#  User Story #27 — View a FRA
-# ─────────────────────────────────────────────────────────────────────────────
-
+"""
+User Story #27: As a Donee, I want to view an active FRA so that I can view existing FRA information that needs donation.
+"""
 class ViewActiveFRAPage:
     """
     Boundary: ViewActiveFRAPage
@@ -164,10 +162,9 @@ def view_fra(fraId):
     return render_template('donee/DoneeViewFRA.html', fra=fra, is_favourited=is_fav)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-#  User Story #28 — Save a FRA to favourite list
-# ─────────────────────────────────────────────────────────────────────────────
-
+"""
+User Story #28: As a Donee, I want to save a FRA to my favourite list so that I can decide on a donation later.
+"""
 class SaveFavouritePage:
     """
     Boundary: SaveFavouritePage
@@ -256,10 +253,9 @@ def remove_favourite():
     return jsonify({"success": removed, "message": page.displaySuccess() if removed else page.displayError()})
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-#  User Story #29 — Search FRA in favourite list by name
-# ─────────────────────────────────────────────────────────────────────────────
-
+"""
+User Story #29: As a Donee, I want to search for an active FRA in my favourite list by name so that I can find a specific FRA within the favourite list.
+"""
 class SearchFavouritePage:
     """
     Boundary: SearchFavouritePage
@@ -301,10 +297,9 @@ def api_search_favourites():
     })
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-#  User Story #30 — View all FRAs in favourite list
-# ─────────────────────────────────────────────────────────────────────────────
-
+"""
+User Story #30: As a Donee, I want to view FRA in my favourite list so that I can view all FRA within the favourite list.
+"""
 class ViewFavouritePage:
     """
     Boundary: ViewFavouritePage
@@ -352,10 +347,9 @@ def api_view_favourites():
     })
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-#  User Story #31 — Search donation history by FRA category and date period
-# ─────────────────────────────────────────────────────────────────────────────
-
+"""
+User Story #31: As a Donee, I want to search history of donation byFRA category and date period so that I can find a specific FRA I had donated.
+"""
 class SearchDonationHistoryPage:
     """
     Boundary: SearchDonationHistoryPage
@@ -401,10 +395,9 @@ def api_search_history():
     })
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-#  User Story #32 — View all donation history
-# ─────────────────────────────────────────────────────────────────────────────
-
+"""
+User Story #32: As a Donee, I want to view the history of donation so that I can evaluate the impact of my donation and consider another donation.
+"""
 class ViewDonationHistoryPage:
     """
     Boundary: ViewDonationHistoryPage

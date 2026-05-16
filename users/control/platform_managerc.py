@@ -3,23 +3,49 @@ from typing import List, Dict, Any
 
 from users.entity.fra_view import FRAView
 
+'''
+User Story #35: As a platform manager, I want to create FRA categories so that I can create a new category for FRA.
+'''
 class CreateFRACategoryController:
     def createFRACategory(self, cat_name: str, description: str, status: int) -> bool:
         return FRACategory.createCategory(cat_name, description, status)
 
+
+'''
+User Story #36: As a platform manager, I want to view FRA categories so that I can view the FRA categories I created.
+'''
 class ViewFRACategoryController:
     def viewFRACategory(self, category_name: str) -> FRACategory | None:
         return FRACategory.getCategory(category_name)
 
-# check for backend for this user story
+
+'''
+User Story #37: As a platform manager, I want to update FRA categories so that I can ensure the information is latest.
+'''
 class UpdateFRACategoryController:
     def updateFRACategory(self, old_name: str, new_name: str, description: str, status: int) -> bool:
         return FRACategory.updateFRACategory(old_name, new_name, description, status)
-    
+
+
+'''
+Not in user stories, but needed for the platform manager to view the list of FRA categories and manage them.
+'''
 class ViewAllFRACategoryController:
     def viewAllFRACategory(self):
         return FRACategory.getAllCategory()
 
+
+'''
+User Story #38: As a platform manager, I want to suspend FRA categories so that I can make it easier for users to navigate the platform.
+'''   
+class SuspendFRACategoryController:
+    def suspendFRACategory(self, category_name: str) -> bool:
+        return FRACategory.suspendCategory(category_name)
+    
+    
+'''
+User Story #39: As a platform manager, I want to search FRA categories so that I can filter the current FRA categories the platform has.
+'''
 class SearchFRACategoryController:
     def searchFRACategory(self, query: str) -> List["FRACategory"]:
         all_profiles = FRACategory.getAllCategory()
@@ -35,15 +61,11 @@ class SearchFRACategoryController:
         ]
         return results
     
-class SuspendFRACategoryController:
-    def suspendFRACategory(self, category_name: str) -> bool:
-        return FRACategory.suspendCategory(category_name)
-    
+
+"""
+User Story #40: As a platform manager, I want to generate a daily report, so that I can analyze the total number of views of all FRA and each FRA category.
+"""
 class DailyReportController:
-    """
-    User Story #40 (Platform Manager): As a platform manager, I want to generate a daily report, 
-    so that I can analyze the total number of views of all FRA and each FRA category.
-    """
     def generateDailyReport(self) -> Dict[str, Any]:
         category_rows = FRAView.getViewsGroupedByDayAndCategory()
         categories = sorted({r["fra_category"] for r in category_rows})
@@ -56,11 +78,11 @@ class DailyReportController:
         ]
         return {"total_views": sum(r["count"] for r in rows), "categories": categories, "rows": rows}
 
+
+"""
+User Story #41: As a platform manager, I want to generate a weekly report, so that I can analyze the total number of views of all FRA and each FRA category.
+"""
 class WeeklyReportController:
-    """
-    User Story #41 (Platform Manager): As a platform manager, I want to generate a weekly report, 
-    so that I can analyze the total number of views of all FRA and each FRA category.
-    """
     def generateWeeklyReport(self) -> Dict[str, Any]:
         category_rows = FRAView.getViewsGroupedByWeekAndCategory()
         categories = sorted({r["fra_category"] for r in category_rows})
@@ -73,11 +95,11 @@ class WeeklyReportController:
         ]
         return {"total_views": sum(r["count"] for r in rows), "categories": categories, "rows": rows}
 
+
+"""
+User Story #42: As a platform manager, I want to generate a monthly report, so that I can analyze the total number of views of all FRA and each FRA category.
+"""
 class MonthlyReportController:
-    """
-    User Story #42 (Platform Manager): As a platform manager, I want to generate a monthly report, 
-    so that I can analyze the total number of views of all FRA and each FRA category.
-    """
     def generateMonthlyReport(self) -> Dict[str, Any]:
         category_rows = FRAView.getViewsGroupedByMonthAndCategory()
         categories = sorted({r["fra_category"] for r in category_rows})

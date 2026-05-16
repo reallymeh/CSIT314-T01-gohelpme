@@ -2,6 +2,9 @@ from users.entity.useraccount import UserAccount
 
 '''
 User Story #13: As a user admin, I want to log in my user account so that I can access the platform.
+User Story #24: As a Fund Raiser, I want to log in my user account so that I can start a session.
+User Story #33: As a Donee, I want to log in my user account so that I can start a session.
+User Story #43: As a Platform Manager, I want to log in my user account so that I can start a session.
 '''
 class LoginController:
     def login(self, email_address: str, password: str) -> bool:

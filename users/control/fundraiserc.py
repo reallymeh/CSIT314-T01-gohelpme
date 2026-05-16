@@ -87,7 +87,7 @@ class ViewCompletedFRAController:
     
 
 '''
-User Story #344: As a Fund Raiser, I want to view all FRAs so that I can view many FRAs at the same time .
+Not specifically mentioned in user stories, but needed for the fund raiser to view the list of their FRAs and manage them.
 '''
 class DisplayFRAController:
     def displayFRA(self) -> list[FRA]:

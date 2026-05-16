@@ -11,6 +11,9 @@ def homepage():
 
 '''
 User Story #13: As a user admin, I want to log in my user account so that I can access the platform.
+User Story #24: As a Fund Raiser, I want to log in my user account so that I can start a session.
+User Story #33: As a Donee, I want to log in my user account so that I can start a session.
+User Story #43: As a Platform Manager, I want to log in my user account so that I can start a session.
 '''
 @user_bp.route('/login', methods=['GET'])
 def show_login():
@@ -63,7 +66,10 @@ def login():
     })
 
 '''
-User Story #13: As a user admin, I want to log in my user account so that I can access the platform.
+User Story #14: As a user admin, I want to log out my user account so that I can end my session.
+User Story #25: As a Fund Raiser, I want to log out my user account so that I can end a session.
+User Story #34: As a Donee, I want to log out my user account so that I can end a session.
+User Story #44: As a platform manager, I want to log out my user account so that I can end a session.
 '''
 class LogoutPage:
     def logout(self):

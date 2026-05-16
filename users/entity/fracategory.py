@@ -8,6 +8,9 @@ class FRACategory:
     description: str
     status: int
 
+    '''
+    User Story #35: As a platform manager, I want to create FRA categories so that I can create a new category for FRA.
+    '''
     @staticmethod
     def createCategory(cat_name: str, description: str, status: int) -> bool:
         if FRACategory.checkCategoryExist(cat_name):
@@ -38,6 +41,10 @@ class FRACategory:
         conn.close()
         return res is not None
 
+    
+    '''
+    User Story #36: As a platform manager, I want to view FRA categories so that I can view the FRA categories I created.
+    '''
     @staticmethod
     def getCategory(category_name: str) -> "FRACategory | None":
         conn, cur = connect_db()
@@ -52,26 +59,10 @@ class FRACategory:
             return None
         return FRACategory(row[0], row[1], row[2])
     
-    @staticmethod
-    def getAllCategory() -> List["FRACategory"]:
-        conn, cur = connect_db()
-        try:
-            result = cur.execute(
-                "SELECT * FROM fra_category"
-            )
-            rows = result.fetchall()
-            return [
-            FRACategory(name, description, status)
-            for name, description, status in rows
-            ]
-
-        except Exception as e:
-            print(e)
-        finally:
-            cur.close()
-            conn.close()
     
-    # check for backend for this user story
+    '''
+    User Story #37: As a platform manager, I want to update FRA categories so that I can ensure the information is latest.
+    '''
     @staticmethod
     def updateFRACategory(old_name: str, new_name: str, description: str, status: int) -> bool:
         conn, cur = connect_db()
@@ -92,6 +83,10 @@ class FRACategory:
             cur.close()
             conn.close()
 
+
+    '''
+    User Story #38: As a platform manager, I want to suspend FRA categories so that I can make it easier for users to navigate the platform.
+    '''
     @staticmethod
     def suspendCategory(category_name: str) -> bool:
         conn, cur = connect_db()
@@ -123,3 +118,27 @@ class FRACategory:
             cur.close()
             conn.close()
         
+        
+    '''
+    User Story #39: As a platform manager, I want to search FRA categories so that I can filter the current FRA categories the platform has.
+    '''
+    @staticmethod
+    def getAllCategory() -> List["FRACategory"]:
+        conn, cur = connect_db()
+        try:
+            result = cur.execute(
+                "SELECT * FROM fra_category"
+            )
+            rows = result.fetchall()
+            return [
+            FRACategory(name, description, status)
+            for name, description, status in rows
+            ]
+
+        except Exception as e:
+            print(e)
+        finally:
+            cur.close()
+            conn.close()
+    
+    

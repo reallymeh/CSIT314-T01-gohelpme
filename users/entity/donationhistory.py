@@ -19,8 +19,7 @@ class DonationHistory:
     donation_date: str
 
     """
-    User Story #31 (Donee): As a Donee, I want to search history of donation by
-    FRA category and date period so that I can find a specific FRA I had donated.
+    User Story #31: As a Donee, I want to search history of donation by FRA category and date period so that I can find a specific FRA I had donated.
     """
     @staticmethod
     def searchHistory(donee_email: str, category: str,
@@ -58,8 +57,7 @@ class DonationHistory:
         ]
 
     """
-    User Story #32 (Donee): As a Donee, I want to view the history of donation
-    so that I can evaluate the impact of my donation and consider another donation.
+    User Story #32: As a Donee, I want to view the history of donation so that I can evaluate the impact of my donation and consider another donation.
     """
     @staticmethod
     def viewHistory(donee_email: str) -> List["DonationHistory"]:

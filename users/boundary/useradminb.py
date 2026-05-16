@@ -422,6 +422,8 @@ def search_user_accounts_api():
     return jsonify(data), 200
 
 
+'''Not specifically mentioned in user stories, but needed for the admin to view the list of user profiles and accounts.'''
+
 class DisplayUserProfile:
     def __init__(self):
         self.controller = DisplayUserProfileController()
