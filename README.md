@@ -89,7 +89,6 @@ users/
     fundraiserc.py            # Fund Raiser controllers
     doneec.py                 # Donee controllers
   entity/
-    user.py
     useraccount.py
     userprofile.py
     fra.py

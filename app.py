@@ -20,13 +20,6 @@ def create_app():
     app.register_blueprint(user_bp)
     app.register_blueprint(donee_bp)
 
-    '''# Redirect to login page when accessing root URL
-    @app.route('/')
-    def index():
-        return redirect('/admin/login')
-    return app
-    '''
-
     return app
 
 if __name__ == '__main__':
